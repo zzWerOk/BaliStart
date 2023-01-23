@@ -59,6 +59,7 @@ const MapPoint = sequelize.define('map_point', {
     deleted_date: {type: DataTypes.BIGINT}
 })
 
+
 const Topics = sequelize.define('topics', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, allowNull: false},
