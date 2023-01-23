@@ -22,11 +22,11 @@ const Guide = sequelize.define('guide', {
     phone: {type: DataTypes.STRING, allowNull: false},
     is_has_car: {type: DataTypes.BOOLEAN},
     languages: {type: DataTypes.STRING, allowNull: false},
-    tours_ids: {type: DataTypes.ARRAY(DataTypes.INTEGER)},
+    tours_ids: {type: DataTypes.INTEGER},
     is_emergency_help: {type: DataTypes.BOOLEAN},
     emergency_help_price: {type: DataTypes.STRING},
     is_can_discount: {type: DataTypes.BOOLEAN},
-    holidays: {type: DataTypes.ARRAY(DataTypes.INTEGER)}
+    holidays: {type: DataTypes.INTEGER}
 })
 
 const Tours = sequelize.define('tours', {
@@ -34,14 +34,15 @@ const Tours = sequelize.define('tours', {
     name: {type: DataTypes.STRING, allowNull: false},
     description: {type: DataTypes.STRING},
     image_logo: {type: DataTypes.STRING, allowNull: false},
-    images: {type: DataTypes.ARRAY(DataTypes.STRING)},
-    videos: {type: DataTypes.ARRAY(DataTypes.STRING)},
-    tracks: {type: DataTypes.ARRAY(DataTypes.STRING)},
-    deleted: {type: DataTypes.BOOLEAN, defaultValue: false},
     created_by_user_id: {type: DataTypes.INTEGER},
     created_date: {type: DataTypes.BIGINT},
-    deleted_by_user_id: {type: DataTypes.INTEGER},
-    deleted_date: {type: DataTypes.BIGINT}
+    tour_category: {type: DataTypes.STRING},
+    tour_type: {type: DataTypes.STRING},
+    duration: {type: DataTypes.STRING},
+    activity_level: {type: DataTypes.STRING},
+    languages: {type: DataTypes.STRING},
+    file_name: {type: DataTypes.STRING},
+
 })
 
 const MapPoint = sequelize.define('map_point', {
@@ -49,16 +50,12 @@ const MapPoint = sequelize.define('map_point', {
     name: {type: DataTypes.STRING, allowNull: false},
     description: {type: DataTypes.STRING},
     image_logo: {type: DataTypes.STRING, allowNull: false},
-    images: {type: DataTypes.ARRAY(DataTypes.STRING)},
-    videos: {type: DataTypes.ARRAY(DataTypes.STRING)},
     google_map_url: {type: DataTypes.STRING},
-    deleted: {type: DataTypes.BOOLEAN, defaultValue: false},
     created_by_user_id: {type: DataTypes.INTEGER},
     created_date: {type: DataTypes.BIGINT},
-    deleted_by_user_id: {type: DataTypes.INTEGER},
-    deleted_date: {type: DataTypes.BIGINT}
-})
+    file_name: {type: DataTypes.STRING},
 
+})
 
 const Topics = sequelize.define('topics', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -75,7 +72,6 @@ const Topics = sequelize.define('topics', {
     deleted_by_user_id: {type: DataTypes.INTEGER},
     deleted_date: {type: DataTypes.BIGINT},
     file_name: {type: DataTypes.STRING},
-
 })
 
 const TopicsCategory = sequelize.define('topics_category', {
@@ -107,7 +103,7 @@ User.hasOne(Topics)
 Topics.belongsTo(User)
 
 Guide.hasMany(Tours)
-Tours.belongsTo(Guide)
+// Tours.belongsTo(Guide)
 
 Tours.hasMany(MapPoint)
 MapPoint.belongsTo(Tours)

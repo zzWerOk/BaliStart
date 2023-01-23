@@ -9,6 +9,7 @@ import TopicDetailsStore from "./store/TopicDetailsStore";
 import UserListStore from "./store/UserListStore";
 import NavBarStore from "./store/NavBarStore";
 import {BrowserRouter} from "react-router-dom";
+import MapPointsStore from "./store/MapPointsStore";
 
 export const Context = createContext(null)
 
@@ -19,6 +20,7 @@ root.render(
         userList: new UserListStore(),
         topicsCategoryStore: new TopicsCategoryStore(),
         topicsStore: new TopicsStore(),
+        mapPointsStore: new MapPointsStore(),
         topicDetailsStore: new TopicDetailsStore(),
         navBarTitle: new NavBarStore()
     }}>

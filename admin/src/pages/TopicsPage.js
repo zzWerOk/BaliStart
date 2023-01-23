@@ -45,25 +45,11 @@ const ToursPage = () => {
 
                 if (tuData.date !== lastDateTable) {
                     getAllData()
-                    // getAll().then(data => {
-                    //
-                    //     if (data.hasOwnProperty('rows')) {
-                    //
-                    //         topicsStore.saveTopicsListRows(data.rows)
-                    //
-                    //         /**
-                    //          Сохраняем список пользователей преобразовав его в строку
-                    //          **/
-                    //     }
-                    // }).finally(() => {
-                    //     topicsStore.loadTopicsList()
-                    //     setLoading(false)
-                    // })
                     /**
                      Сохраняем дату последнего изменения таблицы
                      **/
                     topicsStore.saveLastDateTableTopics(tuData.date)
-                }else{
+                } else {
                     topicsStore.loadTopicsList()
                     setLoading(false)
                 }
