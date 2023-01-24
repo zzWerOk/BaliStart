@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../index";
 import SpinnerSM from "../components/SpinnerSM";
-import {getAll} from "../http/topicsAPI";
+import {getAll} from "../http/mapPointsAPI";
 import {delay} from "../utils/consts";
 import {getTableUpdateByName} from "../http/tableUpdatesAPI";
 

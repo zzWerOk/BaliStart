@@ -49,6 +49,7 @@ const MapPoint = sequelize.define('map_point', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, allowNull: false},
     description: {type: DataTypes.STRING},
+    topics: {type: DataTypes.STRING},
     image_logo: {type: DataTypes.STRING, allowNull: false},
     google_map_url: {type: DataTypes.STRING},
     created_by_user_id: {type: DataTypes.INTEGER},

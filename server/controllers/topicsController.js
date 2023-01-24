@@ -5,137 +5,158 @@ const uniqueFilename = require("unique-filename");
 const path = require("path");
 const {rows} = require("pg/lib/defaults");
 const {Op} = require("sequelize");
+const {createNewFile} = require("../utils/consts.js");
+const {reWrightFile, readFile, removeFile} = require("../utils/consts");
 
 
-const removeFile = (fileName) => {
-
-    try {
-        const filePath = path.resolve(__dirname, '..', "data", fileName)
-        // let data = fs.readFileSync(filePath, 'utf8')
-
-        fs.unlinkSync(filePath)
-
-        return {status: 'ok'}
-    } catch (e) {
-        throw e
-        // return {status: 'error', message: e.message}
-    }
-
-}
-
-const readFile = (fileName) => {
-
-    try {
-        const filePath = path.resolve(__dirname, '..', "data", fileName)
-        let data = fs.readFileSync(filePath, 'utf8')
-        return {status: 'ok', data}
-    } catch (e) {
-        return {status: 'error', message: e.message}
-    }
-
-}
-
-const reWrightFile = (textData, tableName, fileName, next) => {
-    try {
-        let dirName = getDirName(tableName)
-
-        const dirPath = path.resolve(__dirname, '..', "data")
-        fs.mkdir(dirPath, (err) => {
-            if (err) {
-                return {err}
-            }
-        });
-        fs.mkdir(dirPath + "/" + dirName, (err) => {
-            if (err) {
-                return {err}
-            }
-        });
-
-        const filePath = path.resolve(__dirname, '..', "data", fileName)
-
-        fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
-            return {error: 'error', message: err}
-        })
-
-        // addNewFileNameToTable(tableName, fileName, () => {})
-        return {status: 'ok', fileName: fileName}
-
-    } catch (e) {
-        // return {error: e.message}
-    }
-    return {error: "Ошибка создания файла"}
-}
-
-const createNewFile = (textData, tableName, next) => {
-    try {
-        let dirName = getDirName(tableName)
-
-        const fileName = getFreeFileName(dirName)
-        const dirPath = path.resolve(__dirname, '..', "data")
-        fs.mkdir(dirPath, (err) => {
-            if (err) {
-                return {err}
-            }
-        });
-        fs.mkdir(dirPath + "/" + dirName, (err) => {
-            if (err) {
-                return {err}
-            }
-        });
-
-        const filePath = path.resolve(__dirname, '..', "data", fileName)
-
-        fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
-            return {error: 'error', message: err}
-        })
-
-        addNewFileNameToTable(tableName, fileName, () => {
-        })
-        return {status: 'ok', fileName: fileName}
-
-    } catch (e) {
-        // return {error: e.message}
-    }
-    return {error: "Ошибка создания файла"}
-}
-
-const getDirName = (tableName) => {
-    let dirName = 'static'
-
-    switch (tableName) {
-        case 'Topics':
-            dirName = 'topics'
-            break
-        case 'MapPoint':
-            dirName = 'mappoint'
-            break
-        case 'img':
-            dirName = 'static'
-            break
-        case 'Tour':
-            dirName = 'tour'
-            break
-        default:
-            dirName = 'other'
-            break
-    }
-    return dirName
-}
-
-const getFreeFileName = (dirName) => {
-    let fileName = ''
-    let fileCandidate = null
-    while (!fileCandidate) {
-        fileName = uniqueFilename(dirName)
-        fileCandidate = Files.findOne({where: {file_name: fileName}})
-    }
-
-    return fileName
-}
-
-const addNewFileNameToTable = (tableName, fileName, next) => {
-    Files.create({table_name: tableName, file_name: fileName}).then(next)
-}
+// module.exports.removeFile = function (fileName) {
+// // const removeFile = (fileName) => {
+//
+//     try {
+//         const filePath = path.resolve(__dirname, '..', "data", fileName)
+//         // let data = fs.readFileSync(filePath, 'utf8')
+//
+//         fs.unlinkSync(filePath)
+//
+//         return {status: 'ok'}
+//     } catch (e) {
+//         throw e
+//         // return {status: 'error', message: e.message}
+//     }
+//
+// }
+//
+// module.exports.readFile = function (fileName) {
+// // const readFile = (fileName) => {
+//
+//     try {
+//         const filePath = path.resolve(__dirname, '..', "data", fileName)
+//         let data = fs.readFileSync(filePath, 'utf8')
+//         return {status: 'ok', data}
+//     } catch (e) {
+//         return {status: 'error', message: e.message}
+//     }
+//
+// }
+//
+// module.exports.reWrightFile = function (textData, tableName, fileName, next) {
+// // const reWrightFile = (textData, tableName, fileName, next) => {
+//     try {
+//         let dirName = getDirName(tableName)
+//
+//         const dirPath = path.resolve(__dirname, '..', "data")
+//         fs.mkdir(dirPath, (err) => {
+//             if (err) {
+//                 return {err}
+//             }
+//         });
+//         fs.mkdir(dirPath + "/" + dirName, (err) => {
+//             if (err) {
+//                 return {err}
+//             }
+//         });
+//
+//         const filePath = path.resolve(__dirname, '..', "data", fileName)
+//
+//         fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
+//             return {error: 'error', message: err}
+//         })
+//
+//         // addNewFileNameToTable(tableName, fileName, () => {})
+//         return {status: 'ok', fileName: fileName}
+//
+//     } catch (e) {
+//         // return {error: e.message}
+//     }
+//     return {error: "Ошибка создания файла"}
+// }
+//
+// module.exports.createNewFile = function (textData, tableName, img, next) {
+// // export const createNewFile = (textData, tableName, img, next) => {
+//     try {
+//         let dirName = getDirName(tableName)
+//
+//         const fileName = getFreeFileName(dirName)
+//         const dirPath = path.resolve(__dirname, '..', "data")
+//         fs.mkdir(dirPath, (err) => {
+//             if (err) {
+//                 return {err}
+//             }
+//         });
+//         fs.mkdir(dirPath + "/" + dirName, (err) => {
+//             if (err) {
+//                 return {err}
+//             }
+//         });
+//
+//         const filePath = path.resolve(__dirname, '..', "data", fileName)
+//
+//         fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
+//             return {error: 'error', message: err}
+//         })
+//
+//         addNewFileNameToTable(tableName, fileName)
+//
+//         let imgFileName = ''
+//         if (img) {
+//             try {
+//                 imgFileName = fileName.split('\\')[1]
+//                 img.mv(path.resolve(__dirname, '..', "static", imgFileName)).then(r => {
+//                     return {status: 'ok', fileName: fileName, imgFileName: r}
+//                 })
+//             } catch (e) {
+//                 return {status: 'error', message: e.message}
+//             }
+//         }
+//
+//         return {status: 'ok', fileName: fileName}
+//
+//     } catch (e) {
+//         // return {error: e.message}
+//     }
+//     return {error: "Ошибка создания файла"}
+// }
+//
+// module.exports.getDirName = function (tableName) {
+// // export const getDirName = (tableName) => {
+//     let dirName = 'static'
+//
+//     switch (tableName) {
+//         case 'Topics':
+//             dirName = 'topics'
+//             break
+//         case 'MapPoint':
+//             dirName = 'mappoint'
+//             break
+//         case 'img':
+//             dirName = 'static'
+//             break
+//         case 'Tour':
+//             dirName = 'tour'
+//             break
+//         default:
+//             dirName = 'other'
+//             break
+//     }
+//     return dirName
+// }
+//
+// module.exports.getFreeFileName = function (dirName) {
+// // export const getFreeFileName = (dirName) => {
+//     let fileName = ''
+//     let fileCandidate = null
+//     while (!fileCandidate) {
+//         fileName = uniqueFilename(dirName)
+//         fileCandidate = Files.findOne({where: {file_name: fileName}})
+//     }
+//
+//     return fileName
+// }
+//
+// module.exports.addNewFileNameToTable = function (tableName, fileName, next) {
+// // export const addNewFileNameToTable = (tableName, fileName, next) => {
+//     Files.create({table_name: tableName, file_name: fileName}).then(next)
+// }
 
 class TopicsController {
 
@@ -162,21 +183,27 @@ class TopicsController {
                 img = req.files.img
             }
 
+
             if (name && created_by_user_id) {
-                const result = createNewFile(dataText, 'Topics')
+                const result = createNewFile(dataText, 'Topics', img)
 
                 if (result.hasOwnProperty('status')) {
                     if (result.status === 'ok') {
                         const fileName = result.fileName
                         let imgFileName = ''
-                        try {
-                            if (img) {
-                                imgFileName = fileName.split('\\')[1]
-                                await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
-                            }
-                        } catch (e) {
-                            return res.json({status: 'error', message: e.message})
+                        if(result.imgFileName){
+                            imgFileName = result.imgFileName
                         }
+
+                        // let imgFileName = ''
+                        // try {
+                        //     if (img) {
+                        //         imgFileName = fileName.split('\\')[1]
+                        //         await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                        //     }
+                        // } catch (e) {
+                        //     return res.json({status: 'error', message: e.message})
+                        // }
 
                         const newTopic = await Topics.create({
                             name: name,
@@ -211,6 +238,8 @@ class TopicsController {
                         }
 
                         return res.json({status: 'ok', id: newTopic.id})
+                    }else{
+                        return res.json({status: 'error', message: result.message})
                     }
                 }
                 return res.json({status: 'error', message: 'Create file error'})
@@ -415,8 +444,8 @@ class TopicsController {
                 count: newRows.length,
                 'rows': newRows
             })
-        }catch (e) {
-            return res.json({'status': 'error', 'message': e.message})
+        } catch (e) {
+            // return res.json({'status': 'error', 'message': e.message})
 
             return next(ApiError.internal("Ошибка параметра"))
         }
