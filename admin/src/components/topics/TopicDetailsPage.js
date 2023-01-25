@@ -100,7 +100,14 @@ const TopicDetailsPage = observer((props) => {
             setIsActive(currTopic.active)
             setTopicCategoriesItems(topicsCategoryStore.getSavedTopicsCategoryList())
             setTopicTags(currTopic.tagJSON)
-            setItemImageLogo(currTopic.image_logo + '?' + Date.now())
+
+            if (item.image_logo) {
+                if (item.id >= 0) {
+                    setItemImageLogo(currTopic.image_logo + '?' + Date.now())
+                }
+            }
+
+            // setItemImageLogo(currTopic.image_logo + '?' + Date.now())
 
             if (Object.keys(currTopic.dataJSON).length === 0) {
                 delay(0).then(r => {

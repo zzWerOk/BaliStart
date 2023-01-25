@@ -52,6 +52,7 @@ const MapPoint = sequelize.define('map_point', {
     topics: {type: DataTypes.STRING},
     image_logo: {type: DataTypes.STRING, allowNull: false},
     google_map_url: {type: DataTypes.STRING},
+    active: {type: DataTypes.BOOLEAN, defaultValue: true},
     created_by_user_id: {type: DataTypes.INTEGER},
     created_date: {type: DataTypes.BIGINT},
     file_name: {type: DataTypes.STRING},

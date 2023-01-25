@@ -4,11 +4,13 @@ import SpinnerSM from "../components/SpinnerSM";
 import {getAll} from "../http/mapPointsAPI";
 import {delay} from "../utils/consts";
 import {getTableUpdateByName} from "../http/tableUpdatesAPI";
+import MapPointsList from "../components/mappoints/MapPointsList";
 
 const MapPointPage = () => {
     const {navBarTitle} = useContext(Context)
-    const {mapPointsStore} = useContext(Context)
+    const {mapPointsStore, user} = useContext(Context)
     const [loading, setLoading] = useState(true)
+    const [redraw, setRedraw] = useState(true)
 
     const getAllData = () => {
         setLoading(true)
@@ -22,6 +24,7 @@ const MapPointPage = () => {
                  Сохраняем список пользователей преобразовав его в строку
                  **/
             }
+
         }).finally(() => {
             mapPointsStore.loadMapPointsList()
             setLoading(false)
@@ -54,15 +57,19 @@ const MapPointPage = () => {
         })
     }, [])
 
+    const redrawPage = () => {
+        setRedraw(!redraw)
+    }
+
 
     if (loading) {
         return <SpinnerSM/>
     } else {
         return (
             <div>
-                MapPoint PAGE
+                <MapPointsList getAllData={getAllData} redrawPage={redrawPage}/>
             </div>
-        );
+        )
     }
 };
 

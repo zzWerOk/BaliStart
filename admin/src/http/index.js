@@ -19,11 +19,11 @@ const authInterceptor = config => {
     return config
 }
 
-const fileInterceptor = config => {
-    config.headers.authorization = `Bearer ${localStorage.getItem('token')}`
-    config.headers['Content-Type'] = 'multipart/form-data'
-    return config
-}
+// const fileInterceptor = config => {
+//     config.headers.authorization = `Bearer ${localStorage.getItem('token')}`
+//     config.headers['Content-Type'] = 'multipart/form-data'
+//     return config
+// }
 
 $authHost.interceptors.request.use(authInterceptor)
 $authHostUpload.interceptors.request.use(authInterceptor)

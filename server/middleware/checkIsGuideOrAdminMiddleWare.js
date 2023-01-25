@@ -12,7 +12,7 @@ module.exports = function (req, res, next) {
         }
         const decoded = jwt.verify(token, process.env.SECRET_KEY)
 
-        if(!decoded.isAdmin || !decoded.isGuide){
+        if(!decoded.isAdmin && !decoded.isGuide){
             return next(ApiError.forbidden("Нет доступа"))
         }
 

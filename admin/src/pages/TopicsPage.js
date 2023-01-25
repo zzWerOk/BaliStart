@@ -81,7 +81,6 @@ const ToursPage = () => {
                             <TopicsList getAllData={getAllData} redrawPage={redrawPage}/>
                         </div>
                 }
-
             </div>
         )
     }

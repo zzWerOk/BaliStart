@@ -16,6 +16,20 @@ export default class MapPointsStore {
         return localStorage.getItem("lastDateTableMapPoints")
     }
 
+    get getMapPointList() {
+        let rows = JSON.parse(this._mapPoints)
+        try {
+            return rows
+        } catch (e) {
+        }
+        return null
+    }
+
+    setMapPointsListFromArr(newArr) {
+        this._mapPoints = JSON.stringify(newArr)
+        this.saveMapPointsList()
+    }
+
     saveMapPointsListRows(rows) {
         let textForSave = ''
         rows.map(item => {
@@ -26,8 +40,58 @@ export default class MapPointsStore {
         localStorage.setItem('mapPointsPage_listItems', textForSave)
     }
 
+    saveMapPointsList() {
+        localStorage.setItem('mapPointsPage_listItems', this._mapPoints)
+    }
+
+
     loadMapPointsList(){
         this._mapPoints = localStorage.getItem("mapPointsPage_listItems")
+    }
+
+
+    deleteMapPointById(id) {
+        try {
+
+            let mapPointsArr = JSON.parse(this._mapPoints)
+            const found = mapPointsArr.find(element => element.id === id)
+            if (found) {
+                const filtered = mapPointsArr.filter(function (value, index, arr) {
+                    return value !== found;
+                })
+                this._mapPoints = JSON.stringify(filtered)
+                return true
+            }
+        } catch (e) {
+        }
+        return false
+    }
+
+    createAndAddMapPointsJson(userId) {
+        try {
+
+            let newItem = {
+                id: (Date.now() / 1000) * -1,
+                name: 'New Map point',
+                description: 'Please fill in description',
+                topics: '',
+                image_logo: '',
+                google_map_url: '',
+                active: true,
+                created_by_user_id: userId,
+                created_date: Date.now(),
+                file_name: '',
+                data: '[]',
+                isSaved: false,
+            }
+
+            let mapPointsArr = JSON.parse(this._mapPoints)
+            mapPointsArr = [...mapPointsArr, newItem]
+            this._mapPoints = JSON.stringify(mapPointsArr)
+            return true
+        } catch (e) {
+        }
+        return false
     }
 
 }
