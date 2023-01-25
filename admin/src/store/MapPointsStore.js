@@ -94,4 +94,22 @@ export default class MapPointsStore {
         return false
     }
 
+    get sort_code() {
+        let sortCode = localStorage.getItem("sort_code_MapPoints")
+        if(!sortCode){
+            sortCode = 'id'
+            this.sort_code = sortCode
+        }
+        if(sortCode === ''){
+            sortCode = 'id'
+            this.sort_code = sortCode
+        }
+
+        return sortCode
+    }
+
+    set sort_code(value) {
+        localStorage.setItem('sort_code_MapPoints', value)
+    }
+
 }

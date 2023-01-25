@@ -66,7 +66,6 @@ export const saveTopicAPI = async (
         }
 
         const {data} = await $authHostUpload.post('api/topics/create', formData)
-        console.log(data)
         return data
     } catch (e) {
         console.log('data error', e.message)

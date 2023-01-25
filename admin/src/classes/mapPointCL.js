@@ -1,4 +1,3 @@
-
 export default class mapPointCL {
 
     constructor() {
@@ -16,7 +15,7 @@ export default class mapPointCL {
         this._created_by_user_name = ''
     }
 
-    set isSaved(value){
+    set isSaved(value) {
         this._isSaved = value
     }
 
@@ -83,7 +82,7 @@ export default class mapPointCL {
                 "created_by_user_name": this._created_by_user_name,
             }
 
-            if(this.hasOwnProperty('newId')){
+            if (this.hasOwnProperty('newId')) {
                 itemObj.newId = this['newId']
             }
 
@@ -135,7 +134,6 @@ export default class mapPointCL {
         this._data = value;
     }
 
-
     get id() {
         return this._id;
     }
@@ -176,16 +174,50 @@ export default class mapPointCL {
         return this._data;
     }
 
+    get descriptionData() {
+        let descriptionDataText = null
+        const currDataJSONArr = this.dataJSON
+        for (let i = 0; i < currDataJSONArr.length; i++) {
+            let currDataItem = currDataJSONArr[i]
+            if (currDataItem.hasOwnProperty('description')) {
+                descriptionDataText = currDataItem.description
+                break
+            }
+        }
+        if (!descriptionDataText) {
+            this.addNewItemJSON({description: ''})
+            descriptionDataText = ''
+        }
+        return descriptionDataText
+    }
+
+    setDescriptionData(newDescriptionDataText) {
+        let descriptionDataText = null
+        let currDataJSONArr = this.dataJSON
+        for (let i = 0; i < currDataJSONArr.length; i++) {
+            let currDataItem = currDataJSONArr[i]
+            if (currDataItem.hasOwnProperty('description')) {
+                currDataItem.description = newDescriptionDataText
+                descriptionDataText = currDataItem.description
+                break
+            }
+        }
+
+        if (!descriptionDataText) {
+            this.addNewItemJSON({description: newDescriptionDataText})
+        }else{
+            this._data = JSON.stringify(currDataJSONArr)
+        }
+    }
+
     get dataJSON() {
         let newData = []
-        
-        try{
+
+        try {
             newData = JSON.parse(this._data)
-            // if(newData){
-            //     return newData
-            // }
-        }catch (e) {}
-        
+        } catch (e) {
+        }
+
         return newData
     }
 

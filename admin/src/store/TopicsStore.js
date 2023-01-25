@@ -34,14 +34,10 @@ export default class TopicsStore {
         }
 
         return sortCode
-
-        // return this._sort_code;
     }
 
     set sort_code(value) {
         localStorage.setItem('sort_code_Topics', value)
-
-        // this._sort_code = value;
     }
 
     sortTopicsBy(code) {

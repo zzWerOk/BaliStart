@@ -372,20 +372,10 @@ class TopicsController {
         try {
             const {tag_search, sort_code} = req.query
             let sortOrder = ['id', 'ASC']
-            // if(sort_code) {
-            //     return res.json({'status': 'error', message: "" + sort_code})
-            // }
-            // return res.json({'status': 'error', message: 'no'})
 
             let tagSearch = tag_search
             if (!tagSearch) {
                 tagSearch = ''
-                // tagSearch_obj = {}
-            }
-            let tagSearch_obj = {
-                tag: {
-                    [Op.like]: '%' + tagSearch + '%'
-                }
             }
 
             switch (sort_code) {

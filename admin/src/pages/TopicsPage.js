@@ -34,7 +34,6 @@ const ToursPage = () => {
             topicsStore.loadTopicsList()
             setLoading(false)
         })
-
     }
 
     useEffect(() => {

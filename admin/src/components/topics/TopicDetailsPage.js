@@ -596,9 +596,7 @@ const TopicDetailsPage = observer((props) => {
                     <div
                         style={{
                             height: '250px',
-                            // display: 'inline-block',
                             overflow: 'hidden',
-                            // position: 'relative',
                             margin: 0,
                         }}>
 
@@ -606,14 +604,10 @@ const TopicDetailsPage = observer((props) => {
 
                             style={{
                                 objectFit: 'cover',
-                                // display: 'block',
                                 position: 'absolute',
                                 width: '100%',
                                 height: '200px',
-                                // top: '50%',
                                 left: '50%',
-                                // minHeight: '100%',
-                                // minWidth: '100%',
                                 transform: 'translate(-50%, 10%)',
                             }}
                             src={itemImageLogo

@@ -13,7 +13,7 @@ import TopicItemCard from "../topics/components/TopicItemCard";
 import TopicGoogleMapUrlComponent from "../topics/components/TopicGoogleMapUrlComponent";
 import TopicTextComponent from "../topics/components/TopicTextComponent";
 import MapPointTopicComponent from "../topics/components/MapPointTopicComponent";
-import {changeMapPointAPI, getMapPointData, saveMapPointAPI} from "../../http/mapPointsAPI";
+import {changeMapPointAPI, deleteMapPointAPI, getMapPointData, saveMapPointAPI} from "../../http/mapPointsAPI";
 import mapPointCL from "../../classes/mapPointCL";
 import SpinnerSM from "../SpinnerSM";
 
@@ -60,7 +60,8 @@ const MapPointsDetailsPage = observer((props) => {
             setMapPointsItems_load(true)
             currMapPoint.setFromJson(item)
             setCurrName(currMapPoint.name)
-            setCurrDescription(currMapPoint.description)
+            // setCurrDescription(currMapPoint.description)
+
             setIsActive(currMapPoint.active)
 
             if (item.image_logo) {
@@ -76,6 +77,7 @@ const MapPointsDetailsPage = observer((props) => {
                             if (data.hasOwnProperty('status')) {
                                 if (data.status === 'ok') {
                                     currMapPoint.data = data.data
+                                    setCurrDescription(currMapPoint.descriptionData)
                                 }
                             }
                         }).finally(() => {
@@ -107,8 +109,30 @@ const MapPointsDetailsPage = observer((props) => {
     }
 
     const onDescriptionHandler = (value) => {
+        currMapPoint.description = value.substring(0,120)
+        currMapPoint.setDescriptionData(value)
         setCurrDescription(value)
-        currMapPoint.description = currDescription
+
+        // let dataArr = JSON.parse(currMapPoint.data)
+        // // let isThere = false
+        // let descriptionDataItem = null
+        // for(let i = 0;i < dataArr.length;i++){
+        //     let currDataItem = dataArr[i]
+        //     if(currDataItem.hasOwnProperty('description')){
+        //         currDataItem.description = value
+        //         descriptionDataItem = currDataItem.description
+        //     }
+        // }
+        // if(!descriptionDataItem){
+        //     descriptionDataItem = {description: value}
+        //     dataArr.push(descriptionDataItem)
+        // }
+
+        // descriptionDataItem.description = value
+
+        // console.log(descriptionDataItem)
+        // console.log(dataArr)
+        // currMapPoint.data = JSON.stringify(dataArr)
         currMapPoint.isSaved = false
         onItemEditHandler(currMapPoint.getAsJson())
     }
@@ -220,7 +244,7 @@ const MapPointsDetailsPage = observer((props) => {
         delay(0).then(r => {
 
             if (currMapPoint.id > 0) {
-                deleteTopicAPI(
+                deleteMapPointAPI(
                     currMapPoint.id
                 ).then(data => {
                     if (data.hasOwnProperty('status')) {
@@ -247,9 +271,21 @@ const MapPointsDetailsPage = observer((props) => {
         setSaveError(false)
         delay(0).then(r => {
 
+            /***
+             * Удаляем поле 'index' с каждого элемента
+            ***/
+            let newDataArr = []
+            currMapPoint.dataJSON.map(dataItem => {
+                delete dataItem.index
+                newDataArr.push(dataItem)
+            })
+
+
             if (currMapPoint.id < 0) {
+                /***
+                 * Сохраняем новый объект
+                 ***/
                 saveMapPointAPI(
-                    // currMapPoint.
                     currMapPoint.name,
                     currMapPoint.description,
                     currMapPoint.google_map_url,
@@ -257,7 +293,8 @@ const MapPointsDetailsPage = observer((props) => {
                     currMapPoint.active,
                     currMapPoint.created_by_user_id,
                     currMapPoint.created_date,
-                    currMapPoint.data,
+                    // currMapPoint.data,
+                    JSON.stringify(newDataArr),
                     currMapPoint.image_logo_file,
                 ).then(data => {
                     if (data.hasOwnProperty('status')) {
@@ -279,6 +316,9 @@ const MapPointsDetailsPage = observer((props) => {
                     setIsSaving(false)
                 })
             } else {
+                /***
+                 * Пересохраняем объект
+                 ***/
                 changeMapPointAPI(
                     currMapPoint.id,
                     currMapPoint.name,
@@ -288,7 +328,8 @@ const MapPointsDetailsPage = observer((props) => {
                     currMapPoint.active,
                     currMapPoint.created_by_user_id,
                     currMapPoint.created_date,
-                    currMapPoint.data,
+                    // currMapPoint.data,
+                    JSON.stringify(newDataArr),
                     currMapPoint.image_logo_file,
                 ).then(data => {
 

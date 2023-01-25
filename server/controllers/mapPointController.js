@@ -1,8 +1,9 @@
-const {TableUpdates, MapPoint, Topics, User} = require("../models/models");
+const {TableUpdates, MapPoint, Topics, User, Files} = require("../models/models");
 const ApiError = require("../error/ApiError");
-const {createNewFile, readFile, reWrightFile} = require("../utils/consts");
+const {createNewFile, readFile, reWrightFile, removeFile} = require("../utils/consts");
 const {Op} = require("sequelize");
 const path = require("path");
+const fs = require("fs");
 
 class MapPointController {
 
@@ -172,14 +173,37 @@ class MapPointController {
 
     async getAll(req, res, next) {
         try {
+            const {tag_search, sort_code} = req.query
+            let sortOrder = ['id', 'ASC']
+
+            switch (sort_code) {
+                case 'user':
+                    sortOrder = ['created_by_user_id', 'ASC']
+                    break
+                case 'reuser':
+                    sortOrder = ['created_by_user_id', 'DESC']
+                    break
+                case 'date':
+                    sortOrder = ['created_date', 'ASC']
+                    break
+                case 'redate':
+                    sortOrder = ['created_date', 'DESC']
+                    break
+                case 'id':
+                    sortOrder = ['id', 'ASC']
+                    break
+                case 'reid':
+                    sortOrder = ['id', 'DESC']
+                    break
+            }
 
             const mapPointsList = await MapPoint.findAndCountAll({
                     // limit: 10,
                     // attributes: ['tag', tagSearch],
-                    // order: ['id', 'ASC'
-                    //     // ['name', 'DESC'],
-                    //     // ['name', 'ASC'],
-                    // ],
+                    order: [sortOrder,
+                        // ['name', 'DESC'],
+                        // ['name', 'ASC'],
+                    ],
                 }
             )
 
@@ -216,15 +240,44 @@ class MapPointController {
 
     }
 
-    async deleteMapPoint(req, res) {
-        /**
-         Обновление таблиц
-         **/
+    async deleteMapPoint(req, res, next) {
+        const {id} = req.query
         try {
-            // await TableUpdates.update({date: Date.now()}, {where: { table_name: 'MapPoint' }})
-            await TableUpdates.upsert({table_name: 'MapPoint', date: Date.now()})
+            if (!id) {
+                return next(ApiError.badRequest("Ошибка параметра"))
+            } else {
+                /**
+                 Обновление таблиц
+                 **/
+                try {
+                    await TableUpdates.upsert({table_name: 'MapPoint', date: Date.now()})
+                } catch (e) {
+                }
+                const candidate = await MapPoint.findOne({where: {id}})
+
+                if (candidate) {
+
+                    try {
+                        let imgFileName = candidate.file_name.split('\\')[1]
+                        const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
+                        fs.unlinkSync(imgFilePath)
+                    } catch (e) {
+                    }
+
+                    const result = removeFile(candidate.file_name)
+                    if (result.hasOwnProperty('status')) {
+                        if (result.status === 'ok') {
+                            await Files.destroy({where: {table_name: 'MapPoint', file_name: candidate.file_name}})
+                            const count = await MapPoint.destroy({where: {id: id}})
+                            return res.json({status: "ok", message: `Удалено записей: ${count}`})
+                        }
+                    }
+                }
+            }
         } catch (e) {
+            return res.json({status: "error", message: e.message})
         }
+        return next(ApiError.internal("Ошибка удаления"))
     }
 
     async getData(req, res, next) {
