@@ -2,16 +2,16 @@ import React, {useCallback, useContext, useEffect, useMemo, useState} from 'reac
 import TopicCL from "../../classes/topicCL";
 import {Button, Dropdown, DropdownButton, Image, Row, ToggleButton} from "react-bootstrap";
 import noImageLogo from '../../img/nophoto.jpg'
-import TopicItemCard from "./components/TopicItemCard";
-import TopicTextComponent from "./components/TopicTextComponent";
-import TopicCommentComponent from "./components/TopicCommentComponent";
-import TopicListComponent from "./components/TopicListComponent";
-import TopicLinkComponent from "./components/TopicLinkComponent";
-import TopicEmailComponent from "./components/TopicEmailComponent";
-import TopicPhoneComponent from "./components/TopicPhoneComponent";
-import TopicImagesComponent from "./components/TopicImagesComponent";
-import TopicGoogleMapUrlComponent from "./components/TopicGoogleMapUrlComponent";
-import TopicAddNewBtn from "./components/TopicAddNewBTN";
+// import TopicItemCard from "../components/TopicItemCard";
+// import TopicTextComponent from "./components/TopicTextComponent";
+// import TopicCommentComponent from "./components/TopicCommentComponent";
+// import TopicListComponent from "./components/TopicListComponent";
+// import TopicLinkComponent from "./components/TopicLinkComponent";
+// import TopicEmailComponent from "./components/TopicEmailComponent";
+// import TopicPhoneComponent from "./components/TopicPhoneComponent";
+// import TopicImagesComponent from "./components/TopicImagesComponent";
+// import TopicGoogleMapUrlComponent from "./components/TopicGoogleMapUrlComponent";
+// import TopicAddNewBtn from "./components/TopicAddNewBTN";
 import {Context} from "../../index";
 import {observer} from "mobx-react-lite";
 
@@ -22,187 +22,197 @@ import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
 import {changeTopicAPI, deleteTopicAPI, getTopicData, saveTopicAPI, setActiveAPI} from "../../http/topicsAPI";
 import {MDBFile} from "mdb-react-ui-kit";
+import {changeTourAPI, deleteTourAPI, getTourData, saveTourAPI} from "../../http/toursAPI";
+import TopicTextComponent from "../topics/components/TopicTextComponent";
+import TopicCommentComponent from "../topics/components/TopicCommentComponent";
+import TopicListComponent from "../topics/components/TopicListComponent";
+import TopicLinkComponent from "../topics/components/TopicLinkComponent";
+import TopicEmailComponent from "../topics/components/TopicEmailComponent";
+import TopicPhoneComponent from "../topics/components/TopicPhoneComponent";
+import TopicImagesComponent from "../topics/components/TopicImagesComponent";
+import TopicGoogleMapUrlComponent from "../topics/components/TopicGoogleMapUrlComponent";
+import TopicItemCard from "../topics/components/TopicItemCard";
+import TopicAddNewBtn from "../topics/components/TopicAddNewBTN";
+import TourCL from "../../classes/tourCL";
 
-const dropDownItems = [
-    {
-        id: 0,
-        name: 'Text card',
-        type: 'text',
-    },
-    {
-        id: 1,
-        name: 'Commend card',
-        type: 'comment',
-    },
-    {
-        id: 2,
-        name: 'List card',
-        type: 'list',
-    },
-    {
-        id: 3,
-        name: 'Link card',
-        type: 'link',
-    },
-    {
-        id: 4,
-        name: 'Email card',
-        type: 'email',
-    },
-    {
-        id: 5,
-        name: 'Phones card',
-        type: 'phone',
-    },
-    {
-        id: 6,
-        name: 'Images card',
-        type: 'images',
-    },
-    {
-        id: 7,
-        name: 'Google Map Url card',
-        type: 'googleMapUrl',
-    },
-]
-let currTopic = null
+// const dropDownItems = [
+//     {
+//         id: 0,
+//         name: 'Text card',
+//         type: 'text',
+//     },
+//     {
+//         id: 1,
+//         name: 'Commend card',
+//         type: 'comment',
+//     },
+//     {
+//         id: 2,
+//         name: 'List card',
+//         type: 'list',
+//     },
+//     {
+//         id: 3,
+//         name: 'Link card',
+//         type: 'link',
+//     },
+//     {
+//         id: 4,
+//         name: 'Email card',
+//         type: 'email',
+//     },
+//     {
+//         id: 5,
+//         name: 'Phones card',
+//         type: 'phone',
+//     },
+//     {
+//         id: 6,
+//         name: 'Images card',
+//         type: 'images',
+//     },
+//     {
+//         id: 7,
+//         name: 'Google Map Url card',
+//         type: 'googleMapUrl',
+//     },
+// ]
 
-const TopicDetailsPage = observer((props) => {
+let currTour = null
+
+const TourDetailsPage = observer((props) => {
     const {item, onItemEditHandler, deleteTopic} = props
 
     const {topicDetailsStore} = useContext(Context)
-    const {topicsCategoryStore} = useContext(Context)
+    const {toursCategoryStore} = useContext(Context)
 
-    const [canBeShared, setCanBeShared] = useState(true)
-    const [setActiveError, setSetActiveError] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
     const [saveError, setSaveError] = useState(false)
     const [deleteError, setDeleteError] = useState(false)
     const [currName, setCurrName] = useState('')
     const [currDescription, setCurrDescription] = useState('')
-    const [itemData, setItemData] = useState([])
-    const [topicTags, setTopicTags] = useState([])
-    const [isActive, setIsActive] = useState(true)
     const [itemImageLogo, setItemImageLogo] = useState('')
     const [newImageLogo, setNewImageLogo] = useState(false)
     const [topicCategoriesItems, setTopicCategoriesItems] = useState([])
     const [topicCategoriesItems_load, setTopicCategoriesItems_load] = useState(true)
+    const [topicTags, setTopicTags] = useState([])
 
     useEffect(
         () => {
-            currTopic = new TopicCL()
+
+            currTour = new TourCL()
 
             setTopicCategoriesItems_load(true)
-            currTopic.setFromJson(item)
-            setCurrName(currTopic.name)
-            setCurrDescription(currTopic.description)
-            setIsActive(currTopic.active)
-            setTopicCategoriesItems(topicsCategoryStore.getSavedCategoriesList())
-            setTopicTags(currTopic.tagJSON)
+            currTour.setFromJson(item)
+            setCurrName(currTour.name)
+            setCurrDescription(currTour.description)
+            // setIsActive(currTour.active)
+            setTopicCategoriesItems(toursCategoryStore.getSavedCategoriesList())
+            setTopicTags(currTour.tagJSON)
 
             if (item.image_logo) {
                 if (item.id >= 0) {
-                    setItemImageLogo(currTopic.image_logo + '?' + Date.now())
+                    setItemImageLogo(currTour.image_logo + '?' + Date.now())
                 }
             }
 
-            // setItemImageLogo(currTopic.image_logo + '?' + Date.now())
+            // setItemImageLogo(currTour.image_logo + '?' + Date.now())
 
-            if (Object.keys(currTopic.dataJSON).length === 0) {
-                delay(0).then(r => {
-                    if (currTopic.id > -1) {
-                        getTopicData(currTopic.id).then(data => {
-                            if (data.hasOwnProperty('status')) {
-                                if (data.status === 'ok') {
-                                    currTopic.data = data.data
-                                }
-                            }
-                        }).finally(() => {
-                            setItemData(currTopic.dataJSON)
-                            setTopicCategoriesItems_load(false)
-                        })
-                    } else {
-                        setTopicCategoriesItems_load(false)
-                    }
-                })
-            } else {
-                setItemData(currTopic.dataJSON)
-                setTopicCategoriesItems_load(false)
-            }
+            // if (Object.keys(currTour.dataJSON).length === 0) {
+            //     delay(0).then(r => {
+            //         if (currTour.id > -1) {
+            //             getTourData(currTour.id).then(data => {
+            //                 if (data.hasOwnProperty('status')) {
+            //                     if (data.status === 'ok') {
+            //                         currTour.data = data.data
+            //                     }
+            //                 }
+            //             }).finally(() => {
+            //                 setItemData(currTour.dataJSON)
+            //                 setTopicCategoriesItems_load(false)
+            //             })
+            //         } else {
+            //             setTopicCategoriesItems_load(false)
+            //         }
+            //     })
+            // } else {
+            //     setItemData(currTour.dataJSON)
+            //     setTopicCategoriesItems_load(false)
+            // }
 
         }, []
     )
 
     const onNameHandler = (value) => {
         setCurrName(value)
-        currTopic.name = value
-        currTopic.isSaved = false
-        onItemEditHandler(currTopic.getAsJson())
+        currTour.name = value
+        currTour.isSaved = false
+        onItemEditHandler(currTour.getAsJson())
     }
 
     const changeTopicId = (id) => {
-        currTopic.newId = id
-        onItemEditHandler(currTopic.getAsJson(), newImageLogo)
+        currTour.newId = id
+        onItemEditHandler(currTour.getAsJson(), newImageLogo)
     }
 
     const onDescriptionHandler = (value) => {
         setCurrDescription(value)
-        currTopic.description = currDescription
-        currTopic.isSaved = false
-        onItemEditHandler(currTopic.getAsJson())
+        currTour.description = currDescription
+        currTour.isSaved = false
+        onItemEditHandler(currTour.getAsJson())
     }
 
-    const getNewDataItemByType = (type) => {
-        let newItem = {}
-        switch (type) {
-            case "text":
-                newItem = {"type": type, "name": "", "text": ""}
-                break
-            case "comment":
-                newItem = {"type": type, "name": "", "text": ""}
-                break
-            case "list":
-                newItem = {"type": type, "name": "", "items": '[""]'}
-                break
-            case "link":
-                newItem = {"type": type, "name": "", "items": '[{"type":"","link":""}]'}
-                break
-            case "email":
-                newItem = {"type": type, "name": "", "email": ""}
-                break
-            case "phone":
-                newItem = {"type": type, "name": "", "items": '[{"type":"","phone":""}]'}
-                break
-            case "images":
-                newItem = {"type": type, "name": "", "items": '[""]'}
-                break
-            case "googleMapUrl":
-                newItem = {"type": type, "name": "", "url": ""}
-                break
-        }
-        return newItem
-    }
+    // const getNewDataItemByType = (type) => {
+    //     let newItem = {}
+    //     switch (type) {
+    //         case "text":
+    //             newItem = {"type": type, "name": "", "text": ""}
+    //             break
+    //         case "comment":
+    //             newItem = {"type": type, "name": "", "text": ""}
+    //             break
+    //         case "list":
+    //             newItem = {"type": type, "name": "", "items": '[""]'}
+    //             break
+    //         case "link":
+    //             newItem = {"type": type, "name": "", "items": '[{"type":"","link":""}]'}
+    //             break
+    //         case "email":
+    //             newItem = {"type": type, "name": "", "email": ""}
+    //             break
+    //         case "phone":
+    //             newItem = {"type": type, "name": "", "items": '[{"type":"","phone":""}]'}
+    //             break
+    //         case "images":
+    //             newItem = {"type": type, "name": "", "items": '[""]'}
+    //             break
+    //         case "googleMapUrl":
+    //             newItem = {"type": type, "name": "", "url": ""}
+    //             break
+    //     }
+    //     return newItem
+    // }
 
-    const addNewItemHandler = useCallback((value) => {
-        let type = ''
-
-        for (let i = 0; i < dropDownItems.length; i++) {
-            if (dropDownItems[i].id === value) {
-                type = dropDownItems[i].type
-            }
-        }
-
-        let newItem = getNewDataItemByType(type)
-
-        currTopic.addNewItemJSON(newItem)
-        currTopic.isSaved = false
-        onItemEditHandler(currTopic.getAsJson())
-
-        setItemData(currTopic.dataJSON)
-
-        // the function only changes when any of these dependencies change
-    }, [topicDetailsStore, currTopic])
+    // const addNewItemHandler = useCallback((value) => {
+    //     let type = ''
+    //
+    //     for (let i = 0; i < dropDownItems.length; i++) {
+    //         if (dropDownItems[i].id === value) {
+    //             type = dropDownItems[i].type
+    //         }
+    //     }
+    //
+    //     let newItem = getNewDataItemByType(type)
+    //
+    //     currTour.addNewItemJSON(newItem)
+    //     currTour.isSaved = false
+    //     onItemEditHandler(currTour.getAsJson())
+    //
+    //     setItemData(currTour.dataJSON)
+    //
+    //     // the function only changes when any of these dependencies change
+    // }, [topicDetailsStore, currTour])
 
     const addNewTagHandler = (value) => {
         let newCategory = null
@@ -217,21 +227,21 @@ const TopicDetailsPage = observer((props) => {
             const found = topicTags.find(element => element === newCategory.id)
             if (!found) {
                 setTopicTags([...topicTags, newCategory.id])
-                currTopic.tag = JSON.stringify([...topicTags, newCategory.id])
-                currTopic.isSaved = false
-                onItemEditHandler(currTopic.getAsJson())
+                currTour.tag = JSON.stringify([...topicTags, newCategory.id])
+                currTour.isSaved = false
+                onItemEditHandler(currTour.getAsJson())
             }
         }
     }
 
     const dataItemEditHandler = (item) => {
         if (item.hasOwnProperty('index')) {
-            let dataArr = JSON.parse(currTopic.data)
+            let dataArr = JSON.parse(currTour.data)
             const itemIndex = item.index
             dataArr[itemIndex] = item
-            currTopic.data = JSON.stringify(dataArr)
-            currTopic.isSaved = false
-            onItemEditHandler(currTopic.getAsJson())
+            currTour.data = JSON.stringify(dataArr)
+            currTour.isSaved = false
+            onItemEditHandler(currTour.getAsJson())
         }
     }
 
@@ -251,22 +261,21 @@ const TopicDetailsPage = observer((props) => {
                     return value !== found;
                 })
                 setTopicTags(filtered)
-                currTopic.tag = JSON.stringify(filtered)
-                currTopic.isSaved = false
-                onItemEditHandler(currTopic.getAsJson())
-
+                currTour.tag = JSON.stringify(filtered)
+                currTour.isSaved = false
+                onItemEditHandler(currTour.getAsJson())
             }
         }
     }
 
-    const getDropDownTitleByType = (type) => {
-        for (let i = 0; i < dropDownItems.length; i++) {
-            if (dropDownItems[i].type === type) {
-                return dropDownItems[i].name
-            }
-
-        }
-    }
+    // const getDropDownTitleByType = (type) => {
+    //     for (let i = 0; i < dropDownItems.length; i++) {
+    //         if (dropDownItems[i].type === type) {
+    //             return dropDownItems[i].name
+    //         }
+    //
+    //     }
+    // }
 
     const getTagNameById = (id) => {
         for (let i = 0; i < topicCategoriesItems.length; i++) {
@@ -276,35 +285,35 @@ const TopicDetailsPage = observer((props) => {
         }
     }
 
-    const deleteDataItemByIndex = (index) => {
-        const currItem = itemData[index]
+    // const deleteDataItemByIndex = (index) => {
+    //     const currItem = itemData[index]
+    //
+    //     const filtered = itemData.filter(function (value, index, arr) {
+    //         return value !== currItem;
+    //     })
+    //
+    //     setItemData(filtered)
+    //     currTour.data = JSON.stringify(filtered)
+    //     currTour.isSaved = false
+    //     onItemEditHandler(currTour.getAsJson())
+    // }
 
-        const filtered = itemData.filter(function (value, index, arr) {
-            return value !== currItem;
-        })
-
-        setItemData(filtered)
-        currTopic.data = JSON.stringify(filtered)
-        currTopic.isSaved = false
-        onItemEditHandler(currTopic.getAsJson())
-    }
-
-    const changeItemType = (id, type) => {
-        let newArr = []
-        for (let i = 0; i < itemData.length; i++) {
-            if (i === id) {
-                let newItem = getNewDataItemByType(type)
-                newItem.name = itemData[i].name
-                itemData[i] = newItem
-            }
-            newArr.push(itemData[i])
-        }
-
-        setItemData(newArr)
-        currTopic.data = JSON.stringify(itemData)
-        currTopic.isSaved = false
-        onItemEditHandler(currTopic.getAsJson())
-    }
+    // const changeItemType = (id, type) => {
+    //     let newArr = []
+    //     for (let i = 0; i < itemData.length; i++) {
+    //         if (i === id) {
+    //             let newItem = getNewDataItemByType(type)
+    //             newItem.name = itemData[i].name
+    //             itemData[i] = newItem
+    //         }
+    //         newArr.push(itemData[i])
+    //     }
+    //
+    //     setItemData(newArr)
+    //     currTour.data = JSON.stringify(itemData)
+    //     currTour.isSaved = false
+    //     onItemEditHandler(currTour.getAsJson())
+    // }
 
     const onDeleteHandler = () => {
         setIsDeleting(true)
@@ -314,12 +323,12 @@ const TopicDetailsPage = observer((props) => {
     }
 
 
-    const setActiveHandler = (value) => {
-        setIsActive(value)
-        currTopic.active = value
-        currTopic.isSaved = false
-        onItemEditHandler(currTopic.getAsJson())
-    }
+    // const setActiveHandler = (value) => {
+    //     setIsActive(value)
+    //     currTour.active = value
+    //     currTour.isSaved = false
+    //     onItemEditHandler(currTour.getAsJson())
+    // }
 
     const deleteHandler = () => {
         setIsSaving(true)
@@ -327,13 +336,13 @@ const TopicDetailsPage = observer((props) => {
 
         delay(0).then(r => {
 
-            if (currTopic.id > 0) {
-                deleteTopicAPI(
-                    currTopic.id
+            if (currTour.id > 0) {
+                deleteTourAPI(
+                    currTour.id
                 ).then(data => {
                     if (data.hasOwnProperty('status')) {
                         if (data.status === 'ok') {
-                            deleteTopic(currTopic.id)
+                            deleteTopic(currTour.id)
                         }
                     }
                 }).catch(() => {
@@ -355,31 +364,28 @@ const TopicDetailsPage = observer((props) => {
         setSaveError(false)
         delay(0).then(r => {
 
-            if (currTopic.id < 0) {
-                saveTopicAPI(
-                    // currTopic.
-                    currTopic.name,
-                    currTopic.description,
-                    currTopic.tag,
-                    currTopic.image_logo,
-                    currTopic.images,
-                    currTopic.videos,
-                    currTopic.google_map_url,
-                    currTopic.active,
-                    currTopic.created_by_user_id,
-                    currTopic.created_date,
-                    currTopic.deleted_by_user_id,
-                    currTopic.deleted_date,
-                    currTopic.data,
-                    currTopic.image_logo_file,
+            if (currTour.id < 0) {
+                saveTourAPI(
+                    currTour.name,
+                    currTour.description,
+                    currTour.image_logo_file,
+                    currTour.created_by_user_id,
+                    currTour.created_date,
+
+                    currTour.tour_category,
+                    currTour.tour_type,
+                    currTour.duration,
+                    currTour.activity_level,
+                    currTour.languages,
+
                 ).then(data => {
                     if (data.hasOwnProperty('status')) {
                         if (data.status === 'ok') {
-                            currTopic.isSaved = true
+                            currTour.isSaved = true
 
                             if (data.hasOwnProperty('image_logo')) {
 
-                                currTopic.image_logo = data.image_logo
+                                currTour.image_logo = data.image_logo
                                 setItemImageLogo(data.image_logo + '?' + Date.now())
                             }
 
@@ -392,38 +398,35 @@ const TopicDetailsPage = observer((props) => {
                     setIsSaving(false)
                 })
             } else {
-                changeTopicAPI(
-                    currTopic.id,
-                    currTopic.name,
-                    currTopic.description,
-                    currTopic.tag,
-                    currTopic.image_logo,
-                    currTopic.images,
-                    currTopic.videos,
-                    currTopic.google_map_url,
-                    currTopic.active,
-                    currTopic.created_by_user_id,
-                    currTopic.created_date,
-                    currTopic.deleted_by_user_id,
-                    currTopic.deleted_date,
-                    currTopic.data,
-                    currTopic.image_logo_file,
+                changeTourAPI(
+                    currTour.id,
+                    currTour.name,
+                    currTour.description,
+                    currTour.image_logo_file,
+                    currTour.created_by_user_id,
+                    currTour.created_date,
+
+                    currTour.tour_category,
+                    currTour.tour_type,
+                    currTour.duration,
+                    currTour.activity_level,
+                    currTour.languages,
                 ).then(data => {
 
                     if (data.hasOwnProperty('status')) {
                         if (data.status === 'ok') {
-                            currTopic.isSaved = true
+                            currTour.isSaved = true
 
                             if (data.hasOwnProperty('image_logo')) {
-                                currTopic.image_logo = data.image_logo
+                                currTour.image_logo = data.image_logo
                                 setItemImageLogo(data.image_logo + '?' + Date.now())
                             }
 
-                            onItemEditHandler(currTopic.getAsJson(), newImageLogo)
+                            onItemEditHandler(currTour.getAsJson(), newImageLogo)
                         }
                     }
                 }).catch(() => {
-                    currTopic.isSaved = false
+                    currTour.isSaved = false
                     setSaveError(true)
                 }).finally(() => {
                     setIsSaving(false)
@@ -438,9 +441,9 @@ const TopicDetailsPage = observer((props) => {
         } else {
             setNewImageLogo(false)
         }
-        currTopic.image_logo_file = fileName
-        currTopic.isSaved = false
-        onItemEditHandler(currTopic.getAsJson())
+        currTour.image_logo_file = fileName
+        currTour.isSaved = false
+        onItemEditHandler(currTour.getAsJson())
     }
 
     return (
@@ -758,4 +761,4 @@ const TopicDetailsPage = observer((props) => {
     );
 });
 
-export default TopicDetailsPage;
+export default TourDetailsPage;

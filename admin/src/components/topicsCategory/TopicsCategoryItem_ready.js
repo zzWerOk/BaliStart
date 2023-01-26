@@ -1,23 +1,17 @@
 import React, {useContext, useRef, useState} from 'react';
 import TopicsCategoryItem from "./TopicsCategoryItem";
-import TopicsCategoryPage from "./TopicsCategoryPage";
 import {Button, ToggleButton} from "react-bootstrap";
 import {delay} from "../../utils/consts";
-import {changeAPI, createAPI, deleteAPI} from "../../http/topicsCategoryAPI";
-import {Context} from "../../index";
 import {ReactComponent as CircleOkIco} from "../../img/svg/circle_ok.svg";
 import {ReactComponent as CircleIco} from "../../img/svg/circle.svg";
 import SpinnerSm from "../SpinnerSM";
 
 const TopicsCategoryItemReady = (props) => {
-    const {topicsCategoryStore} = useContext(Context)
+    // const {topicsCategoryStore} = useContext(Context)
     const editItemTrigger = useRef(null)
 
-    const {onDeleteItemTrigger} = props
+    const {onDeleteItemTrigger, changeAPI, deleteAPI, categoriesStore} = props
 
-    // let name, description = ''
-    // let is_for_tour = false
-    // let itemId = -1
     const [isNameEdit, setIsNameEdit] = useState(false)
     const [loadingEditItem, setLoadingEditItem] = useState(false)
     const [saveError, setSaveError] = useState(false)
@@ -28,6 +22,7 @@ const TopicsCategoryItemReady = (props) => {
     const [description, setDescription] = useState('')
     const [itemId, setItemId] = useState('')
     const [isForTourActive, setIsForTourActive] = useState(false)
+    const [isForTourVisible, setIsForTourVisible] = useState(false)
 
     React.useEffect(() => {
         setIsLoading(true)
@@ -43,6 +38,7 @@ const TopicsCategoryItemReady = (props) => {
                 }
                 if (props.hasOwnProperty('is_for_tour')) {
                     setIsForTourActive(props['is_for_tour'])
+                    setIsForTourVisible(true)
                 }
                 if (props.hasOwnProperty('id')) {
                     // itemId = props['id']
@@ -72,8 +68,8 @@ const TopicsCategoryItemReady = (props) => {
                 setSaveError(true)
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
-                        if (topicsCategoryStore.deleteItem(itemId)) {
-                            topicsCategoryStore.saveTopicsCategoryList()
+                        if (categoriesStore.deleteItem(itemId)) {
+                            categoriesStore.saveCategoriesList()
                             setSaveError(false)
                             onDeleteItemTrigger(itemId)
                         }
@@ -97,8 +93,8 @@ const TopicsCategoryItemReady = (props) => {
                 setSaveError(true)
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
-                        if (topicsCategoryStore.editItem(name, description, isForTourActive, itemId)) {
-                            topicsCategoryStore.saveTopicsCategoryList()
+                        if (categoriesStore.editItem(name, description, isForTourActive, itemId)) {
+                            categoriesStore.saveCategoriesList()
                             setSaveError(false)
                         }
                     }
@@ -131,41 +127,44 @@ const TopicsCategoryItemReady = (props) => {
             isNameEdit ?
 
                 <div style={{display: 'flex'}}>
-                    <ToggleButton
-                        id={"toggle-is-for-tour-" + name}
-                        type="checkbox"
-                        variant={"outline-secondary"}
-                        checked={isForTourActive}
-                        value={'1'}
-                        // disabled={!!isSaving}
-                        onChange={(e) => setIsTourActiveHandler(e.currentTarget.checked)}
-                        style={{display: 'flex', marginRight: '5px'}}
-                    >
-                        {isForTourActive
-                            ?
-                            <CircleOkIco
-                                fill='white'
-                                style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    marginTop: '4px',
-                                    marginRight: '5px',
-                                }}
+                    {isForTourVisible ?
+                        <ToggleButton
+                            id={"toggle-is-for-tour-" + name}
+                            type="checkbox"
+                            variant={"outline-secondary"}
+                            checked={isForTourActive}
+                            value={'1'}
+                            // disabled={!!isSaving}
+                            onChange={(e) => setIsTourActiveHandler(e.currentTarget.checked)}
+                            style={{display: 'flex', marginRight: '5px'}}
+                        >
+                            {isForTourActive
+                                ?
+                                <CircleOkIco
+                                    fill='white'
+                                    style={{
+                                        width: '16px',
+                                        height: '16px',
+                                        marginTop: '4px',
+                                        marginRight: '5px',
+                                    }}
 
-                            />
-                            :
-                            <CircleIco
-                                fill='gray'
-                                style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    marginTop: '4px',
-                                    marginRight: '5px',
-                                }}
-                            />
-                        }
-                        Tour
-                    </ToggleButton>
+                                />
+                                :
+                                <CircleIco
+                                    fill='gray'
+                                    style={{
+                                        width: '16px',
+                                        height: '16px',
+                                        marginTop: '4px',
+                                        marginRight: '5px',
+                                    }}
+                                />
+                            }
+                            Tour
+                        </ToggleButton>
+                        : ''
+                    }
                     <Button
                         variant={saveError ? 'danger' : 'primary'}
                         style={{marginRight: '5px'}}
@@ -206,7 +205,6 @@ const TopicsCategoryItemReady = (props) => {
                 >Delete</Button>
         }
     </div>);
-
 
 
     if (isLoading) {

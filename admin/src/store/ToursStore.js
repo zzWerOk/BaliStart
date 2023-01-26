@@ -65,7 +65,7 @@ export default class ToursStore {
         this.saveToursList()
     }
 
-    get getToursList() {
+    get getTopicsList() {
         let rows = JSON.parse(this._toursList)
         try {
             return rows
@@ -74,7 +74,7 @@ export default class ToursStore {
         return null
     }
 
-    get getSavedTours_List() {
+    get getSavedTopics_List() {
         const savedToursList = localStorage.getItem("toursPage_listItems")
 
         let rows = JSON.parse(savedToursList)
@@ -101,7 +101,7 @@ export default class ToursStore {
         return false
     }
 
-    deleteTourById(id) {
+    deleteTopicById(id) {
         try {
 
             let toursArr = JSON.parse(this._toursList)
@@ -118,7 +118,7 @@ export default class ToursStore {
         return false
     }
 
-    createAndAddNewTourJson(userId) {
+    createAndAddNewTopicJson(userId) {
         try {
             let newItem = {
                 id: (Date.now() / 1000) * -1,

@@ -3,11 +3,12 @@ import {Button, Nav} from "react-bootstrap";
 import ModalPopUp from "./modal/ModalPopUp";
 import UserPageCard from "./users/UserPageCard";
 import TopicsCategoryPage from "./topicsCategory/TopicsCategoryPage";
+import ToursCategoryPage from "./tours/ToursCategoryPage";
 
 const ToursCategories = () => {
     const [showModal, setShowModal] = useState(false)
 
-    const categoriesPageCardComponent = () => ( <TopicsCategoryPage /> );
+    const categoriesPageCardComponent = () => ( <ToursCategoryPage /> );
 
     return (
         <Nav variant="pills" defaultActiveKey="/home">

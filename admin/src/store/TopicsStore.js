@@ -111,7 +111,7 @@ export default class TopicsStore {
             return rows
         } catch (e) {
         }
-        return null
+        return '[]'
     }
 
     get getSavedTopics_List() {
@@ -127,7 +127,7 @@ export default class TopicsStore {
             return rows
         } catch (e) {
         }
-        return null
+        return '[]'
     }
 
     addNewTopicJson(newTopicObj) {

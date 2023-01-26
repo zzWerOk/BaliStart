@@ -1,32 +1,202 @@
-const {TableUpdates, Topics, User, Tours} = require("../models/models");
+const {TableUpdates, Topics, User, Tours, Files} = require("../models/models");
 const {Op} = require("sequelize");
 const ApiError = require("../error/ApiError");
+const {readFile, removeFile, createNewFile, reWrightFile} = require("../utils/consts");
+const path = require("path");
+const fs = require("fs");
 
-class ToursController{
+class ToursController {
 
-    async create(req, res){
-        /**
-         Обновление таблиц
-         **/
-        try{
-            // await TableUpdates.update({date: Date.now()}, {where: { table_name: 'Topics' }})
-            await TableUpdates.upsert({table_name:'Tours', date:Date.now()})
-        }catch (e){}
+    async create(req, res, next) {
+        try {
+            const {
+                name,
+                description,
+                image_logo,
+                created_by_user_id,
+                created_date,
+                tour_category,
+                tour_type,
+                duration,
+                activity_level,
+                languages,
+            } = req.body
+
+            let img
+            if (req.files) {
+                img = req.files.img
+            }
+
+            if (name && created_by_user_id) {
+                const result = createNewFile('', 'Topics', img)
+
+                if (result.hasOwnProperty('status')) {
+                    if (result.status === 'ok') {
+                        const fileName = result.fileName
+                        let imgFileName = ''
+                        if (result.imgFileName) {
+                            imgFileName = result.imgFileName
+                        }
+
+                        const newTour = await Tours.create({
+                            name,
+                            description,
+                            image_logo,
+                            created_by_user_id,
+                            created_date,
+                            tour_category,
+                            tour_type,
+                            duration,
+                            activity_level,
+                            languages,
+                            file_name: fileName,
+                        })
+
+                        /**
+                         Обновление таблиц
+                         **/
+                        try {
+                            // await TableUpdates.update({date: Date.now()}, {where: { table_name: 'Topics' }})
+                            await TableUpdates.upsert({table_name: 'Tours', date: Date.now()})
+                        } catch (e) {
+                        }
+
+                        try {
+                            if (img) {
+                                return res.json({status: 'ok', id: newTour.id, 'image_logo': imgFileName})
+                            }
+                        } catch (e) {
+                        }
+
+                        return res.json({status: 'ok', id: newTour.id})
+                    } else {
+                        return res.json({status: 'error', message: result.message})
+                    }
+                }
+                return res.json({status: 'error', message: 'Create file error'})
+
+
+            } else {
+                return next(ApiError.forbidden("Необходимо указать все данные..."))
+            }
+        } catch (e) {
+            return res.json({status: 'error', message: e.message})
+
+            // return next(ApiError.forbidden("Ошибка добавления..."))
+        }
+    }
+
+    async change(req, res, next) {
+        try {
+            const {
+                id,
+                name,
+                description,
+                image_logo,
+                created_by_user_id,
+                created_date,
+                tour_category,
+                tour_type,
+                duration,
+                activity_level,
+                languages,
+            } = req.body
+
+            let img
+            if (req.files) {
+                img = req.files.img
+            }
+
+            if (id && name && created_by_user_id) {
+
+                const candidate = await Tours.findOne({where: {id}})
+
+                if (candidate) {
+                    // const result = reWrightFile('', 'Tours', candidate.file_name, null)
+                    //
+                    // if (result.hasOwnProperty('status')) {
+                    //     if (result.status === 'ok') {
+
+                    let imgFileName = ''
+                    try {
+                        if (img) {
+                            imgFileName = candidate.file_name.split('\\')[1]
+                            await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                        }
+                    } catch (e) {
+                        return res.json({status: 'error', message: 'save image error', e: e.message})
+                    }
+
+                    await Topics.update({
+                        name,
+                        description,
+                        image_logo,
+                        created_by_user_id,
+                        created_date,
+                        tour_category,
+                        tour_type,
+                        duration,
+                        activity_level,
+                        languages,
+                    }, {where: {id: id}})
+
+                    try {
+                        if (img) {
+                            await Topics.update({
+                                image_logo: imgFileName,
+                            }, {where: {id: id}})
+                        }
+                    } catch (e) {
+                    }
+
+                    /**
+                     Обновление таблиц
+                     **/
+                    try {
+                        // await TableUpdates.update({date: Date.now()}, {where: { table_name: 'Topics' }})
+                        await TableUpdates.upsert({table_name: 'Tours', date: Date.now()})
+                    } catch (e) {
+                    }
+
+                    try {
+                        if (img) {
+                            return res.json({status: 'ok', 'image_logo': imgFileName})
+                        }
+                    } catch (e) {
+                    }
+
+                    return res.json({status: 'ok'})
+                    // }
+                    // }
+
+                }
+            } else {
+                return next(ApiError.forbidden("Необходимо указать все данные..."))
+            }
+        } catch (e) {
+            return res.json({status: 'error', message: e.message})
+
+        }
+        return next(ApiError.forbidden("Ошибка изменения..."))
 
     }
 
-    async change(req, res){
-        /**
-         Обновление таблиц
-         **/
-        try{
-            // await TableUpdates.update({date: Date.now()}, {where: { table_name: 'Topics' }})
-            await TableUpdates.upsert({table_name:'Tours', date:Date.now()})
-        }catch (e){}
+    // async getData(req, res, next) {
+    //     const {id} = req.params
+    //     if (!id) {
+    //         return next(ApiError.badRequest("Ошибка параметра"))
+    //     } else {
+    //         const candidate = await Topics.findOne({where: {id}})
+    //
+    //         if (candidate) {
+    //             return res.json(readFile(candidate.file_name))
+    //         }
+    //     }
+    //     return next(ApiError.internal("Ошибка чтения данных файла"))
+    //
+    // }
 
-    }
-
-    async getAll(req, res, next){
+    async getAll(req, res, next) {
         try {
             const {tag_search, sort_code} = req.query
             let sortOrder = ['id', 'ASC']
@@ -57,7 +227,7 @@ class ToursController{
                     break
             }
 
-            const topicsCategoriesList = await Tours.findAndCountAll({
+            const toursList = await Tours.findAndCountAll({
                     // limit: 10,
                     // attributes: ['tag', tagSearch],
                     order: [sortOrder
@@ -77,7 +247,7 @@ class ToursController{
 
             const usersArr = await User.findAll()
 
-            topicsCategoriesList.rows.map(item => {
+            toursList.rows.map(item => {
                 let newItem = JSON.parse(JSON.stringify(item))
 
                 usersArr.map(currUser => {
@@ -98,23 +268,53 @@ class ToursController{
         }
     }
 
-    async getById(req, res){
+    async getById(req, res) {
 
     }
 
-    async getByMapPoint(req, res){
+    async getByMapPoint(req, res) {
 
     }
 
-    async deleteTour(req, res){
-        /**
-         Обновление таблиц
-         **/
-        try{
-            // await TableUpdates.update({date: Date.now()}, {where: { table_name: 'Topics' }})
-            await TableUpdates.upsert({table_name:'Tours', date:Date.now()})
-        }catch (e){}
+    async deleteTour(req, res, next) {
+        const {id} = req.query
+        try {
+            if (!id) {
+                return next(ApiError.badRequest("Ошибка параметра"))
+            } else {
+                const candidate = await Tours.findOne({where: {id}})
 
+                if (candidate) {
+
+                    try {
+                        let imgFileName = candidate.file_name.split('\\')[1]
+                        const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
+                        fs.unlinkSync(imgFilePath)
+                    } catch (e) {
+                    }
+
+                    /**
+                     Обновление таблиц
+                     **/
+                    try {
+                        await TableUpdates.upsert({table_name: 'Tours', date: Date.now()})
+                    } catch (e) {
+                    }
+
+                    const result = removeFile(candidate.file_name)
+                    if (result.hasOwnProperty('status')) {
+                        if (result.status === 'ok') {
+                            await Files.destroy({where: {table_name: 'Tours', file_name: candidate.file_name}})
+                            const count = await Topics.destroy({where: {id: id}})
+                            return res.json({status: "ok", message: `Удалено записей: ${count}`})
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            return res.json({status: "error", message: e.message})
+        }
+        return next(ApiError.internal("Ошибка удаления"))
     }
 
 }

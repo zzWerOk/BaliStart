@@ -211,7 +211,7 @@ export default class TopicsCategoryStore {
         }
     }
 
-    saveTopicsCategoryList(data) {
+    saveCategoriesList(data) {
         let newList = []
         if (data) {
             newList = data
@@ -234,8 +234,8 @@ export default class TopicsCategoryStore {
         localStorage.setItem('topicsCategoryPage_listItems', textForSave)
     }
 
-    getSavedTopicsCategoryList() {
-        this._itemsArr = localStorage.getItem("topicsCategoryPage_listItems")
+    getSavedCategoriesList() {
+        this._itemsArr = localStorage.getItem("topicsCategoryPage_listItems") || '[]'
         this._newItemsArr = ''
 
         // console.log(localStorage.getItem("topicsCategoryPage_listItems"))
@@ -245,7 +245,7 @@ export default class TopicsCategoryStore {
             return this.itemsArr
         } catch (e) {
         }
-        return null
+        return '[]'
     }
 
 

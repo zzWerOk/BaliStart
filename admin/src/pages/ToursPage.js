@@ -4,12 +4,14 @@ import SpinnerSM from "../components/SpinnerSM";
 import {getAll} from "../http/toursAPI";
 import {delay} from "../utils/consts";
 import {getTableUpdateByName} from "../http/tableUpdatesAPI";
-import TopicsCategories from "../components/TopicsCategories";
 import TopicsList from "../components/topics/TopicsList";
 import ToursCategories from "../components/ToursCategories";
+import TopicListsCell from "../components/topics/TopicListsCell";
+import TourListsCell from "../components/tours/TourListsCell";
 
 const ToursPage = () => {
     const {toursStore, navBarTitle, user} = useContext(Context)
+    const {toursCategoryStore} = useContext(Context)
 
     const [loading, setLoading] = useState(true)
     const [redraw, setRedraw] = useState(true)
@@ -73,11 +75,23 @@ const ToursPage = () => {
                             ?
                             <div>
                                 <ToursCategories/>
-                                {/*<TopicsList getAllData={getAllData} redrawPage={redrawPage}/>*/}
+                                <TopicsList
+                                    topicsStore={toursStore}
+                                    categoriesStore={toursCategoryStore}
+                                    getAllData={getAllData}
+                                    redrawPage={redrawPage}
+                                    ItemsListsCell={TourListsCell}
+                                />
                             </div>
                             :
                             <div>
-                                {/*<TopicsList getAllData={getAllData} redrawPage={redrawPage}/>*/}
+                                <TopicsList
+                                    topicsStore={toursStore}
+                                    categoriesStore={toursCategoryStore}
+                                    getAllData={getAllData}
+                                    redrawPage={redrawPage}
+                                    ItemsListsCell={TourListsCell}
+                                />
                             </div>
                     }
                 </div>

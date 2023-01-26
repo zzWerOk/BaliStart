@@ -1,12 +1,12 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Col, Image, Row} from "react-bootstrap";
 import ModalPopUp from "../modal/ModalPopUp";
-import TopicDetailsPage from "./TopicDetailsPage";
 import SpinnerSM from "../SpinnerSM";
 import {epochToDate} from "../../utils/consts";
 import imageLogo from '../../img/nophoto.jpg'
+import TourDetailsPage from "./TourDetailsPage";
 
-const TopicListsCell = (props) => {
+const TourListsCell = (props) => {
     const {item, onItemEditHandler, deleteTopic} = props
 
     const [showModal, setShowModal] = useState(false)
@@ -23,7 +23,7 @@ const TopicListsCell = (props) => {
     )
 
     const topicPageCardComponent = (data) => (
-        <TopicDetailsPage
+        <TourDetailsPage
             item={data}
             onItemEditHandler={onItemEditHandlerCell}
             deleteTopic={deleteTopic}
@@ -148,4 +148,4 @@ const TopicListsCell = (props) => {
     }
 };
 
-export default TopicListsCell;
+export default TourListsCell;

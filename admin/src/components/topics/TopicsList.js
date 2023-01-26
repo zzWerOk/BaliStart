@@ -5,6 +5,8 @@ import {Context} from "../../index";
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
 import {ReactComponent as CloseIco} from "../../img/svg/close.svg";
+import TopicDetailsPage from "./TopicDetailsPage";
+import TourListsCell from "../tours/TourListsCell";
 
 const sortItems = [
     {name: `By user (a-b)`, code: 'user'},
@@ -16,11 +18,10 @@ const sortItems = [
 ]
 
 const TopicsList = (props) => {
-    const {topicsStore} = useContext(Context)
+    // const {topicsStore} = useContext(Context)
     const {user} = useContext(Context)
-    const {topicsCategoryStore} = useContext(Context)
 
-    const {redrawPage, getAllData} = props
+    const {redrawPage, getAllData, categoriesStore, topicsStore, ItemsListsCell} = props
 
     const [itemsList, setItemsList] = useState([])
     const [loading, setLoading] = useState(true)
@@ -33,14 +34,18 @@ const TopicsList = (props) => {
     const [topicCategoriesItems, setTopicCategoriesItems] = useState([])
     const [topicCategoriesItems_load, setTopicCategoriesItems_load] = useState(true)
 
-    useEffect(() => {
+    useEffect(() =>
+    {
+
         delay(0).then(r => {
             let topicsArr = topicsStore.getTopicsList
+            // let topicsArr = topicsStore.getSavedTopics_List
             if (!topicsArr) {
                 topicsArr = []
             }
+            setItemsList(topicsArr)
 
-            setTopicCategoriesItems([...topicsCategoryStore.getSavedTopicsCategoryList(),
+            setTopicCategoriesItems([...categoriesStore.getSavedCategoriesList(),
                 {
                     "id": -99,
                     "category_name": "Divider"
@@ -52,7 +57,7 @@ const TopicsList = (props) => {
 
             ])
 
-            const filtered = topicsCategoryStore.getSavedTopicsCategoryList().filter(function (value, index, arr) {
+            const filtered = categoriesStore.getSavedCategoriesList().filter(function (value, index, arr) {
                 return ("" + value.id) === ("" + topicsStore.tag_search)
             })
 
@@ -62,10 +67,6 @@ const TopicsList = (props) => {
             setSelectedName(sortItems.filter(function (value, index, arr) {
                 return value.code === topicsStore.sort_code;
             })[0].name)
-            setItemsList(topicsArr)
-
-
-            // setTopicCategoriesItems(topicsCategoryStore.getSavedTopicsCategoryList())
 
             setLoading(false)
         })
@@ -132,6 +133,16 @@ const TopicsList = (props) => {
 
         getAllData()
     }
+
+    // function castDetailPage({ data, onItemEditHandlerCell, deleteTopic}) {
+    //     return (
+    //         <TopicDetailsPage
+    //             item={data}
+    //             onItemEditHandler={onItemEditHandlerCell}
+    //             deleteTopic={deleteTopic}
+    //         />
+    //     );
+    // }
 
     if (loading) {
         return <SpinnerSM/>
@@ -230,11 +241,14 @@ const TopicsList = (props) => {
                 </nav>
 
                 {itemsList.map(item =>
-                    <TopicListsCell
+                    // <TopicListsCell
+                    <ItemsListsCell
                         key={item.id}
                         item={item}
                         onItemEditHandler={onItemEditHandler}
                         deleteTopic={deleteTopic}
+                        categoriesStore={categoriesStore}
+                        // ItemDetailsPage={castDetailPage}
                     />
                 )}
 

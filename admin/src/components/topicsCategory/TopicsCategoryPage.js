@@ -4,7 +4,7 @@ import TopicsCategoryItem_new from "./TopicsCategoryItem_new";
 import TopicsCategoryItem_ready from "./TopicsCategoryItem_ready";
 import {delay} from "../../utils/consts";
 import {getTableUpdateByName} from "../../http/tableUpdatesAPI";
-import {getAll} from "../../http/topicsCategoryAPI";
+import {changeAPI, deleteAPI, getAll} from "../../http/topicsCategoryAPI";
 import {Context} from "../../index";
 import SpinnerSm from "../SpinnerSM";
 import {observer} from "mobx-react-lite";
@@ -31,13 +31,13 @@ const TopicsCategoryPage = observer(() => {
             getTableUpdateByName('TopicsCategory').then(tuData => {
                 const lastDateTable = topicsCategoryStore.getSavedLastDateTableTopicsCategory()
 
-                if (tuData.date.toString() !== lastDateTable.toString() || topicsCategoryStore.getSavedTopicsCategoryList().length === 0) {
+                if (tuData.date.toString() !== lastDateTable.toString() || topicsCategoryStore.getSavedCategoriesList().length === 0) {
                     getAll().then(data => {
                         /**
                          Сохраняем список
                          **/
                         // console.log(data)
-                        topicsCategoryStore.saveTopicsCategoryList(data.rows)
+                        topicsCategoryStore.saveCategoriesList(data.rows)
                         // console.log('Даты не равны, получаем данные с сервера')
                         setItems_arr(data.rows)
                     }).finally(() => {
@@ -48,7 +48,7 @@ const TopicsCategoryPage = observer(() => {
                      **/
                     topicsCategoryStore.saveLastDateTableTopicsCategory(tuData.date)
                 } else {
-                    setItems_arr(topicsCategoryStore.getSavedTopicsCategoryList())
+                    setItems_arr(topicsCategoryStore.getSavedCategoriesList())
                     // console.log('Даты равны, получаем данные с LocalStorage')
                 }
 
@@ -78,7 +78,7 @@ const TopicsCategoryPage = observer(() => {
                             if (data.status === 'ok') {
                                 if (topicsCategoryStore.addNewItem(newItemData.name, newItemData.description, false, data.id)) {
                                     setNew_items_arr(topicsCategoryStore.newItemsArr)
-                                    topicsCategoryStore.saveTopicsCategoryList()
+                                    topicsCategoryStore.saveCategoriesList()
                                     addItemTrigger.added()
 
                                 }
@@ -146,6 +146,9 @@ const TopicsCategoryPage = observer(() => {
                     is_for_tour={item.is_for_tour}
                     id={item.id}
                     onDeleteItemTrigger={onDeleteItemTrigger}
+                    changeAPI={changeAPI}
+                    deleteAPI={deleteAPI}
+                    categoriesStore={topicsCategoryStore}
                 />)}
             </div>
             <div>
@@ -157,6 +160,10 @@ const TopicsCategoryPage = observer(() => {
                     is_for_tour={item.is_for_tour}
                     id={item.id}
                     onDeleteItemTrigger={onDeleteItemTrigger}
+                    changeAPI={changeAPI}
+                    deleteAPI={deleteAPI}
+                    categoriesStore={topicsCategoryStore}
+
                 />)}
             </div>
 

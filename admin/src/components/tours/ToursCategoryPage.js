@@ -2,13 +2,13 @@ import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {Button, ListGroup} from "react-bootstrap";
 import {delay} from "../../utils/consts";
 import {getTableUpdateByName} from "../../http/tableUpdatesAPI";
-import {getAll} from "../../http/topicsCategoryAPI";
 import {Context} from "../../index";
 import SpinnerSm from "../SpinnerSM";
 import {observer} from "mobx-react-lite";
-import {createAPI} from "../../http/topicsCategoryAPI";
+import {getAll, createAPI} from "../../http/toursCategoryAPI";
 import TopicsCategoryItem_new from "../topicsCategory/TopicsCategoryItem_new";
 import TopicsCategoryItem_ready from "../topicsCategory/TopicsCategoryItem_ready";
+import {changeAPI, deleteAPI} from "../../http/toursCategoryAPI";
 
 const ToursCategoryPage = observer(() => {
 
@@ -26,27 +26,27 @@ const ToursCategoryPage = observer(() => {
 
         delay(0).then(r => {
 
-            getTableUpdateByName('TopicsCategory').then(tuData => {
-                const lastDateTable = topicsCategoryStore.getSavedLastDateTableTopicsCategory()
+            getTableUpdateByName('ToursCategory').then(tuData => {
+                const lastDateTable = toursCategoryStore.getSavedLastDateTableToursCategory()
 
-                if (tuData.date.toString() !== lastDateTable.toString() || topicsCategoryStore.getSavedTopicsCategoryList().length === 0) {
+                if (tuData.date.toString() !== lastDateTable.toString() || toursCategoryStore.getSavedToursCategoryList().length === 0) {
                     getAll().then(data => {
                         /**
                          Сохраняем список
                          **/
                         // console.log(data)
-                        topicsCategoryStore.saveTopicsCategoryList(data.rows)
+                        toursCategoryStore.saveCategoriesList(data.rows)
                         // console.log('Даты не равны, получаем данные с сервера')
                         setItems_arr(data.rows)
                     }).finally(() => {
-                        // setItems_arr(topicsCategoryStore.itemsArr)
+                        // setItems_arr(toursCategoryStore.itemsArr)
                     })
                     /**
                      Сохраняем дату последнего изменения таблицы
                      **/
-                    topicsCategoryStore.saveLastDateTableTopicsCategory(tuData.date)
+                    toursCategoryStore.saveLastDateTableToursCategory(tuData.date)
                 } else {
-                    setItems_arr(topicsCategoryStore.getSavedTopicsCategoryList())
+                    setItems_arr(toursCategoryStore.getSavedToursCategoryList())
                     // console.log('Даты равны, получаем данные с LocalStorage')
                 }
 
@@ -62,21 +62,18 @@ const ToursCategoryPage = observer(() => {
         if (newItemData.hasOwnProperty('name')) {
 
 
-            if (!topicsCategoryStore.checkIfNewItemExists(newItemData.name)) {
+            if (!toursCategoryStore.checkIfNewItemExists(newItemData.name)) {
 
                 setLoadingAddItem(true)
 
-                /**
-                 Изменение роли пользователя API
-                 **/
                 delay(0).then(r => {
                     createAPI(newItemData.name, newItemData.description).then(data => {
                         if (data.hasOwnProperty('status')) {
 
                             if (data.status === 'ok') {
-                                if (topicsCategoryStore.addNewItem(newItemData.name, newItemData.description, false, data.id)) {
-                                    setNew_items_arr(topicsCategoryStore.newItemsArr)
-                                    topicsCategoryStore.saveTopicsCategoryList()
+                                if (toursCategoryStore.addNewItem(newItemData.name, newItemData.description, false, data.id)) {
+                                    setNew_items_arr(toursCategoryStore.newItemsArr)
+                                    toursCategoryStore.saveCategoriesList()
                                     addItemTrigger.added()
 
                                 }
@@ -131,30 +128,36 @@ const ToursCategoryPage = observer(() => {
                     addNewItemFunc={addNewNewItem}
                     loadingAddItem={loadingAddItem}
                     addItemTrigger={addItemTrigger}
-                    // name={topicsCategoryStore.name}
-                    // description={topicsCategoryStore.description}
+                    // name={toursCategoryStore.name}
+                    // description={toursCategoryStore.description}
                 />
             </ListGroup>
             <div style={{marginBottom: '10px'}}>
-                {/*{topicsCategoryStore.newItemsArr.map(item => <TopicsCategoryItem_ready*/}
+                {/*{toursCategoryStore.newItemsArr.map(item => <TopicsCategoryItem_ready*/}
                 {new_items_arr.map(item => <TopicsCategoryItem_ready
                     key={item.id + 'new'}
                     name={item.category_name}
                     description={item.description}
-                    is_for_tour={item.is_for_tour}
                     id={item.id}
                     onDeleteItemTrigger={onDeleteItemTrigger}
+                    changeAPI={changeAPI}
+                    deleteAPI={deleteAPI}
+                    categoriesStore={toursCategoryStore}
+
                 />)}
             </div>
             <div>
-                {/*{topicsCategoryStore.itemsArr.map(item => <TopicsCategoryItem_ready*/}
+                {/*{toursCategoryStore.itemsArr.map(item => <TopicsCategoryItem_ready*/}
                 {items_arr.map(item => <TopicsCategoryItem_ready
                     key={item.id}
                     name={item.category_name}
                     description={item.description}
-                    is_for_tour={item.is_for_tour}
                     id={item.id}
                     onDeleteItemTrigger={onDeleteItemTrigger}
+                    changeAPI={changeAPI}
+                    deleteAPI={deleteAPI}
+                    categoriesStore={toursCategoryStore}
+
                 />)}
             </div>
 

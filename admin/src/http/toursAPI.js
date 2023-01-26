@@ -19,6 +19,142 @@ export const getAll = async () => {
     }
 
     const {data} = await $host.get(apiUrl+'/getAll', request)
-    console.log(data)
     return data
 }
+
+// export const getTourData = async (id) => {
+//     const {data} = await $host.get(apiUrl+'/data/' + id)
+//     return data
+// }
+
+export const deleteTourAPI = async (id) => {
+    const {data} = await $authHost.delete(apiUrl+'/', {params: {id: id}})
+    return data
+}
+
+export const saveTourAPI = async (
+    name,
+    description,
+    image_logo,
+    created_by_user_id,
+    created_date,
+    tour_category,
+    tour_type,
+    duration,
+    activity_level,
+    languages,
+) => {
+
+    try {
+        let formData = new FormData();
+        formData = addToFormData(formData,
+            name,
+            description,
+            image_logo,
+            created_by_user_id,
+            created_date,
+            tour_category,
+            tour_type,
+            duration,
+            activity_level,
+            languages,
+        )
+
+        if(!formData){
+            console.log('FormData error...')
+            return null
+        }
+
+        const {data} = await $authHostUpload.post(apiUrl+'/create', formData)
+        return data
+    } catch (e) {
+        console.log('data error', e.message)
+    }
+
+}
+
+export const changeTourAPI = async (
+    id,
+    name,
+    description,
+    image_logo,
+    created_by_user_id,
+    created_date,
+    tour_category,
+    tour_type,
+    duration,
+    activity_level,
+    languages,
+) => {
+    try {
+
+        let formData = new FormData();
+
+        formData.append("id", id);
+        formData = addToFormData(formData,
+            name,
+            description,
+            image_logo,
+            created_by_user_id,
+            created_date,
+            tour_category,
+            tour_type,
+            duration,
+            activity_level,
+            languages,
+        )
+
+        if(!formData){
+            console.log('FormData error...')
+            return null
+        }
+
+        const {data} = await $authHostUpload.post(apiUrl+'/change', formData)
+        return data
+    } catch (e) {
+        console.log('data error', e.message)
+    }
+
+}
+
+const addToFormData = (formData,
+                       name,
+                       description,
+                       image_logo,
+                       created_by_user_id,
+                       created_date,
+                       tour_category,
+                       tour_type,
+                       duration,
+                       activity_level,
+                       languages,
+) => {
+    try {
+        formData.append("name", name);
+        formData.append("description", description);
+        formData.append("image_logo", image_logo);
+        formData.append("created_by_user_id", created_by_user_id);
+        formData.append("created_date", created_date);
+
+        formData.append("tour_category", tour_category);
+        formData.append("tour_type", tour_type);
+        formData.append("duration", duration);
+        formData.append("activity_level", activity_level);
+        formData.append("languages", languages);
+
+        if (image_logo !== '') {
+            if (image_logo !== undefined) {
+                try {
+                    formData.append("img", image_logo, "imageFile");
+                } catch (e) {
+                    console.log('File apply error: ', e.message)
+                }
+            }
+        }
+
+        return formData
+    } catch (e) {
+        return null
+    }
+}
+

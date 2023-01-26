@@ -64,7 +64,6 @@ export default class TopicDetailsStore {
 
     }
 
-
     set items(value) {
         this._items = value;
     }

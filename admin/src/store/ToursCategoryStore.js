@@ -8,7 +8,7 @@ export default class ToursCategoryStore {
         this._newItemsIsEdited = false
         this._newItemsArr = ''
         this._itemsArr = ''
-        this._lastDateTableTopicsCategory = -1
+        this._lastDateTableToursCategory = -1
 
         makeAutoObservable(this)
     }
@@ -211,7 +211,7 @@ export default class ToursCategoryStore {
         }
     }
 
-    saveTopicsCategoryList(data) {
+    saveCategoriesList(data) {
         let newList = []
         if (data) {
             newList = data
@@ -226,39 +226,37 @@ export default class ToursCategoryStore {
             newList.push.apply(newList, this.newItemsArr)
         }
 
-
         let textForSave = ''
 
         textForSave = JSON.stringify(newList)
 
-        localStorage.setItem('topicsCategoryPage_listItems', textForSave)
+        localStorage.setItem('toursCategoryPage_listItems', textForSave)
     }
 
-    getSavedTopicsCategoryList() {
-        this._itemsArr = localStorage.getItem("topicsCategoryPage_listItems")
+    getSavedCategoriesList() {
+        this._itemsArr = localStorage.getItem("toursCategoryPage_listItems") || '[]'
         this._newItemsArr = ''
-
-        // console.log(localStorage.getItem("topicsCategoryPage_listItems"))
 
         try {
             // return JSON.parse(this.itemsArr)
             return this.itemsArr
         } catch (e) {
         }
-        return null
+        return '[]'
     }
 
 
-    getSavedLastDateTableTopicsCategory() {
-        if (this._lastDateTableTopicsCategory === -1) {
-            this._lastDateTableTopicsCategory = localStorage.getItem("lastDateTableTopicsCategory")
+    getSavedLastDateTableToursCategory() {
+        if (this._lastDateTableToursCategory === -1) {
+            this._lastDateTableToursCategory = localStorage.getItem("lastDateTableToursCategory") || -1
         }
-        return this._lastDateTableTopicsCategory
+
+        return this._lastDateTableToursCategory
     }
 
-    saveLastDateTableTopicsCategory(newDate) {
-        this._lastDateTableTopicsCategory = newDate
-        localStorage.setItem('lastDateTableTopicsCategory', newDate)
+    saveLastDateTableToursCategory(newDate) {
+        this._lastDateTableToursCategory = newDate
+        localStorage.setItem('lastDateTableToursCategory', newDate)
     }
 
 

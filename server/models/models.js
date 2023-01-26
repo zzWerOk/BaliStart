@@ -85,6 +85,14 @@ const TopicsCategory = sequelize.define('topics_category', {
 
 })
 
+const ToursCategory = sequelize.define('tours_category', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    category_name: {type: DataTypes.STRING, allowNull: false, unique: true},
+    description: {type: DataTypes.STRING},
+    is_active: {type: DataTypes.BOOLEAN, defaultValue: true},
+
+})
+
 const TableUpdates = sequelize.define('table_updates', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     table_name: {type: DataTypes.STRING, allowNull: false, unique: true},
@@ -122,4 +130,5 @@ module.exports = {
     TableUpdates,
     Files,
     TopicsCategory,
+    ToursCategory,
 }

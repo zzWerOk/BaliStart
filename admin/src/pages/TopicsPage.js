@@ -6,8 +6,11 @@ import {delay} from "../utils/consts";
 import {getTableUpdateByName} from "../http/tableUpdatesAPI";
 import {getAll} from "../http/topicsAPI";
 import TopicsList from "../components/topics/TopicsList";
+import TopicListsCell from "../components/topics/TopicListsCell";
 
 const ToursPage = () => {
+    const {topicsCategoryStore} = useContext(Context)
+
     const {navBarTitle} = useContext(Context)
     const {topicsStore, user} = useContext(Context)
     const [loading, setLoading] = useState(true)
@@ -73,11 +76,23 @@ const ToursPage = () => {
                         ?
                         <div>
                             <TopicsCategories/>
-                            <TopicsList getAllData={getAllData} redrawPage={redrawPage}/>
+                            <TopicsList
+                                topicsStore={topicsStore}
+                                categoriesStore={topicsCategoryStore}
+                                getAllData={getAllData}
+                                redrawPage={redrawPage}
+                                ItemsListsCell={TopicListsCell}
+                            />
                         </div>
                         :
                         <div>
-                            <TopicsList getAllData={getAllData} redrawPage={redrawPage}/>
+                            <TopicsList
+                                topicsStore={topicsStore}
+                                categoriesStore={topicsCategoryStore}
+                                getAllData={getAllData}
+                                redrawPage={redrawPage}
+                                ItemsListsCell={TopicListsCell}
+                            />
                         </div>
                 }
             </div>
