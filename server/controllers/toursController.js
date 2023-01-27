@@ -1,4 +1,4 @@
-const {TableUpdates, Topics, User, Tours, Files} = require("../models/models");
+const {TableUpdates, User, Tours, Files} = require("../models/models");
 const {Op} = require("sequelize");
 const ApiError = require("../error/ApiError");
 const {readFile, removeFile, createNewFile, reWrightFile} = require("../utils/consts");
@@ -15,6 +15,7 @@ class ToursController {
                 image_logo,
                 created_by_user_id,
                 created_date,
+                active,
                 tour_category,
                 tour_type,
                 duration,
@@ -28,7 +29,7 @@ class ToursController {
             }
 
             if (name && created_by_user_id) {
-                const result = createNewFile('', 'Topics', img)
+                const result = createNewFile('', 'Tours', img)
 
                 if (result.hasOwnProperty('status')) {
                     if (result.status === 'ok') {
@@ -44,6 +45,7 @@ class ToursController {
                             image_logo,
                             created_by_user_id,
                             created_date,
+                            active,
                             tour_category,
                             tour_type,
                             duration,
@@ -56,7 +58,6 @@ class ToursController {
                          Обновление таблиц
                          **/
                         try {
-                            // await TableUpdates.update({date: Date.now()}, {where: { table_name: 'Topics' }})
                             await TableUpdates.upsert({table_name: 'Tours', date: Date.now()})
                         } catch (e) {
                         }
@@ -95,6 +96,7 @@ class ToursController {
                 image_logo,
                 created_by_user_id,
                 created_date,
+                active,
                 tour_category,
                 tour_type,
                 duration,
@@ -127,12 +129,13 @@ class ToursController {
                         return res.json({status: 'error', message: 'save image error', e: e.message})
                     }
 
-                    await Topics.update({
+                    await Tours.update({
                         name,
                         description,
                         image_logo,
                         created_by_user_id,
                         created_date,
+                        active,
                         tour_category,
                         tour_type,
                         duration,
@@ -142,7 +145,7 @@ class ToursController {
 
                     try {
                         if (img) {
-                            await Topics.update({
+                            await Tours.update({
                                 image_logo: imgFileName,
                             }, {where: {id: id}})
                         }
@@ -153,7 +156,6 @@ class ToursController {
                      Обновление таблиц
                      **/
                     try {
-                        // await TableUpdates.update({date: Date.now()}, {where: { table_name: 'Topics' }})
                         await TableUpdates.upsert({table_name: 'Tours', date: Date.now()})
                     } catch (e) {
                     }
@@ -180,21 +182,6 @@ class ToursController {
         return next(ApiError.forbidden("Ошибка изменения..."))
 
     }
-
-    // async getData(req, res, next) {
-    //     const {id} = req.params
-    //     if (!id) {
-    //         return next(ApiError.badRequest("Ошибка параметра"))
-    //     } else {
-    //         const candidate = await Topics.findOne({where: {id}})
-    //
-    //         if (candidate) {
-    //             return res.json(readFile(candidate.file_name))
-    //         }
-    //     }
-    //     return next(ApiError.internal("Ошибка чтения данных файла"))
-    //
-    // }
 
     async getAll(req, res, next) {
         try {
@@ -305,7 +292,7 @@ class ToursController {
                     if (result.hasOwnProperty('status')) {
                         if (result.status === 'ok') {
                             await Files.destroy({where: {table_name: 'Tours', file_name: candidate.file_name}})
-                            const count = await Topics.destroy({where: {id: id}})
+                            const count = await Tours.destroy({where: {id: id}})
                             return res.json({status: "ok", message: `Удалено записей: ${count}`})
                         }
                     }

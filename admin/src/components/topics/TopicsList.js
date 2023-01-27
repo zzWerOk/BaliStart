@@ -1,12 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
-import TopicListsCell from "./TopicListsCell";
 import {Button, Dropdown, Row, ToggleButton} from "react-bootstrap";
 import {Context} from "../../index";
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
-import {ReactComponent as CloseIco} from "../../img/svg/close.svg";
-import TopicDetailsPage from "./TopicDetailsPage";
-import TourListsCell from "../tours/TourListsCell";
 
 const sortItems = [
     {name: `By user (a-b)`, code: 'user'},
@@ -133,16 +129,6 @@ const TopicsList = (props) => {
 
         getAllData()
     }
-
-    // function castDetailPage({ data, onItemEditHandlerCell, deleteTopic}) {
-    //     return (
-    //         <TopicDetailsPage
-    //             item={data}
-    //             onItemEditHandler={onItemEditHandlerCell}
-    //             deleteTopic={deleteTopic}
-    //         />
-    //     );
-    // }
 
     if (loading) {
         return <SpinnerSM/>

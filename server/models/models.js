@@ -36,6 +36,7 @@ const Tours = sequelize.define('tours', {
     image_logo: {type: DataTypes.STRING, allowNull: false},
     created_by_user_id: {type: DataTypes.INTEGER},
     created_date: {type: DataTypes.BIGINT},
+    active: {type: DataTypes.BOOLEAN, defaultValue: true},
     tour_category: {type: DataTypes.STRING},
     tour_type: {type: DataTypes.STRING},
     duration: {type: DataTypes.STRING},
@@ -93,6 +94,14 @@ const ToursCategory = sequelize.define('tours_category', {
 
 })
 
+const ToursType = sequelize.define('tours_types', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    type_name: {type: DataTypes.STRING, allowNull: false, unique: true},
+    description: {type: DataTypes.STRING},
+    is_active: {type: DataTypes.BOOLEAN, defaultValue: true},
+
+})
+
 const TableUpdates = sequelize.define('table_updates', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     table_name: {type: DataTypes.STRING, allowNull: false, unique: true},
@@ -131,4 +140,5 @@ module.exports = {
     Files,
     TopicsCategory,
     ToursCategory,
+    ToursType,
 }

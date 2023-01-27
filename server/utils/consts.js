@@ -118,6 +118,7 @@ getDirName = function (tableName) {
 
     switch (tableName) {
         case 'Topics':
+        case 'Topic':
             dirName = 'topics'
             break
         case 'MapPoint':
@@ -126,6 +127,7 @@ getDirName = function (tableName) {
         case 'img':
             dirName = 'static'
             break
+        case 'Tours':
         case 'Tour':
             dirName = 'tour'
             break

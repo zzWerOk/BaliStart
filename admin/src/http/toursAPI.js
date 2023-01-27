@@ -38,11 +38,13 @@ export const saveTourAPI = async (
     image_logo,
     created_by_user_id,
     created_date,
+    active,
     tour_category,
     tour_type,
     duration,
     activity_level,
     languages,
+    image_logo_file,
 ) => {
 
     try {
@@ -53,11 +55,13 @@ export const saveTourAPI = async (
             image_logo,
             created_by_user_id,
             created_date,
+            active,
             tour_category,
             tour_type,
             duration,
             activity_level,
             languages,
+            image_logo_file
         )
 
         if(!formData){
@@ -80,11 +84,14 @@ export const changeTourAPI = async (
     image_logo,
     created_by_user_id,
     created_date,
+    active,
     tour_category,
     tour_type,
     duration,
     activity_level,
     languages,
+    image_logo_file,
+
 ) => {
     try {
 
@@ -97,11 +104,13 @@ export const changeTourAPI = async (
             image_logo,
             created_by_user_id,
             created_date,
+            active,
             tour_category,
             tour_type,
             duration,
             activity_level,
             languages,
+            image_logo_file
         )
 
         if(!formData){
@@ -110,6 +119,7 @@ export const changeTourAPI = async (
         }
 
         const {data} = await $authHostUpload.post(apiUrl+'/change', formData)
+        console.log(data)
         return data
     } catch (e) {
         console.log('data error', e.message)
@@ -123,11 +133,13 @@ const addToFormData = (formData,
                        image_logo,
                        created_by_user_id,
                        created_date,
+                       active,
                        tour_category,
                        tour_type,
                        duration,
                        activity_level,
                        languages,
+                       image_logo_file
 ) => {
     try {
         formData.append("name", name);
@@ -135,6 +147,7 @@ const addToFormData = (formData,
         formData.append("image_logo", image_logo);
         formData.append("created_by_user_id", created_by_user_id);
         formData.append("created_date", created_date);
+        formData.append("active", active);
 
         formData.append("tour_category", tour_category);
         formData.append("tour_type", tour_type);
@@ -142,10 +155,10 @@ const addToFormData = (formData,
         formData.append("activity_level", activity_level);
         formData.append("languages", languages);
 
-        if (image_logo !== '') {
-            if (image_logo !== undefined) {
+        if (image_logo_file !== '') {
+            if (image_logo_file !== undefined) {
                 try {
-                    formData.append("img", image_logo, "imageFile");
+                    formData.append("img", image_logo_file, "imageFile");
                 } catch (e) {
                     console.log('File apply error: ', e.message)
                 }

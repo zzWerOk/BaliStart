@@ -5,10 +5,13 @@ import UserPageCard from "./users/UserPageCard";
 import TopicsCategoryPage from "./topicsCategory/TopicsCategoryPage";
 import ToursCategoryPage from "./tours/ToursCategoryPage";
 
-const ToursCategories = () => {
+const ToursCategories = (props) => {
+    const {tagType} = props
     const [showModal, setShowModal] = useState(false)
 
-    const categoriesPageCardComponent = () => ( <ToursCategoryPage /> );
+    const categoriesPageCardComponent = () => (
+        <ToursCategoryPage tagType={tagType}/>
+    );
 
     return (
         <Nav variant="pills" defaultActiveKey="/home">
@@ -17,14 +20,20 @@ const ToursCategories = () => {
                     onClick={() => {
                         setShowModal(true)
                     }}
-                >Categories</Button>
+                >{
+                    tagType === 'categories'
+                        ?
+                        'Categories'
+                        :
+                        'Types'
+                }</Button>
             </Nav.Item>
             <ModalPopUp
                 show={showModal}
                 onHide={() => {
                     setShowModal(false)
                 }}
-                title={'Categories'}
+                title={tagType === 'categories' ? 'Categories' : 'Types'}
                 child={categoriesPageCardComponent}
             />
         </Nav>

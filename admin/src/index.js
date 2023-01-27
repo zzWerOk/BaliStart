@@ -5,6 +5,7 @@ import App from './App';
 import UserStore from "./store/UserStore";
 import TopicsCategoryStore from "./store/TopicsCategoryStore";
 import ToursCategoryStore from "./store/ToursCategoryStore";
+import ToursTypeStore from "./store/ToursTypeStore";
 import TopicsStore from "./store/TopicsStore";
 import ToursStore from "./store/ToursStore";
 import TopicDetailsStore from "./store/TopicDetailsStore";
@@ -22,6 +23,7 @@ root.render(
         userList: new UserListStore(),
         topicsCategoryStore: new TopicsCategoryStore(),
         toursCategoryStore: new ToursCategoryStore(),
+        toursTypeStore: new ToursTypeStore(),
         toursStore: new ToursStore(),
         topicsStore: new TopicsStore(),
         mapPointsStore: new MapPointsStore(),

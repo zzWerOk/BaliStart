@@ -74,7 +74,10 @@ const ToursPage = () => {
                         user.isAdmin
                             ?
                             <div>
-                                <ToursCategories/>
+                                <div style={{display: 'flex'}}>
+                                <ToursCategories tagType={'categories'}/>
+                                <ToursCategories tagType={'types'}/>
+                                </div>
                                 <TopicsList
                                     topicsStore={toursStore}
                                     categoriesStore={toursCategoryStore}

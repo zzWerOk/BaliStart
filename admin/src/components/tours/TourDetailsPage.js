@@ -1,17 +1,6 @@
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import TopicCL from "../../classes/topicCL";
+import React, {useContext, useEffect, useState} from 'react';
 import {Button, Dropdown, DropdownButton, Image, Row, ToggleButton} from "react-bootstrap";
 import noImageLogo from '../../img/nophoto.jpg'
-// import TopicItemCard from "../components/TopicItemCard";
-// import TopicTextComponent from "./components/TopicTextComponent";
-// import TopicCommentComponent from "./components/TopicCommentComponent";
-// import TopicListComponent from "./components/TopicListComponent";
-// import TopicLinkComponent from "./components/TopicLinkComponent";
-// import TopicEmailComponent from "./components/TopicEmailComponent";
-// import TopicPhoneComponent from "./components/TopicPhoneComponent";
-// import TopicImagesComponent from "./components/TopicImagesComponent";
-// import TopicGoogleMapUrlComponent from "./components/TopicGoogleMapUrlComponent";
-// import TopicAddNewBtn from "./components/TopicAddNewBTN";
 import {Context} from "../../index";
 import {observer} from "mobx-react-lite";
 
@@ -20,19 +9,8 @@ import {ReactComponent as CircleOkIco} from "../../img/svg/circle_ok.svg"
 import {ReactComponent as CloseIco} from "../../img/svg/close.svg"
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
-import {changeTopicAPI, deleteTopicAPI, getTopicData, saveTopicAPI, setActiveAPI} from "../../http/topicsAPI";
 import {MDBFile} from "mdb-react-ui-kit";
-import {changeTourAPI, deleteTourAPI, getTourData, saveTourAPI} from "../../http/toursAPI";
-import TopicTextComponent from "../topics/components/TopicTextComponent";
-import TopicCommentComponent from "../topics/components/TopicCommentComponent";
-import TopicListComponent from "../topics/components/TopicListComponent";
-import TopicLinkComponent from "../topics/components/TopicLinkComponent";
-import TopicEmailComponent from "../topics/components/TopicEmailComponent";
-import TopicPhoneComponent from "../topics/components/TopicPhoneComponent";
-import TopicImagesComponent from "../topics/components/TopicImagesComponent";
-import TopicGoogleMapUrlComponent from "../topics/components/TopicGoogleMapUrlComponent";
-import TopicItemCard from "../topics/components/TopicItemCard";
-import TopicAddNewBtn from "../topics/components/TopicAddNewBTN";
+import {changeTourAPI, deleteTourAPI, saveTourAPI} from "../../http/toursAPI";
 import TourCL from "../../classes/tourCL";
 
 // const dropDownItems = [
@@ -83,33 +61,38 @@ let currTour = null
 const TourDetailsPage = observer((props) => {
     const {item, onItemEditHandler, deleteTopic} = props
 
-    const {topicDetailsStore} = useContext(Context)
-    const {toursCategoryStore} = useContext(Context)
+    const {toursCategoryStore, toursTypeStore} = useContext(Context)
 
     const [isSaving, setIsSaving] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
     const [saveError, setSaveError] = useState(false)
     const [deleteError, setDeleteError] = useState(false)
+    const [isActive, setIsActive] = useState(true)
     const [currName, setCurrName] = useState('')
     const [currDescription, setCurrDescription] = useState('')
     const [itemImageLogo, setItemImageLogo] = useState('')
     const [newImageLogo, setNewImageLogo] = useState(false)
-    const [topicCategoriesItems, setTopicCategoriesItems] = useState([])
-    const [topicCategoriesItems_load, setTopicCategoriesItems_load] = useState(true)
-    const [topicTags, setTopicTags] = useState([])
+    const [tourCategoriesItems, setTourCategoriesItems] = useState([])
+    const [tourCategoriesItems_load, setTourCategoriesItems_load] = useState(true)
+    const [tourTypesItems, setTourTypesItems] = useState([])
+    const [tourTypeItems_load, setTourTypeItems_load] = useState(true)
+    const [tourTags, setTourTags] = useState([])
+    const [tourTypes, setTourTypes] = useState([])
 
     useEffect(
         () => {
 
             currTour = new TourCL()
 
-            setTopicCategoriesItems_load(true)
+            setTourCategoriesItems_load(true)
             currTour.setFromJson(item)
             setCurrName(currTour.name)
             setCurrDescription(currTour.description)
-            // setIsActive(currTour.active)
-            setTopicCategoriesItems(toursCategoryStore.getSavedCategoriesList())
-            setTopicTags(currTour.tagJSON)
+            setIsActive(currTour.active)
+            setTourCategoriesItems(toursCategoryStore.getSavedCategoriesList())
+            setTourTypesItems(toursTypeStore.getSavedCategoriesList())
+            setTourTags(currTour.tour_categoryJSON)
+            setTourTypes(currTour.tour_typeJSON)
 
             if (item.image_logo) {
                 if (item.id >= 0) {
@@ -140,7 +123,7 @@ const TourDetailsPage = observer((props) => {
             //     setItemData(currTour.dataJSON)
             //     setTopicCategoriesItems_load(false)
             // }
-
+            setTourCategoriesItems_load(false)
         }, []
     )
 
@@ -217,51 +200,94 @@ const TourDetailsPage = observer((props) => {
     const addNewTagHandler = (value) => {
         let newCategory = null
 
-        for (let i = 0; i < topicCategoriesItems.length; i++) {
-            if (topicCategoriesItems[i].id === value) {
-                newCategory = topicCategoriesItems[i]
+        for (let i = 0; i < tourCategoriesItems.length; i++) {
+            if (tourCategoriesItems[i].id === value) {
+                newCategory = tourCategoriesItems[i]
             }
         }
 
         if (newCategory) {
-            const found = topicTags.find(element => element === newCategory.id)
+            const found = tourTags.find(element => element === newCategory.id)
             if (!found) {
-                setTopicTags([...topicTags, newCategory.id])
-                currTour.tag = JSON.stringify([...topicTags, newCategory.id])
+                setTourTags([...tourTags, newCategory.id])
+                currTour.tour_category = JSON.stringify([...tourTags, newCategory.id])
                 currTour.isSaved = false
                 onItemEditHandler(currTour.getAsJson())
             }
         }
     }
 
-    const dataItemEditHandler = (item) => {
-        if (item.hasOwnProperty('index')) {
-            let dataArr = JSON.parse(currTour.data)
-            const itemIndex = item.index
-            dataArr[itemIndex] = item
-            currTour.data = JSON.stringify(dataArr)
-            currTour.isSaved = false
-            onItemEditHandler(currTour.getAsJson())
+    const addNewTypeHandler = (value) => {
+        let newType = null
+
+        for (let i = 0; i < tourTypesItems.length; i++) {
+            if (tourTypesItems[i].id === value) {
+                newType = tourTypesItems[i]
+            }
+        }
+
+        if (newType) {
+            const found = tourTypes.find(element => element === newType.id)
+            if (!found) {
+                setTourTypes([...tourTypes, newType.id])
+                currTour.tour_type = JSON.stringify([...tourTypes, newType.id])
+                currTour.isSaved = false
+                onItemEditHandler(currTour.getAsJson())
+            }
         }
     }
+
+    // const dataItemEditHandler = (item) => {
+    //     if (item.hasOwnProperty('index')) {
+    //         let dataArr = JSON.parse(currTour.data)
+    //         const itemIndex = item.index
+    //         dataArr[itemIndex] = item
+    //         currTour.data = JSON.stringify(dataArr)
+    //         currTour.isSaved = false
+    //         onItemEditHandler(currTour.getAsJson())
+    //     }
+    // }
 
     const deleteNewTagHandler = (value) => {
         let newCategory = null
 
-        for (let i = 0; i < topicCategoriesItems.length; i++) {
-            if (topicCategoriesItems[i].id === value) {
-                newCategory = topicCategoriesItems[i]
+        for (let i = 0; i < tourCategoriesItems.length; i++) {
+            if (tourCategoriesItems[i].id === value) {
+                newCategory = tourCategoriesItems[i]
             }
         }
 
         if (newCategory) {
-            const found = topicTags.find(element => element === newCategory.id)
+            const found = tourTags.find(element => element === newCategory.id)
             if (found) {
-                const filtered = topicTags.filter(function (value, index, arr) {
+                const filtered = tourTags.filter(function (value, index, arr) {
                     return value !== found;
                 })
-                setTopicTags(filtered)
-                currTour.tag = JSON.stringify(filtered)
+                setTourTags(filtered)
+                currTour.tour_category = JSON.stringify(filtered)
+                currTour.isSaved = false
+                onItemEditHandler(currTour.getAsJson())
+            }
+        }
+    }
+
+    const deleteNewTypeHandler = (value) => {
+        let newCategory = null
+
+        for (let i = 0; i < tourTypesItems.length; i++) {
+            if (tourTypesItems[i].id === value) {
+                newCategory = tourTypesItems[i]
+            }
+        }
+
+        if (newCategory) {
+            const found = tourTypes.find(element => element === newCategory.id)
+            if (found) {
+                const filtered = tourTypes.filter(function (value, index, arr) {
+                    return value !== found;
+                })
+                setTourTypes(filtered)
+                currTour.tour_type = JSON.stringify(filtered)
                 currTour.isSaved = false
                 onItemEditHandler(currTour.getAsJson())
             }
@@ -278,9 +304,17 @@ const TourDetailsPage = observer((props) => {
     // }
 
     const getTagNameById = (id) => {
-        for (let i = 0; i < topicCategoriesItems.length; i++) {
-            if (topicCategoriesItems[i].id === id) {
-                return topicCategoriesItems[i].category_name
+        for (let i = 0; i < tourCategoriesItems.length; i++) {
+            if (tourCategoriesItems[i].id === id) {
+                return tourCategoriesItems[i].category_name
+            }
+        }
+    }
+
+    const getTypeNameById = (id) => {
+        for (let i = 0; i < tourTypesItems.length; i++) {
+            if (tourTypesItems[i].id === id) {
+                return tourTypesItems[i].category_name
             }
         }
     }
@@ -323,12 +357,12 @@ const TourDetailsPage = observer((props) => {
     }
 
 
-    // const setActiveHandler = (value) => {
-    //     setIsActive(value)
-    //     currTour.active = value
-    //     currTour.isSaved = false
-    //     onItemEditHandler(currTour.getAsJson())
-    // }
+    const setActiveHandler = (value) => {
+        setIsActive(value)
+        currTour.active = value
+        currTour.isSaved = false
+        onItemEditHandler(currTour.getAsJson())
+    }
 
     const deleteHandler = () => {
         setIsSaving(true)
@@ -368,16 +402,17 @@ const TourDetailsPage = observer((props) => {
                 saveTourAPI(
                     currTour.name,
                     currTour.description,
-                    currTour.image_logo_file,
+                    currTour.image_logo,
                     currTour.created_by_user_id,
                     currTour.created_date,
+                    currTour.active,
 
                     currTour.tour_category,
                     currTour.tour_type,
                     currTour.duration,
                     currTour.activity_level,
                     currTour.languages,
-
+                    currTour.image_logo_file,
                 ).then(data => {
                     if (data.hasOwnProperty('status')) {
                         if (data.status === 'ok') {
@@ -402,15 +437,17 @@ const TourDetailsPage = observer((props) => {
                     currTour.id,
                     currTour.name,
                     currTour.description,
-                    currTour.image_logo_file,
+                    currTour.image_logo,
                     currTour.created_by_user_id,
                     currTour.created_date,
+                    currTour.active,
 
                     currTour.tour_category,
                     currTour.tour_type,
                     currTour.duration,
                     currTour.activity_level,
                     currTour.languages,
+                    currTour.image_logo_file,
                 ).then(data => {
 
                     if (data.hasOwnProperty('status')) {
@@ -466,6 +503,9 @@ const TourDetailsPage = observer((props) => {
             </Row>
 
             <Row>
+                {/***
+                     ACTIVE BTN
+                     ***/}
                 <div
                     className={'col-sm-5 justify-content-start '}
                     style={{display: 'flex'}}
@@ -482,7 +522,7 @@ const TourDetailsPage = observer((props) => {
                     <ToggleButton
                         id="toggle-active"
                         type="checkbox"
-                        variant={setActiveError ? "outline-danger" : "outline-primary"}
+                        variant={"outline-primary"}
                         checked={isActive}
                         value={'1'}
                         disabled={!!isSaving}
@@ -529,7 +569,7 @@ const TourDetailsPage = observer((props) => {
                 </div>
             </Row>
             <Row>
-                {topicCategoriesItems_load
+                {tourCategoriesItems_load
                     ?
                     <SpinnerSM/>
                     :
@@ -541,12 +581,12 @@ const TourDetailsPage = observer((props) => {
                                 id="dropdown-tag"
                                 disabled={!!isSaving}
                             >
-                                Add category tag
+                                Add tour category
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu>
 
-                                {topicCategoriesItems.map(item => {
+                                {tourCategoriesItems.map(item => {
                                     return <Dropdown.Item
                                         key={item.id}
                                         name={item.category_name}
@@ -560,7 +600,7 @@ const TourDetailsPage = observer((props) => {
                         </Dropdown>
 
                         {
-                            topicTags.map(item => {
+                            tourTags.map(item => {
                                 return <Button
                                     key={item}
                                     className="badge btn-secondary"
@@ -636,90 +676,71 @@ const TourDetailsPage = observer((props) => {
                 </div>
             </Row>
             <Row>
-                <div>
-
-                    {itemData.map(function (item, index) {
-                        if (item.hasOwnProperty('type')) {
-                            let child = null
-                            item.index = index
-                            switch (item.type) {
-                                default : {
-                                    child = <TopicTextComponent
-                                        item={item}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'comment': {
-                                    child = <TopicCommentComponent
-                                        item={item}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'list': {
-                                    child = <TopicListComponent
-                                        item={item}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'link': {
-                                    child = <TopicLinkComponent
-                                        item={item}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'email': {
-                                    child = <TopicEmailComponent
-                                        item={item}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'phone': {
-                                    child = <TopicPhoneComponent
-                                        item={item}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'images': {
-                                    child = <TopicImagesComponent
-                                        item={item}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'googleMapUrl': {
-                                    child = <TopicGoogleMapUrlComponent
-                                        item={item}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                            }
-
-                            return <TopicItemCard
-                                key={index}
-                                index={index}
-                                child={child}
-                                dropDownItems={dropDownItems}
-                                changeItemType={changeItemType}
-                                deleteDataItemByIndex={deleteDataItemByIndex}
-                                title={getDropDownTitleByType(item.type)}
+                {tourCategoriesItems_load
+                    ?
+                    <SpinnerSM/>
+                    :
+                    <div style={{display: 'flex'}}>
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="outline-secondary"
+                                size="sm"
+                                id="dropdown-tag"
+                                disabled={!!isSaving}
                             >
-                            </TopicItemCard>
-                        }
-                    })}
+                                Add tour type
+                            </Dropdown.Toggle>
 
-                    <TopicAddNewBtn
-                        disabled={!!isSaving}
-                        addNewItemHandler={addNewItemHandler}
-                        dropDownItems={dropDownItems}
-                    />
-                </div>
+                            <Dropdown.Menu>
+
+                                {tourTypesItems.map(item => {
+                                    return <Dropdown.Item
+                                        key={item.id}
+                                        name={item.category_name}
+                                        id={item.id}
+                                        onClick={() => {
+                                            addNewTypeHandler(item.id)
+                                        }}
+                                    >{item.category_name}</Dropdown.Item>
+                                })}
+                            </Dropdown.Menu>
+                        </Dropdown>
+
+                        {
+                            tourTypes.map(item => {
+                                return <Button
+                                    key={item}
+                                    className="badge btn-secondary"
+                                    disabled={!!isSaving}
+                                    style={{
+                                        margin: '0 3px'
+                                    }}
+                                >
+                                    {getTypeNameById(item)}
+                                    <CloseIco
+                                        onClick={() => {
+                                            deleteNewTypeHandler(item)
+                                        }}
+                                        fill='white'
+                                        style={{
+                                            width: '36px',
+                                            height: '16px',
+                                            marginBottom: '2px',
+                                            marginTop: '2px',
+                                            marginLeft: '-5px',
+                                            marginRight: '-15px',
+                                        }}
+                                    />
+                                </Button>
+                            })
+                        }
+
+                    </div>
+                }
+
+            </Row>
+            <Row>
+
             </Row>
             <Row>
                 <Button

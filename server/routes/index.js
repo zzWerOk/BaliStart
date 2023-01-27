@@ -10,6 +10,7 @@ const topicsRouter = require('./topicsRouter')
 const tableUpdates = require('./tableUpdatesRouter')
 const topicsCategory = require('./topicsCategiryRouter')
 const toursCategory = require('./toursCategiryRouter')
+const toursType = require('./toursTypeRouter')
 
 router.use('/user',userRouter)
 router.use('/guide',guideRouter)
@@ -19,6 +20,6 @@ router.use('/topics',topicsRouter)
 router.use('/tableupdates',tableUpdates)
 router.use('/topicscategory',topicsCategory)
 router.use('/tourscategory',toursCategory)
-
+router.use('/tourstype',toursType)
 
 module.exports = router

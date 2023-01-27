@@ -11,6 +11,7 @@ export default class TourCL {
         this._created_date = ''
         this._isSaved = true
         this._created_by_user_name = ''
+        this._active = true
 
         this._tour_category = '[]'
         this._tour_type = '[]'
@@ -19,12 +20,12 @@ export default class TourCL {
         this._languages = '[]'
     }
 
-    get tag() {
-        return this._tour_category;
+    get tour_categoryJSON() {
+        return JSON.parse(this._tour_category)
     }
 
-    get tagJSON() {
-        return JSON.parse(this._tour_category)
+    get tour_typeJSON() {
+        return JSON.parse(this._tour_type)
     }
 
     set isSaved(value) {
@@ -50,6 +51,9 @@ export default class TourCL {
         if (itemObj.hasOwnProperty('image_logo')) {
             this._image_logo = itemObj.image_logo
         }
+        if (itemObj.hasOwnProperty('active')) {
+            this._active = itemObj.active
+        }
         if (itemObj.hasOwnProperty('created_by_user_id')) {
             this._created_by_user_id = itemObj.created_by_user_id
         }
@@ -64,6 +68,9 @@ export default class TourCL {
         }
         if (itemObj.hasOwnProperty('tour_category')) {
             this._tour_category = itemObj.tour_category
+        }
+        if (itemObj.hasOwnProperty('tour_type')) {
+            this._tour_type = itemObj.tour_type
         }
         if (itemObj.hasOwnProperty('duration')) {
             this._duration = itemObj.duration
@@ -88,7 +95,7 @@ export default class TourCL {
                 "created_date": this._created_date,
                 "isSaved": this._isSaved,
                 "created_by_user_name": this._created_by_user_name,
-
+                "active": this._active,
                 "tour_category": this._tour_category,
                 "tour_type": this._tour_type,
                 "duration": this._duration,
@@ -107,6 +114,13 @@ export default class TourCL {
         return null
     }
 
+    get active() {
+        return this._active;
+    }
+
+    set active(value) {
+        this._active = value;
+    }
 
     set id(value) {
         this._id = value;
@@ -156,7 +170,6 @@ export default class TourCL {
     get created_date() {
         return this._created_date;
     }
-
 
     get tour_category() {
         return this._tour_category;

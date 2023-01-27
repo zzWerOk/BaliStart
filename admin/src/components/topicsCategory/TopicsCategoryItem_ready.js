@@ -29,11 +29,9 @@ const TopicsCategoryItemReady = (props) => {
         try {
             if (props) {
                 if (props.hasOwnProperty('name')) {
-                    // name = props['name']
                     setName(props['name'])
                 }
                 if (props.hasOwnProperty('description')) {
-                    // description = props['description']
                     setDescription(props['description'])
                 }
                 if (props.hasOwnProperty('is_for_tour')) {
@@ -41,7 +39,6 @@ const TopicsCategoryItemReady = (props) => {
                     setIsForTourVisible(true)
                 }
                 if (props.hasOwnProperty('id')) {
-                    // itemId = props['id']
                     setItemId(props['id'])
                 }
             }
