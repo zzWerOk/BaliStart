@@ -6,7 +6,6 @@ import {delay} from "../utils/consts";
 import {getTableUpdateByName} from "../http/tableUpdatesAPI";
 import TopicsList from "../components/topics/TopicsList";
 import ToursCategories from "../components/ToursCategories";
-import TopicListsCell from "../components/topics/TopicListsCell";
 import TourListsCell from "../components/tours/TourListsCell";
 
 const ToursPage = () => {
@@ -75,8 +74,8 @@ const ToursPage = () => {
                             ?
                             <div>
                                 <div style={{display: 'flex'}}>
-                                <ToursCategories tagType={'categories'}/>
-                                <ToursCategories tagType={'types'}/>
+                                    <ToursCategories tagType={'categories'}/>
+                                    <ToursCategories tagType={'types'}/>
                                 </div>
                                 <TopicsList
                                     topicsStore={toursStore}

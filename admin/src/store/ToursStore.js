@@ -124,18 +124,17 @@ export default class ToursStore {
                 id: (Date.now() / 1000) * -1,
                 name: 'New tour',
                 description: 'Please fill in the data',
-                tag: '[]',
                 image_logo: '',
-                images: '[]',
-                videos: '[]',
-                google_map_url: '',
-                active: true,
+                active: false,
                 created_by_user_id: userId,
                 created_date: Date.now(),
-                deleted_by_user_id: -1,
-                deleted_date: 0,
-                data: '[]',
                 isSaved: false,
+
+                tour_category: '[]',
+                tour_type: '[]',
+                duration: '1 h',
+                activity_level: 1,
+                languages: '[]',
             }
 
             let toursArr = JSON.parse(this._toursList)

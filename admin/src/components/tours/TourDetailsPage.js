@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Button, Dropdown, DropdownButton, Image, Row, ToggleButton} from "react-bootstrap";
+import {Button, Dropdown, DropdownButton, Image, Row, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import noImageLogo from '../../img/nophoto.jpg'
 import {Context} from "../../index";
 import {observer} from "mobx-react-lite";
@@ -13,48 +13,7 @@ import {MDBFile} from "mdb-react-ui-kit";
 import {changeTourAPI, deleteTourAPI, saveTourAPI} from "../../http/toursAPI";
 import TourCL from "../../classes/tourCL";
 
-// const dropDownItems = [
-//     {
-//         id: 0,
-//         name: 'Text card',
-//         type: 'text',
-//     },
-//     {
-//         id: 1,
-//         name: 'Commend card',
-//         type: 'comment',
-//     },
-//     {
-//         id: 2,
-//         name: 'List card',
-//         type: 'list',
-//     },
-//     {
-//         id: 3,
-//         name: 'Link card',
-//         type: 'link',
-//     },
-//     {
-//         id: 4,
-//         name: 'Email card',
-//         type: 'email',
-//     },
-//     {
-//         id: 5,
-//         name: 'Phones card',
-//         type: 'phone',
-//     },
-//     {
-//         id: 6,
-//         name: 'Images card',
-//         type: 'images',
-//     },
-//     {
-//         id: 7,
-//         name: 'Google Map Url card',
-//         type: 'googleMapUrl',
-//     },
-// ]
+let durationItems = []
 
 let currTour = null
 
@@ -78,14 +37,27 @@ const TourDetailsPage = observer((props) => {
     const [tourTypeItems_load, setTourTypeItems_load] = useState(true)
     const [tourTags, setTourTags] = useState([])
     const [tourTypes, setTourTypes] = useState([])
+    const [durationTime, setDurationTime] = useState(0)
+    const [durationTimeType, setDurationTimeType] = useState('h')
+    const [activityType, setActivityType] = useState(1)
+    const [tourLanguage, setTourLanguage] = useState([])
 
     useEffect(
         () => {
+            durationItems = []
+            for (let i = 1; i <= 21; i++) {
+                durationItems.push({id: i})
+            }
 
             currTour = new TourCL()
 
             setTourCategoriesItems_load(true)
             currTour.setFromJson(item)
+
+            setDurationTime(parseInt(currTour.duration.split(' ')[0]) || 1)
+            setDurationTimeType(currTour.duration.split(' ')[1] || 'h')
+            setActivityType(parseInt(currTour.activity_level) || 1)
+
             setCurrName(currTour.name)
             setCurrDescription(currTour.description)
             setIsActive(currTour.active)
@@ -99,30 +71,6 @@ const TourDetailsPage = observer((props) => {
                     setItemImageLogo(currTour.image_logo + '?' + Date.now())
                 }
             }
-
-            // setItemImageLogo(currTour.image_logo + '?' + Date.now())
-
-            // if (Object.keys(currTour.dataJSON).length === 0) {
-            //     delay(0).then(r => {
-            //         if (currTour.id > -1) {
-            //             getTourData(currTour.id).then(data => {
-            //                 if (data.hasOwnProperty('status')) {
-            //                     if (data.status === 'ok') {
-            //                         currTour.data = data.data
-            //                     }
-            //                 }
-            //             }).finally(() => {
-            //                 setItemData(currTour.dataJSON)
-            //                 setTopicCategoriesItems_load(false)
-            //             })
-            //         } else {
-            //             setTopicCategoriesItems_load(false)
-            //         }
-            //     })
-            // } else {
-            //     setItemData(currTour.dataJSON)
-            //     setTopicCategoriesItems_load(false)
-            // }
             setTourCategoriesItems_load(false)
         }, []
     )
@@ -472,6 +420,34 @@ const TourDetailsPage = observer((props) => {
         })
     }
 
+    const onActivitySelectHandler = (value) => {
+        setActivityType(value)
+        currTour.activity_level = value
+        currTour.isSaved = false
+        onItemEditHandler(currTour.getAsJson())
+
+    }
+
+    const onDurationTimeTypeSelectHandler = (value) => {
+        if(value === 1){
+            setDurationTimeType('h')
+        }else{
+            setDurationTimeType('d')
+        }
+        onDurationChange(durationTime, value)
+    }
+
+    const onDurationTimeSelectHandler = (value) => {
+        setDurationTime(value)
+        onDurationChange(value, durationTimeType)
+    }
+
+    const onDurationChange = (time, type) => {
+        currTour.duration = time + ' ' + type
+        currTour.isSaved = false
+        onItemEditHandler(currTour.getAsJson())
+    }
+
     const onFileChooseHandler = (fileName) => {
         if (fileName) {
             setNewImageLogo(true)
@@ -483,81 +459,90 @@ const TourDetailsPage = observer((props) => {
         onItemEditHandler(currTour.getAsJson())
     }
 
-    return (
-        <div>
 
-            <Row className={'h-25 align-items-center justify-content-center '}
-                 style={{
-                     borderBottom: '1px solid rgba(40, 44, 52, 0.2)',
-                     marginBottom: '15px'
-                 }}>
-                <div className={'col-sm-2 justify-content-center '}>
-                    0 views
-                </div>
-                <div className={'col-sm-2 justify-content-center'}>
-                    0 clicks
-                </div>
-                <div className={'col-sm-2 justify-content-center'}>
-                    0 favs
-                </div>
-            </Row>
+    if (tourCategoriesItems_load) {
+        return <SpinnerSM/>
+    } else {
 
-            <Row>
-                {/***
+        return (
+            <div>
+
+                <Row className={'h-25 align-items-center justify-content-center '}
+                     style={{
+                         borderBottom: '1px solid rgba(40, 44, 52, 0.2)',
+                         marginBottom: '15px'
+                     }}>
+                    <div className={'col-sm-2 justify-content-center '}>
+                        0 views
+                    </div>
+                    <div className={'col-sm-2 justify-content-center'}>
+                        0 clicks
+                    </div>
+                    <div className={'col-sm-2 justify-content-center'}>
+                        0 favs
+                    </div>
+                </Row>
+
+                <Row>
+                    {/***
                      ACTIVE BTN
                      ***/}
-                <div
-                    className={'col-sm-5 justify-content-start '}
-                    style={{display: 'flex'}}
-                >
-                    <input
-                        type="categoryName"
-                        id="formTopicName"
-                        className="form-control"
-                        placeholder='Category'
-                        value={currName}
-                        disabled={!!isSaving}
-                        onChange={e => onNameHandler(e.target.value)}
-                    />
-                    <ToggleButton
-                        id="toggle-active"
-                        type="checkbox"
-                        variant={"outline-primary"}
-                        checked={isActive}
-                        value={'1'}
-                        disabled={!!isSaving}
-                        onChange={(e) => setActiveHandler(e.currentTarget.checked)}
+                    <div
+                        className={'col-sm-5 justify-content-start '}
                         style={{display: 'flex'}}
                     >
-                        {isActive
-                            ?
-                            <CircleOkIco
-                                fill='white'
-                                style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    marginBottom: '3px',
-                                    marginRight: '5px',
-                                }}
+                        <input
+                            type="categoryName"
+                            id="formTopicName"
+                            className="form-control"
+                            placeholder='Category'
+                            value={currName}
+                            disabled={!!isSaving}
+                            onChange={e => onNameHandler(e.target.value)}
+                        />
+                        <ToggleButton
+                            id="toggle-active"
+                            type="checkbox"
+                            variant={"outline-primary"}
+                            checked={isActive}
+                            value={'1'}
+                            disabled={!!isSaving}
+                            onChange={(e) => setActiveHandler(e.currentTarget.checked)}
+                            style={{display: 'flex'}}
+                        >
+                            {isActive
+                                ?
+                                <CircleOkIco
+                                    fill='white'
+                                    style={{
+                                        width: '16px',
+                                        height: '16px',
+                                        marginBottom: '3px',
+                                        marginRight: '5px',
+                                    }}
 
-                            />
-                            :
-                            <CircleIco
-                                fill='blue'
-                                style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    marginBottom: '3px',
-                                    marginRight: '5px',
-                                }}
-                            />
-                        }
-                        Active
-                    </ToggleButton>
-                </div>
-            </Row>
-            <Row>
-                <div className={'col-lg-10 justify-content-center '}>
+                                />
+                                :
+                                <CircleIco
+                                    fill='blue'
+                                    style={{
+                                        width: '16px',
+                                        height: '16px',
+                                        marginBottom: '3px',
+                                        marginRight: '5px',
+                                    }}
+                                />
+                            }
+                            Active
+                        </ToggleButton>
+                    </div>
+                </Row>
+                <Row>
+                    {/***
+                     DESCRIPTION
+                     ***/}
+
+                    <div className={'col-lg-10 justify-content-center '}>
                     <textarea
                         name="topicDescription"
                         id="topicDescription"
@@ -566,220 +551,393 @@ const TourDetailsPage = observer((props) => {
                         value={currDescription}
                         disabled={!!isSaving}
                     />
-                </div>
-            </Row>
-            <Row>
-                {tourCategoriesItems_load
-                    ?
-                    <SpinnerSM/>
-                    :
-                    <div style={{display: 'flex'}}>
-                        <Dropdown>
-                            <Dropdown.Toggle
-                                variant="outline-secondary"
-                                size="sm"
-                                id="dropdown-tag"
-                                disabled={!!isSaving}
-                            >
-                                Add tour category
-                            </Dropdown.Toggle>
-
-                            <Dropdown.Menu>
-
-                                {tourCategoriesItems.map(item => {
-                                    return <Dropdown.Item
-                                        key={item.id}
-                                        name={item.category_name}
-                                        id={item.id}
-                                        onClick={() => {
-                                            addNewTagHandler(item.id)
-                                        }}
-                                    >{item.category_name}</Dropdown.Item>
-                                })}
-                            </Dropdown.Menu>
-                        </Dropdown>
-
-                        {
-                            tourTags.map(item => {
-                                return <Button
-                                    key={item}
-                                    className="badge btn-secondary"
-                                    disabled={!!isSaving}
-                                    style={{
-                                        margin: '0 3px'
-                                    }}
-                                >
-                                    {getTagNameById(item)}
-                                    <CloseIco
-                                        onClick={() => {
-                                            deleteNewTagHandler(item)
-                                        }}
-                                        fill='white'
-                                        style={{
-                                            width: '36px',
-                                            height: '16px',
-                                            marginBottom: '2px',
-                                            marginTop: '2px',
-                                            marginLeft: '-5px',
-                                            marginRight: '-15px',
-                                        }}
-                                    />
-                                </Button>
-                            })
-                        }
-
                     </div>
-                }
+                </Row>
+                <Row>
+                    {/***
+                     CATEGORIES
+                     ***/}
 
-            </Row>
-            <Row>
-                <div
-                    className={'d-flex align-items-center justify-content-center'}
-                >
-                    <div
-                        style={{
-                            height: '250px',
-                            overflow: 'hidden',
-                            margin: 0,
-                        }}>
+                    {tourCategoriesItems_load
+                        ?
+                        <SpinnerSM/>
+                        :
+                        <div style={{display: 'flex'}}>
+                            <Dropdown>
+                                <Dropdown.Toggle
+                                    variant="outline-secondary"
+                                    size="sm"
+                                    id="dropdown-tag"
+                                    disabled={!!isSaving}
+                                >
+                                    Add tour category
+                                </Dropdown.Toggle>
 
-                        <Image
+                                <Dropdown.Menu>
 
-                            style={{
-                                objectFit: 'cover',
-                                position: 'absolute',
-                                width: '100%',
-                                height: '200px',
-                                left: '50%',
-                                transform: 'translate(-50%, 10%)',
-                            }}
-                            src={itemImageLogo
-                                ?
-                                `${process.env.REACT_APP_API_URL}/static/${itemImageLogo}`
-                                :
-                                noImageLogo
+                                    {tourCategoriesItems.map(item => {
+                                        return <Dropdown.Item
+                                            key={item.id}
+                                            name={item.category_name}
+                                            id={item.id}
+                                            onClick={() => {
+                                                addNewTagHandler(item.id)
+                                            }}
+                                        >{item.category_name}</Dropdown.Item>
+                                    })}
+                                </Dropdown.Menu>
+                            </Dropdown>
+
+                            {
+                                tourTags.map(item => {
+                                    return <Button
+                                        key={item}
+                                        className="badge btn-secondary"
+                                        disabled={!!isSaving}
+                                        style={{
+                                            margin: '0 3px'
+                                        }}
+                                    >
+                                        {getTagNameById(item)}
+                                        <CloseIco
+                                            onClick={() => {
+                                                deleteNewTagHandler(item)
+                                            }}
+                                            fill='white'
+                                            style={{
+                                                width: '36px',
+                                                height: '16px',
+                                                marginBottom: '2px',
+                                                marginTop: '2px',
+                                                marginLeft: '-5px',
+                                                marginRight: '-15px',
+                                            }}
+                                        />
+                                    </Button>
+                                })
                             }
+
+                        </div>
+                    }
+
+                </Row>
+                <Row>
+                    {/***
+                     IMAGE
+                     ***/}
+
+                    <div
+                        className={'d-flex align-items-center justify-content-center'}
+                    >
+                        <div
+                            style={{
+                                height: '250px',
+                                overflow: 'hidden',
+                                margin: 0,
+                            }}>
+
+                            <Image
+
+                                style={{
+                                    objectFit: 'cover',
+                                    position: 'absolute',
+                                    width: '100%',
+                                    height: '200px',
+                                    left: '50%',
+                                    transform: 'translate(-50%, 10%)',
+                                }}
+                                src={itemImageLogo
+                                    ?
+                                    `${process.env.REACT_APP_API_URL}/static/${itemImageLogo}`
+                                    :
+                                    noImageLogo
+                                }
+                            />
+                        </div>
+
+                        <MDBFile
+                            className={`btn w-50 ${newImageLogo ? 'btn-primary' : 'btn-secondary'} `}
+                            id='topicLogo'
+                            disabled={!!isSaving}
+                            style={{
+                                position: 'absolute',
+                            }}
+                            onChange={e => {
+                                onFileChooseHandler(e.target.files[0])
+                            }}
                         />
                     </div>
+                </Row>
+                <Row>
+                    {/***
+                     TYPES
+                     ***/}
 
-                    <MDBFile
-                        className={`btn w-50 ${newImageLogo ? 'btn-primary' : 'btn-secondary'} `}
-                        id='topicLogo'
-                        disabled={!!isSaving}
-                        style={{
-                            position: 'absolute',
-                        }}
-                        onChange={e => {
-                            onFileChooseHandler(e.target.files[0])
-                        }}
-                    />
-                </div>
-            </Row>
-            <Row>
-                {tourCategoriesItems_load
-                    ?
-                    <SpinnerSM/>
-                    :
-                    <div style={{display: 'flex'}}>
-                        <Dropdown>
-                            <Dropdown.Toggle
-                                variant="outline-secondary"
-                                size="sm"
-                                id="dropdown-tag"
-                                disabled={!!isSaving}
-                            >
-                                Add tour type
-                            </Dropdown.Toggle>
-
-                            <Dropdown.Menu>
-
-                                {tourTypesItems.map(item => {
-                                    return <Dropdown.Item
-                                        key={item.id}
-                                        name={item.category_name}
-                                        id={item.id}
-                                        onClick={() => {
-                                            addNewTypeHandler(item.id)
-                                        }}
-                                    >{item.category_name}</Dropdown.Item>
-                                })}
-                            </Dropdown.Menu>
-                        </Dropdown>
-
-                        {
-                            tourTypes.map(item => {
-                                return <Button
-                                    key={item}
-                                    className="badge btn-secondary"
+                    {tourCategoriesItems_load
+                        ?
+                        <SpinnerSM/>
+                        :
+                        <div style={{display: 'flex'}}>
+                            <Dropdown>
+                                <Dropdown.Toggle
+                                    variant="outline-secondary"
+                                    size="sm"
+                                    id="dropdown-tag"
                                     disabled={!!isSaving}
-                                    style={{
-                                        margin: '0 3px'
-                                    }}
                                 >
-                                    {getTypeNameById(item)}
-                                    <CloseIco
-                                        onClick={() => {
-                                            deleteNewTypeHandler(item)
-                                        }}
-                                        fill='white'
+                                    Add tour type
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+
+                                    {tourTypesItems.map(item => {
+                                        return <Dropdown.Item
+                                            key={item.id}
+                                            name={item.category_name}
+                                            id={item.id}
+                                            onClick={() => {
+                                                addNewTypeHandler(item.id)
+                                            }}
+                                        >{item.category_name}</Dropdown.Item>
+                                    })}
+                                </Dropdown.Menu>
+                            </Dropdown>
+
+                            {
+                                tourTypes.map(item => {
+                                    return <Button
+                                        key={item}
+                                        className="badge btn-secondary"
+                                        disabled={!!isSaving}
                                         style={{
-                                            width: '36px',
-                                            height: '16px',
-                                            marginBottom: '2px',
-                                            marginTop: '2px',
-                                            marginLeft: '-5px',
-                                            marginRight: '-15px',
+                                            margin: '0 3px'
                                         }}
-                                    />
-                                </Button>
-                            })
-                        }
+                                    >
+                                        {getTypeNameById(item)}
+                                        <CloseIco
+                                            onClick={() => {
+                                                deleteNewTypeHandler(item)
+                                            }}
+                                            fill='white'
+                                            style={{
+                                                width: '36px',
+                                                height: '16px',
+                                                marginBottom: '2px',
+                                                marginTop: '2px',
+                                                marginLeft: '-5px',
+                                                marginRight: '-15px',
+                                            }}
+                                        />
+                                    </Button>
+                                })
+                            }
+
+                        </div>
+                    }
+
+                </Row>
+                <Row>
+                    {/***
+                     DURATION
+                     ***/}
+                    <span>Tour duration</span>
+                    <div>
+                        <ToggleButtonGroup type="radio" name="hourday" defaultValue={durationTimeType === 'h' ? 1 : 2}>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`days-radio-1`}
+                                value={1}
+                                onClick={() => {
+                                    onDurationTimeTypeSelectHandler(1)
+                                }}
+                            >
+                                Hours
+                            </ToggleButton>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`days-radio-2`}
+                                value={2}
+                                onClick={() => {
+                                    onDurationTimeTypeSelectHandler(2)
+                                }}
+                            >
+                                Days
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+                        <div style={{overflow: 'auto', paddingLeft: '10px', paddingRight: '10px',}}>
+                        <ToggleButtonGroup type="radio" name="time" defaultValue={durationTime}>
+                            {
+                                durationItems.map(durationItem => {
+                                    return <ToggleButton
+                                        key={durationItem.id}
+                                        variant={durationTime === durationItem.id ? 'outline-success' : 'outline-secondary'}
+                                        id={`tbg-radio-${durationItem.id}`}
+                                        value={durationItem.id}
+
+                                        onClick={() => {
+                                            onDurationTimeSelectHandler(durationItem.id)
+                                        }}
+                                    >
+                                        {durationItem.id > 20 ? '21+' : durationItem.id}
+                                    </ToggleButton>
+
+                                })
+                            }
+
+                        </ToggleButtonGroup>
+                        </div>
+                    </div>
+                </Row>
+                <Row>
+                    {/***
+                     ACTIVITY LEVEL
+                     ***/}
+                    <span>Tour activity level</span>
+                    <div>
+                        <ToggleButtonGroup type="radio" name="activity" defaultValue={activityType}>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`activity-radio-1`}
+                                value={1}
+                                onClick={() => {
+                                    onActivitySelectHandler(1)
+                                }}
+                            >
+                                Easy
+                            </ToggleButton>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`activity-radio-2`}
+                                value={2}
+                                onClick={() => {
+                                    onActivitySelectHandler(2)
+                                }}
+                            >
+                                Standart
+                            </ToggleButton>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`activity-radio-3`}
+                                value={3}
+                                onClick={() => {
+                                    onActivitySelectHandler(3)
+                                }}
+                            >
+                                Medium
+                            </ToggleButton>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`activity-radio-4`}
+                                value={4}
+                                onClick={() => {
+                                    onActivitySelectHandler(4)
+                                }}
+                            >
+                                Hard
+                            </ToggleButton>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`activity-radio-5`}
+                                value={5}
+                                onClick={() => {
+                                    onActivitySelectHandler(5)
+                                }}
+                            >
+                                Expert
+                            </ToggleButton>
+                        </ToggleButtonGroup>
 
                     </div>
-                }
+                </Row>
+                <Row>
+                    {/***
+                     LANGUAGE
+                     ***/}
+                    <span>Tour activity level</span>
+                    <div>
+                        <ToggleButtonGroup type="checkbox" name="activity" defaultValue={tourLanguage}>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`language-check-1`}
+                                value={'en'}
+                                onClick={() => {
+                                    onActivitySelectHandler('en')
+                                }}
+                            >
+                                English
+                            </ToggleButton>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`language-check-2`}
+                                value={'ru'}
+                                onClick={() => {
+                                    onActivitySelectHandler('ru')
+                                }}
+                            >
+                                Russian
+                            </ToggleButton>
+                            <ToggleButton
+                                variant={'outline-success'}
+                                id={`language-check-3`}
+                                value={'id'}
+                                onClick={() => {
+                                    onActivitySelectHandler('id')
+                                }}
+                            >
+                                Indonesian
+                            </ToggleButton>
 
-            </Row>
-            <Row>
+                        </ToggleButtonGroup>
 
-            </Row>
-            <Row>
-                <Button
-                    className={`btn ${saveError ? 'btn-danger' : 'btn-primary'}  btn-lg w-75 btn-block`}
-                    disabled={!!isSaving}
-                    onClick={saveHandler}
-                >Save</Button>
-            </Row>
-            <Row>
-                <div style={{display: "flex"}}>
-                    <button
-                        type="button"
-                        className={`btn ${deleteError ? 'btn-danger' : 'btn-outline-danger'} w-25 `}
+                    </div>
+                </Row>
+                <Row>
+                    {/***
+                     SAVE
+                     ***/}
+
+                    <Button
+                        className={`btn ${saveError ? 'btn-danger' : 'btn-primary'}  btn-lg w-75 btn-block`}
                         disabled={!!isSaving}
-                        onClick={onDeleteHandler}
-                    >
-                        Delete
-                    </button>
-                    <div style={{display: isDeleting ? "block" : "none"}}>
+                        onClick={saveHandler}
+                    >Save</Button>
+                </Row>
+                <Row>
+                    {/***
+                     DELETE
+                     ***/}
+
+                    <div style={{display: "flex"}}>
+                        <button
+                            type="button"
+                            className={`btn ${deleteError ? 'btn-danger' : 'btn-outline-danger'} w-25 `}
+                            disabled={!!isSaving}
+                            onClick={onDeleteHandler}
+                        >
+                            Delete
+                        </button>
+                        <div style={{display: isDeleting ? "block" : "none"}}>
 
                     <span
                         style={{marginLeft: '25px', marginRight: '10px'}}
                     >
                         Sure?
                     </span>
-                        <button
-                            type="button"
-                            className="btn btn-outline-danger"
-                            onClick={deleteHandler}
-                        >
-                            Yes
-                        </button>
+                            <button
+                                type="button"
+                                className="btn btn-outline-danger"
+                                onClick={deleteHandler}
+                            >
+                                Yes
+                            </button>
 
+                        </div>
                     </div>
-                </div>
 
-            </Row>
-        </div>
-    );
+                </Row>
+            </div>
+        );
+    }
 });
 
 export default TourDetailsPage;

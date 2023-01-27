@@ -15,8 +15,8 @@ export default class TourCL {
 
         this._tour_category = '[]'
         this._tour_type = '[]'
-        this._duration = ''
-        this._activity_level = '[]'
+        this._duration = '1 h'
+        this._activity_level = 1
         this._languages = '[]'
     }
 
