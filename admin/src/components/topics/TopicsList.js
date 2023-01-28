@@ -234,7 +234,6 @@ const TopicsList = (props) => {
                         onItemEditHandler={onItemEditHandler}
                         deleteTopic={deleteTopic}
                         categoriesStore={categoriesStore}
-                        // ItemDetailsPage={castDetailPage}
                     />
                 )}
 

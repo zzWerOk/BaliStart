@@ -12,12 +12,15 @@ import {delay} from "../../utils/consts";
 import {MDBFile} from "mdb-react-ui-kit";
 import {changeTourAPI, deleteTourAPI, saveTourAPI} from "../../http/toursAPI";
 import TourCL from "../../classes/tourCL";
+import ModalPopUp from "../modal/ModalPopUp";
+import MapPointsDetailsPage from "../mappoints/MapPointsDetailsPage";
 
 let durationItems = []
 
 let currTour = null
 
 const TourDetailsPage = observer((props) => {
+    const {mapPointsStore, user} = useContext(Context)
     const {item, onItemEditHandler, deleteTopic} = props
 
     const {toursCategoryStore, toursTypeStore} = useContext(Context)
@@ -40,7 +43,12 @@ const TourDetailsPage = observer((props) => {
     const [durationTime, setDurationTime] = useState(0)
     const [durationTimeType, setDurationTimeType] = useState('h')
     const [activityType, setActivityType] = useState(1)
-    const [tourLanguage, setTourLanguage] = useState([])
+    const [tourLanguage, setTourLanguage] = useState('[]')
+    const [tourMapPoints, setTourMapPoints] = useState('[]')
+    const [mapPointsArr, setMapPointsArr] = useState([])
+
+    const [showModal, setShowModal] = useState(false)
+
 
     useEffect(
         () => {
@@ -58,6 +66,8 @@ const TourDetailsPage = observer((props) => {
             setDurationTimeType(currTour.duration.split(' ')[1] || 'h')
             setActivityType(parseInt(currTour.activity_level) || 1)
 
+            setTourLanguage(currTour.languages)
+
             setCurrName(currTour.name)
             setCurrDescription(currTour.description)
             setIsActive(currTour.active)
@@ -65,6 +75,25 @@ const TourDetailsPage = observer((props) => {
             setTourTypesItems(toursTypeStore.getSavedCategoriesList())
             setTourTags(currTour.tour_categoryJSON)
             setTourTypes(currTour.tour_typeJSON)
+
+
+            mapPointsStore.loadMapPointsList()
+
+            setMapPointsArr(mapPointsStore.getMapPointList)
+
+            let newMapPointArr = []
+            mapPointsStore.getMapPointList.map(currMapPoint => {
+                for(let i = 0;i < currTour.map_points.length;i++){
+                    if(currTour.map_points[i] === currMapPoint.id){
+                        newMapPointArr.push(currTour.map_points[i])
+                        break
+                    }
+                }
+            })
+            // setTourMapPoints(currTour.map_points)
+            setTourMapPoints(JSON.stringify(newMapPointArr))
+
+
 
             if (item.image_logo) {
                 if (item.id >= 0) {
@@ -334,10 +363,15 @@ const TourDetailsPage = observer((props) => {
                     setIsSaving(false)
                 })
             } else {
+                deleteTopic(currTour.id)
                 setIsDeleting(false)
                 setIsSaving(false)
             }
         })
+    }
+
+    const addNewMapPointHandler = () => {
+        setShowModal(true)
     }
 
     const saveHandler = () => {
@@ -360,6 +394,7 @@ const TourDetailsPage = observer((props) => {
                     currTour.duration,
                     currTour.activity_level,
                     currTour.languages,
+                    currTour.map_points,
                     currTour.image_logo_file,
                 ).then(data => {
                     if (data.hasOwnProperty('status')) {
@@ -395,6 +430,7 @@ const TourDetailsPage = observer((props) => {
                     currTour.duration,
                     currTour.activity_level,
                     currTour.languages,
+                    currTour.map_points,
                     currTour.image_logo_file,
                 ).then(data => {
 
@@ -420,6 +456,27 @@ const TourDetailsPage = observer((props) => {
         })
     }
 
+    const onLanguageSelectHandler = (value) => {
+        if (Array.isArray(JSON.parse(tourLanguage))) {
+            const currLangArr = JSON.parse(tourLanguage)
+            const found = currLangArr.find(element => element === value)
+            if (found) {
+                const filtered = currLangArr.filter(function (value, index, arr) {
+                    return value !== found;
+                })
+                currTour.languages = JSON.stringify(filtered)
+                setTourLanguage(JSON.stringify(filtered))
+            } else {
+                currTour.languages = JSON.stringify([...currLangArr, value])
+                setTourLanguage(JSON.stringify([...currLangArr, value]))
+            }
+            currTour.isSaved = false
+            onItemEditHandler(currTour.getAsJson())
+        }
+
+
+    }
+
     const onActivitySelectHandler = (value) => {
         setActivityType(value)
         currTour.activity_level = value
@@ -429,9 +486,9 @@ const TourDetailsPage = observer((props) => {
     }
 
     const onDurationTimeTypeSelectHandler = (value) => {
-        if(value === 1){
+        if (value === 1) {
             setDurationTimeType('h')
-        }else{
+        } else {
             setDurationTimeType('d')
         }
         onDurationChange(durationTime, value)
@@ -457,6 +514,87 @@ const TourDetailsPage = observer((props) => {
         currTour.image_logo_file = fileName
         currTour.isSaved = false
         onItemEditHandler(currTour.getAsJson())
+    }
+
+    const getMapPointName_byId = (id) => {
+        for (let i = 0; i < mapPointsArr.length; i++) {
+            if (mapPointsArr[i].id === id) {
+                return mapPointsArr[i].name
+            }
+        }
+        // console.log('ooops')
+        // return 'ooops'
+    }
+
+    const addToTourId = (id) => {
+
+        if (Array.isArray(JSON.parse(tourMapPoints))) {
+
+            console.log(mapPointsStore.getMapPointList)
+
+            const currMapPointsArr = JSON.parse(tourMapPoints)
+            const found = currMapPointsArr.find(element => element === id)
+            if (found) {
+                const filtered = currMapPointsArr.filter(function (value, index, arr) {
+                    return value !== found;
+                })
+                currTour.map_points = JSON.stringify(filtered)
+                setTourMapPoints(JSON.stringify(filtered))
+            } else {
+                currTour.map_points = JSON.stringify([...currMapPointsArr, id])
+                setTourMapPoints(JSON.stringify([...currMapPointsArr, id]))
+            }
+
+            setMapPointsArr(mapPointsStore.getMapPointList)
+            currTour.isSaved = false
+            onItemEditHandler(currTour.getAsJson())
+        }
+    }
+
+    const deleteMapPoint = (id) => {
+        mapPointsStore.deleteMapPointById(id)
+    }
+
+    const onMapPointEditHandler = (item) => {
+        let currMapPointsArr = mapPointsStore.getMapPointList
+        if (!currMapPointsArr) {
+            currMapPointsArr = []
+        }
+
+        let newArr = currMapPointsArr
+        for (let i = 0; i < newArr.length; i++) {
+            if (newArr[i].id === item.id) {
+                if (item.hasOwnProperty('newId')) {
+                    item.id = item.newId
+                    delete item.newId
+                }
+                newArr[i] = item
+            }
+        }
+        mapPointsStore.setMapPointsListFromArr(newArr)
+        // setTourMapPoints(JSON.stringify(newArr))
+        // currTour.isSaved = false
+        // onItemEditHandler(currTour.getAsJson())
+
+    }
+
+    const onSetHideModal = () => {
+        setShowModal(false)
+        currTour.isSaved = false
+        onItemEditHandler(currTour.getAsJson())
+
+    }
+
+    const mapPointPageCardComponent = (data) => {
+        // const newMapPoint = mapPointsStore.getCreateAndAddMapPointsJson(user.currUserId)
+
+        return <MapPointsDetailsPage
+            // item={newMapPoint}
+            // item={mapPointsStore.getCreateAndAddMapPointsJson(user.currUserId)}
+            onItemEditHandler={onMapPointEditHandler}
+            deleteTopic={deleteMapPoint}
+            addToTourId={addToTourId}
+        />
     }
 
 
@@ -765,26 +903,26 @@ const TourDetailsPage = observer((props) => {
                             </ToggleButton>
                         </ToggleButtonGroup>
                         <div style={{overflow: 'auto', paddingLeft: '10px', paddingRight: '10px',}}>
-                        <ToggleButtonGroup type="radio" name="time" defaultValue={durationTime}>
-                            {
-                                durationItems.map(durationItem => {
-                                    return <ToggleButton
-                                        key={durationItem.id}
-                                        variant={durationTime === durationItem.id ? 'outline-success' : 'outline-secondary'}
-                                        id={`tbg-radio-${durationItem.id}`}
-                                        value={durationItem.id}
+                            <ToggleButtonGroup type="radio" name="time" defaultValue={durationTime}>
+                                {
+                                    durationItems.map(durationItem => {
+                                        return <ToggleButton
+                                            key={durationItem.id}
+                                            variant={durationTime === durationItem.id ? 'outline-success' : 'outline-secondary'}
+                                            id={`tbg-radio-${durationItem.id}`}
+                                            value={durationItem.id}
 
-                                        onClick={() => {
-                                            onDurationTimeSelectHandler(durationItem.id)
-                                        }}
-                                    >
-                                        {durationItem.id > 20 ? '21+' : durationItem.id}
-                                    </ToggleButton>
+                                            onClick={() => {
+                                                onDurationTimeSelectHandler(durationItem.id)
+                                            }}
+                                        >
+                                            {durationItem.id > 20 ? '21+' : durationItem.id}
+                                        </ToggleButton>
 
-                                })
-                            }
+                                    })
+                                }
 
-                        </ToggleButtonGroup>
+                            </ToggleButtonGroup>
                         </div>
                     </div>
                 </Row>
@@ -853,15 +991,15 @@ const TourDetailsPage = observer((props) => {
                     {/***
                      LANGUAGE
                      ***/}
-                    <span>Tour activity level</span>
+                    <span>Tour languages</span>
                     <div>
-                        <ToggleButtonGroup type="checkbox" name="activity" defaultValue={tourLanguage}>
+                        <ToggleButtonGroup type="checkbox" name="activity" defaultValue={JSON.parse(tourLanguage)}>
                             <ToggleButton
                                 variant={'outline-success'}
                                 id={`language-check-1`}
                                 value={'en'}
                                 onClick={() => {
-                                    onActivitySelectHandler('en')
+                                    onLanguageSelectHandler('en')
                                 }}
                             >
                                 English
@@ -871,7 +1009,7 @@ const TourDetailsPage = observer((props) => {
                                 id={`language-check-2`}
                                 value={'ru'}
                                 onClick={() => {
-                                    onActivitySelectHandler('ru')
+                                    onLanguageSelectHandler('ru')
                                 }}
                             >
                                 Russian
@@ -881,13 +1019,65 @@ const TourDetailsPage = observer((props) => {
                                 id={`language-check-3`}
                                 value={'id'}
                                 onClick={() => {
-                                    onActivitySelectHandler('id')
+                                    onLanguageSelectHandler('id')
                                 }}
                             >
                                 Indonesian
                             </ToggleButton>
 
                         </ToggleButtonGroup>
+
+                    </div>
+                </Row>
+                <br/>
+
+                <Row>
+                    {/***
+                     MAP POINT
+                     ***/}
+                    <span>Itinerary</span>
+
+                    {JSON.parse(tourMapPoints).map(function (currMapPoint, index) {
+                        return <span key={index}>
+                            {getMapPointName_byId(currMapPoint)}
+                        </span>
+                    })}
+
+                    <div>
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="outline-secondary"
+                                size="sm"
+                                id="dropdown-tag"
+                                disabled={!!isSaving}
+                            >
+                                Select Map Point
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+
+                                {mapPointsArr.map(item => {
+                                    return <Dropdown.Item
+                                        key={item.id}
+                                        name={item.name}
+                                        id={item.id}
+                                        onClick={() => {
+                                            addToTourId(item.id)
+                                        }}
+                                    >{item.name}</Dropdown.Item>
+                                })}
+                            </Dropdown.Menu>
+                        </Dropdown>
+                        <Button
+                            variant="outline-success"
+                            className='btn btn-sm w-25'
+                            disabled={!!isSaving}
+                            onClick={addNewMapPointHandler}
+                        >Add new Map Point</Button>
+
+                        <br/>
+                        <br/>
+                        <br/>
 
                     </div>
                 </Row>
@@ -918,11 +1108,11 @@ const TourDetailsPage = observer((props) => {
                         </button>
                         <div style={{display: isDeleting ? "block" : "none"}}>
 
-                    <span
-                        style={{marginLeft: '25px', marginRight: '10px'}}
-                    >
-                        Sure?
-                    </span>
+                            <span
+                                style={{marginLeft: '25px', marginRight: '10px'}}
+                            >
+                                Sure?
+                            </span>
                             <button
                                 type="button"
                                 className="btn btn-outline-danger"
@@ -935,6 +1125,19 @@ const TourDetailsPage = observer((props) => {
                     </div>
 
                 </Row>
+
+                <ModalPopUp
+                    show={showModal}
+                    onHide={() => {
+                        onSetHideModal()
+                        // setShowModal(false)
+                    }}
+                    title={'MAp poinTS'}
+                    // item={currItem}
+                    child={mapPointPageCardComponent}
+                />
+
+
             </div>
         );
     }

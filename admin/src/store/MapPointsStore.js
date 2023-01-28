@@ -60,11 +60,40 @@ export default class MapPointsStore {
                     return value !== found;
                 })
                 this._mapPoints = JSON.stringify(filtered)
+                this.saveMapPointsList()
                 return true
             }
         } catch (e) {
         }
         return false
+    }
+
+    getCreateAndAddMapPointsJson(userId) {
+        console.log('getCreateAndAddMapPointsJson')
+        try {
+
+            let newItem = {
+                id: (Date.now() / 1000) * -1,
+                name: 'New Map point',
+                description: 'Please fill in description',
+                topics: '',
+                image_logo: '',
+                google_map_url: '',
+                active: true,
+                created_by_user_id: userId,
+                created_date: Date.now(),
+                file_name: '',
+                data: '[]',
+                isSaved: false,
+            }
+
+            let mapPointsArr = JSON.parse(this._mapPoints)
+            mapPointsArr = [...mapPointsArr, newItem]
+            this._mapPoints = JSON.stringify(mapPointsArr)
+            return newItem
+        } catch (e) {
+        }
+        return null
     }
 
     createAndAddMapPointsJson(userId) {

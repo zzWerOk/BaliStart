@@ -44,6 +44,7 @@ export const saveTourAPI = async (
     duration,
     activity_level,
     languages,
+    map_points,
     image_logo_file,
 ) => {
 
@@ -61,7 +62,8 @@ export const saveTourAPI = async (
             duration,
             activity_level,
             languages,
-            image_logo_file
+            map_points,
+            image_logo_file,
         )
 
         if(!formData){
@@ -90,6 +92,7 @@ export const changeTourAPI = async (
     duration,
     activity_level,
     languages,
+    map_points,
     image_logo_file,
 
 ) => {
@@ -110,6 +113,7 @@ export const changeTourAPI = async (
             duration,
             activity_level,
             languages,
+            map_points,
             image_logo_file
         )
 
@@ -139,6 +143,7 @@ const addToFormData = (formData,
                        duration,
                        activity_level,
                        languages,
+                       map_points,
                        image_logo_file
 ) => {
     try {
@@ -154,6 +159,7 @@ const addToFormData = (formData,
         formData.append("duration", duration);
         formData.append("activity_level", activity_level);
         formData.append("languages", languages);
+        formData.append("map_points", map_points);
 
         if (image_logo_file !== '') {
             if (image_logo_file !== undefined) {

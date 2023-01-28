@@ -1,12 +1,11 @@
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {Button, Dropdown, DropdownButton, Image, Row, ToggleButton} from "react-bootstrap";
+import React, {useCallback, useContext, useEffect, useState} from 'react';
+import {Button, Image, Row, ToggleButton} from "react-bootstrap";
 import noImageLogo from '../../img/nophoto.jpg'
 import {observer} from "mobx-react-lite";
 
 import {ReactComponent as CircleIco} from "../../img/svg/circle.svg"
 import {ReactComponent as CircleOkIco} from "../../img/svg/circle_ok.svg"
 import {delay} from "../../utils/consts";
-import {deleteTopicAPI} from "../../http/topicsAPI";
 import {MDBFile} from "mdb-react-ui-kit";
 import TopicAddNewBtn from "../topics/components/TopicAddNewBTN";
 import TopicItemCard from "../topics/components/TopicItemCard";
@@ -16,6 +15,7 @@ import MapPointTopicComponent from "../topics/components/MapPointTopicComponent"
 import {changeMapPointAPI, deleteMapPointAPI, getMapPointData, saveMapPointAPI} from "../../http/mapPointsAPI";
 import mapPointCL from "../../classes/mapPointCL";
 import SpinnerSM from "../SpinnerSM";
+import {Context} from "../../index";
 
 const dropDownItems = [
     {
@@ -35,9 +35,10 @@ const dropDownItems = [
     },
 ]
 let currMapPoint = null
-
+let item = null
 const MapPointsDetailsPage = observer((props) => {
-    const {item, onItemEditHandler, deleteMapPoint} = props
+    const {itemC, onItemEditHandler, deleteMapPoint, addToTourId} = props
+    const {mapPointsStore, user} = useContext(Context)
 
     const [isSaving, setIsSaving] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
@@ -54,6 +55,10 @@ const MapPointsDetailsPage = observer((props) => {
 
     useEffect(
         () => {
+
+            if(!itemC){
+                item = mapPointsStore.getCreateAndAddMapPointsJson(user.currUserId)
+            }
 
             currMapPoint = new mapPointCL()
 
@@ -113,26 +118,6 @@ const MapPointsDetailsPage = observer((props) => {
         currMapPoint.setDescriptionData(value)
         setCurrDescription(value)
 
-        // let dataArr = JSON.parse(currMapPoint.data)
-        // // let isThere = false
-        // let descriptionDataItem = null
-        // for(let i = 0;i < dataArr.length;i++){
-        //     let currDataItem = dataArr[i]
-        //     if(currDataItem.hasOwnProperty('description')){
-        //         currDataItem.description = value
-        //         descriptionDataItem = currDataItem.description
-        //     }
-        // }
-        // if(!descriptionDataItem){
-        //     descriptionDataItem = {description: value}
-        //     dataArr.push(descriptionDataItem)
-        // }
-
-        // descriptionDataItem.description = value
-
-        // console.log(descriptionDataItem)
-        // console.log(dataArr)
-        // currMapPoint.data = JSON.stringify(dataArr)
         currMapPoint.isSaved = false
         onItemEditHandler(currMapPoint.getAsJson())
     }
@@ -170,7 +155,7 @@ const MapPointsDetailsPage = observer((props) => {
 
         setItemData(currMapPoint.dataJSON)
 
-        // the function only changes when any of these dependencies change
+        /** the function only changes when any of these dependencies change */
     }, [currMapPoint])
 
     const dataItemEditHandler = (item) => {
@@ -285,6 +270,7 @@ const MapPointsDetailsPage = observer((props) => {
                 /***
                  * Сохраняем новый объект
                  ***/
+
                 saveMapPointAPI(
                     currMapPoint.name,
                     currMapPoint.description,
@@ -293,7 +279,6 @@ const MapPointsDetailsPage = observer((props) => {
                     currMapPoint.active,
                     currMapPoint.created_by_user_id,
                     currMapPoint.created_date,
-                    // currMapPoint.data,
                     JSON.stringify(newDataArr),
                     currMapPoint.image_logo_file,
                 ).then(data => {
@@ -307,6 +292,10 @@ const MapPointsDetailsPage = observer((props) => {
                                 setItemImageLogo(data.image_logo + '?' + Date.now())
                             }
 
+                            if(addToTourId){
+                                currMapPoint.id = data.id
+                                addToTourId(data.id)
+                            }
                             changeTopicId(data.id)
                         }
                     }

@@ -1,4 +1,3 @@
-import {makeAutoObservable} from "mobx";
 
 export default class TourCL {
 
@@ -18,6 +17,7 @@ export default class TourCL {
         this._duration = '1 h'
         this._activity_level = 1
         this._languages = '[]'
+        this._map_points = '[]'
     }
 
     get tour_categoryJSON() {
@@ -30,11 +30,6 @@ export default class TourCL {
 
     set isSaved(value) {
         this._isSaved = value
-    }
-
-    setFromText(text) {
-        const itemObj = JSON.parse(text)
-        this.setFromJson(itemObj)
     }
 
     setFromJson(itemObj) {
@@ -81,6 +76,9 @@ export default class TourCL {
         if (itemObj.hasOwnProperty('languages')) {
             this._languages = itemObj.languages
         }
+        if (itemObj.hasOwnProperty('map_points')) {
+            this._map_points = itemObj.map_points
+        }
     }
 
     getAsJson() {
@@ -101,6 +99,7 @@ export default class TourCL {
                 "duration": this._duration,
                 "activity_level": this._activity_level,
                 "languages": this._languages,
+                "map_points": this._map_points,
             }
 
             if (this.hasOwnProperty('newId')) {
@@ -112,6 +111,15 @@ export default class TourCL {
         }
 
         return null
+    }
+
+
+    get map_points() {
+        return this._map_points;
+    }
+
+    set map_points(value) {
+        this._map_points = value;
     }
 
     get active() {

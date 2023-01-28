@@ -222,7 +222,6 @@ export default class mapPointCL {
     }
 
     addNewItemJSON(obj) {
-
         try {
             let newItemsArr = JSON.parse(this._data)
             newItemsArr.push(obj)

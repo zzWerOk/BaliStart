@@ -16,8 +16,7 @@ const sortItems = [
 ]
 
 const MapPointsList = (props) => {
-    const {mapPointsStore} = useContext(Context)
-    const {user} = useContext(Context)
+    const {mapPointsStore, user} = useContext(Context)
 
     const {redrawPage, getAllData} = props
 

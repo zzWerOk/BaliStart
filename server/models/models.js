@@ -42,6 +42,7 @@ const Tours = sequelize.define('tours', {
     duration: {type: DataTypes.STRING},
     activity_level: {type: DataTypes.STRING},
     languages: {type: DataTypes.STRING},
+    map_points: {type: DataTypes.STRING},
     file_name: {type: DataTypes.STRING},
 
 })
@@ -121,14 +122,14 @@ Guide.belongsTo(User)
 User.hasOne(Topics)
 Topics.belongsTo(User)
 
-Guide.hasMany(Tours)
+// Guide.hasMany(Tours)
 // Tours.belongsTo(Guide)
 
-Tours.hasMany(MapPoint)
-MapPoint.belongsTo(Tours)
+// Tours.hasMany(MapPoint)
+// MapPoint.belongsTo(Tours)
 
-Guide.hasMany(MapPoint)
-MapPoint.belongsTo(Guide)
+// Guide.hasMany(MapPoint)
+// MapPoint.belongsTo(Guide)
 
 module.exports = {
     User,

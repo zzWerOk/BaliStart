@@ -21,6 +21,7 @@ class ToursController {
                 duration,
                 activity_level,
                 languages,
+                map_points,
             } = req.body
 
             let img
@@ -51,6 +52,7 @@ class ToursController {
                             duration,
                             activity_level,
                             languages,
+                            map_points,
                             file_name: fileName,
                         })
 
@@ -102,6 +104,7 @@ class ToursController {
                 duration,
                 activity_level,
                 languages,
+                map_points,
             } = req.body
 
             let img
@@ -141,6 +144,7 @@ class ToursController {
                         duration,
                         activity_level,
                         languages,
+                        map_points,
                     }, {where: {id: id}})
 
                     try {
