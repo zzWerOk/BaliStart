@@ -24,7 +24,7 @@ const MapPointsListCell = (props) => {
 
     const mapPointsPageCardComponent = (data) => (
         <MapPointsDetailsPage
-            item={data}
+            itemC={data}
             onItemEditHandler={onItemEditHandlerCell}
             deleteMapPoint={deleteMapPoint}
         />

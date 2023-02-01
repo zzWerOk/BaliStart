@@ -9,11 +9,15 @@ import {ReactComponent as CircleOkIco} from "../../img/svg/circle_ok.svg"
 import {ReactComponent as CloseIco} from "../../img/svg/close.svg"
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
-import {MDBFile} from "mdb-react-ui-kit";
+import {MDBContainer, MDBFile, MDBIcon} from "mdb-react-ui-kit";
 import {changeTourAPI, deleteTourAPI, saveTourAPI} from "../../http/toursAPI";
 import TourCL from "../../classes/tourCL";
 import ModalPopUp from "../modal/ModalPopUp";
 import MapPointsDetailsPage from "../mappoints/MapPointsDetailsPage";
+
+import './TourDetailsPage.css';
+import TourTimeLineCollapse from "./components/TourTimeLineCollapse";
+import {getMapPointData} from "../../http/mapPointsAPI";
 
 let durationItems = []
 
@@ -46,12 +50,12 @@ const TourDetailsPage = observer((props) => {
     const [tourLanguage, setTourLanguage] = useState('[]')
     const [tourMapPoints, setTourMapPoints] = useState('[]')
     const [mapPointsArr, setMapPointsArr] = useState([])
+    const [mapPointsArr_Loading, setMapPointsArr_Loading] = useState(false)
 
     const [showModal, setShowModal] = useState(false)
 
+    useEffect(() => {
 
-    useEffect(
-        () => {
             durationItems = []
             for (let i = 1; i <= 21; i++) {
                 durationItems.push({id: i})
@@ -78,21 +82,29 @@ const TourDetailsPage = observer((props) => {
 
 
             mapPointsStore.loadMapPointsList()
-
+            let storeMapointsItems = mapPointsStore.getMapPointList
             setMapPointsArr(mapPointsStore.getMapPointList)
 
             let newMapPointArr = []
-            mapPointsStore.getMapPointList.map(currMapPoint => {
-                for(let i = 0;i < currTour.map_points.length;i++){
-                    if(currTour.map_points[i] === currMapPoint.id){
-                        newMapPointArr.push(currTour.map_points[i])
-                        break
-                    }
-                }
-            })
-            // setTourMapPoints(currTour.map_points)
-            setTourMapPoints(JSON.stringify(newMapPointArr))
+            let lostMapPointsArr = []
+            let currTourMapPointArr = JSON.parse(currTour.map_points)
+        // console.log(currTour)
 
+            for (let i = 0; i < currTourMapPointArr.length; i++) {
+                mapPointsStore.getMapPointList.map(currMapPoint => {
+                    if (currTourMapPointArr[i] === currMapPoint.id) {
+                        if (!currMapPoint.data) {
+                            // lostMapPointsArr.push(currMapPoint.id)
+                            lostMapPointsArr.push(i)
+                        }
+
+                        newMapPointArr.push(currTourMapPointArr[i])
+                    }
+                })
+            }
+
+            setTourMapPoints(JSON.stringify(newMapPointArr))
+            currTour.map_points = JSON.stringify(newMapPointArr)
 
 
             if (item.image_logo) {
@@ -101,6 +113,47 @@ const TourDetailsPage = observer((props) => {
                 }
             }
             setTourCategoriesItems_load(false)
+
+        setMapPointsArr_Loading(true)
+            if (lostMapPointsArr.length > 0) {
+                lostMapPointsArr.map(async function (lostItem, index) {
+
+                    getMapPointData(currTourMapPointArr[lostItem]).then(data => {
+                        if (data.hasOwnProperty('status')) {
+                            if (data.status === 'ok') {
+
+                                for(let j = 0;j < storeMapointsItems.length;j ++){
+                                    let currStoreMapPointItem = storeMapointsItems[j]
+                                    if(currStoreMapPointItem.id === currTourMapPointArr[lostItem]){
+                                        // storeMapointsItems[currTourMapPointArr[lostItem]].data = data.data
+                                        currStoreMapPointItem.data = data.data
+
+                                        mapPointsStore.addDataToMapPoint_byId(currStoreMapPointItem.id, data.data)
+
+                                    }
+                                }
+
+                            }
+                        }
+                    }).finally(() => {
+
+                        if(lostMapPointsArr.length-1 === index){
+                            setMapPointsArr_Loading(false)
+                            setMapPointsArr(storeMapointsItems)
+
+                            // mapPointsStore.setMapPointsListFromArr(storeMapointsItems)
+
+                        }
+
+                    })
+                })
+            }else{
+                setMapPointsArr(storeMapointsItems)
+                setMapPointsArr_Loading(false)
+
+            }
+
+
         }, []
     )
 
@@ -518,26 +571,67 @@ const TourDetailsPage = observer((props) => {
 
     const getMapPointName_byId = (id) => {
         for (let i = 0; i < mapPointsArr.length; i++) {
-            if (mapPointsArr[i].id === id) {
+            if (parseInt(mapPointsArr[i].id) === parseInt(id)) {
                 return mapPointsArr[i].name
             }
         }
-        // console.log('ooops')
-        // return 'ooops'
+    }
+
+    const getMapPointDataItems = (selectedMapPoint) => {
+        if(selectedMapPoint.hasOwnProperty('data')) {
+            let newDataItems = []
+            const mapPointData = JSON.parse(selectedMapPoint.data)
+            for (let i = 0; i < mapPointData.length; i++) {
+                if (!mapPointData[i].hasOwnProperty('description')) {
+                    newDataItems.push(mapPointData[i])
+                }
+            }
+
+            return newDataItems
+        }
+        return null
+    }
+
+    const getMapPointDataDescription = (selectedMapPoint) => {
+        try {
+            if(selectedMapPoint.hasOwnProperty('data')) {
+                const mapPointData = JSON.parse(selectedMapPoint.data)
+
+                for (let i = 0; i < mapPointData.length; i++) {
+                    if (mapPointData[i].hasOwnProperty('description')) {
+                        return mapPointData[i].description
+                    }
+                }
+
+                return selectedMapPoint.description
+            }
+        }catch (e) {
+            console.log(selectedMapPoint)
+            console.log(e)
+
+        }
+    }
+
+    const getMapPoint_byId = (id) => {
+        for (let i = 0; i < mapPointsArr.length; i++) {
+            // console.log(mapPointsArr[i])
+            if (parseInt(mapPointsArr[i].id) === parseInt(id)) {
+                return mapPointsArr[i]
+            }
+        }
     }
 
     const addToTourId = (id) => {
 
-        if (Array.isArray(JSON.parse(tourMapPoints))) {
+        const currMapPointsArr = JSON.parse(tourMapPoints)
+        if (Array.isArray(currMapPointsArr)) {
 
-            console.log(mapPointsStore.getMapPointList)
-
-            const currMapPointsArr = JSON.parse(tourMapPoints)
             const found = currMapPointsArr.find(element => element === id)
             if (found) {
                 const filtered = currMapPointsArr.filter(function (value, index, arr) {
                     return value !== found;
                 })
+
                 currTour.map_points = JSON.stringify(filtered)
                 setTourMapPoints(JSON.stringify(filtered))
             } else {
@@ -585,18 +679,47 @@ const TourDetailsPage = observer((props) => {
 
     }
 
-    const mapPointPageCardComponent = (data) => {
-        // const newMapPoint = mapPointsStore.getCreateAndAddMapPointsJson(user.currUserId)
+    const mapPointPageCardComponent = () => {
 
         return <MapPointsDetailsPage
-            // item={newMapPoint}
-            // item={mapPointsStore.getCreateAndAddMapPointsJson(user.currUserId)}
             onItemEditHandler={onMapPointEditHandler}
             deleteTopic={deleteMapPoint}
             addToTourId={addToTourId}
         />
     }
 
+    const getMapPointsTimeLine = () => {
+
+
+        return (
+
+            mapPointsArr_Loading
+                ?
+                <SpinnerSM/>
+                :
+                <MDBContainer className="py-5">
+                    <ul className="timeline-with-icons">
+
+                        {
+                            JSON.parse(tourMapPoints).map(function (currMapPoint, index) {
+                                let selectedMapPoint = getMapPoint_byId(currMapPoint)
+                                if (selectedMapPoint)
+                                    return <TourTimeLineCollapse
+                                        key={index}
+                                        name={selectedMapPoint.name}
+                                        description={getMapPointDataDescription(selectedMapPoint)}
+                                        image_logo={selectedMapPoint.image_logo}
+                                        index={index}
+                                        // dataItems={selectedMapPoint.data}
+                                        dataItems={getMapPointDataItems(selectedMapPoint)}
+                                    />
+                            })
+                        }
+
+                    </ul>
+                </MDBContainer>
+        );
+    }
 
     if (tourCategoriesItems_load) {
         return <SpinnerSM/>
@@ -1037,11 +1160,7 @@ const TourDetailsPage = observer((props) => {
                      ***/}
                     <span>Itinerary</span>
 
-                    {JSON.parse(tourMapPoints).map(function (currMapPoint, index) {
-                        return <span key={index}>
-                            {getMapPointName_byId(currMapPoint)}
-                        </span>
-                    })}
+                    {getMapPointsTimeLine()}
 
                     <div>
                         <Dropdown>

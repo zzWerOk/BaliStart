@@ -154,7 +154,6 @@ export default class TourCL {
         this._created_date = value;
     }
 
-
     get id() {
         return this._id;
     }

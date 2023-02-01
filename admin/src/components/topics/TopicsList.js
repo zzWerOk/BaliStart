@@ -89,6 +89,8 @@ const TopicsList = (props) => {
                 newArr[i] = item
             }
         }
+
+
         setItemsList(newArr)
         topicsStore.setListFromArr(newArr)
 

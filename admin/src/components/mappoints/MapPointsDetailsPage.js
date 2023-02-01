@@ -58,6 +58,8 @@ const MapPointsDetailsPage = observer((props) => {
 
             if(!itemC){
                 item = mapPointsStore.getCreateAndAddMapPointsJson(user.currUserId)
+            }else{
+                item = itemC
             }
 
             currMapPoint = new mapPointCL()
@@ -244,6 +246,8 @@ const MapPointsDetailsPage = observer((props) => {
                     setIsSaving(false)
                 })
             } else {
+                mapPointsStore.deleteMapPointById(currMapPoint.id)
+
                 setIsDeleting(false)
                 setIsSaving(false)
             }
@@ -292,11 +296,11 @@ const MapPointsDetailsPage = observer((props) => {
                                 setItemImageLogo(data.image_logo + '?' + Date.now())
                             }
 
+                            changeTopicId(data.id)
                             if(addToTourId){
                                 currMapPoint.id = data.id
                                 addToTourId(data.id)
                             }
-                            changeTopicId(data.id)
                         }
                     }
                 }).catch(() => {

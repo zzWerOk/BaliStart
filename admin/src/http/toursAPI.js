@@ -123,7 +123,6 @@ export const changeTourAPI = async (
         }
 
         const {data} = await $authHostUpload.post(apiUrl+'/change', formData)
-        console.log(data)
         return data
     } catch (e) {
         console.log('data error', e.message)

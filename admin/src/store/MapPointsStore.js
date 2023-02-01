@@ -25,6 +25,17 @@ export default class MapPointsStore {
         return null
     }
 
+    addDataToMapPoint_byId(id, data) {
+        let currMapPointsItems_arr = this.getMapPointList
+        for(let i = 0;i < currMapPointsItems_arr.length;i++){
+            if(id === currMapPointsItems_arr[i].id){
+                currMapPointsItems_arr[i].data = data
+                break
+            }
+        }
+        this.setMapPointsListFromArr(currMapPointsItems_arr)
+    }
+
     setMapPointsListFromArr(newArr) {
         this._mapPoints = JSON.stringify(newArr)
         this.saveMapPointsList()
