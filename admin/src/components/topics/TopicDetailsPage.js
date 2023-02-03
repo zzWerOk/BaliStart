@@ -139,6 +139,7 @@ const TopicDetailsPage = observer((props) => {
         currTopic.name = value
         currTopic.isSaved = false
         onItemEditHandler(currTopic.getAsJson())
+
     }
 
     const changeTopicId = (id) => {
@@ -148,7 +149,7 @@ const TopicDetailsPage = observer((props) => {
 
     const onDescriptionHandler = (value) => {
         setCurrDescription(value)
-        currTopic.description = currDescription
+        currTopic.description = value
         currTopic.isSaved = false
         onItemEditHandler(currTopic.getAsJson())
     }

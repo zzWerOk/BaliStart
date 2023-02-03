@@ -185,8 +185,8 @@ export default class mapPointCL {
             }
         }
         if (!descriptionDataText) {
-            this.addNewItemJSON({description: ''})
-            descriptionDataText = ''
+            this.addNewItemJSON({description: this._description})
+            descriptionDataText = this._description
         }
         return descriptionDataText
     }

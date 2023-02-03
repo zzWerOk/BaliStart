@@ -39,6 +39,9 @@ const TopicListsCell = (props) => {
         if (newImage) {
             setItemImageLogo(item.image_logo + '?' + Date.now())
         }
+
+        console.log(item)
+
         onItemEditHandler(item)
     }
 

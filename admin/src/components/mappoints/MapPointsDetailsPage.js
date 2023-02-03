@@ -84,19 +84,21 @@ const MapPointsDetailsPage = observer((props) => {
                             if (data.hasOwnProperty('status')) {
                                 if (data.status === 'ok') {
                                     currMapPoint.data = data.data
-                                    setCurrDescription(currMapPoint.descriptionData)
                                 }
                             }
                         }).finally(() => {
                             setItemData(currMapPoint.dataJSON)
                             setMapPointsItems_load(false)
+                            setCurrDescription(currMapPoint.descriptionData)
                         })
                     } else {
+                        setCurrDescription(currMapPoint.descriptionData)
                         setMapPointsItems_load(false)
                     }
                 })
             } else {
                 setItemData(currMapPoint.dataJSON)
+                setCurrDescription(currMapPoint.descriptionData)
                 setMapPointsItems_load(false)
             }
 

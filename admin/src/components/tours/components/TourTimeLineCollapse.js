@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import './TourTimeLineCollapse.css';
 import {MDBCollapse} from "mdb-react-ui-kit";
 import noImageLogo from "../../../img/nophoto.jpg";
@@ -13,14 +13,24 @@ const TourTimeLineCollapse = (props) => {
     const [showShow, setShowShow] = useState(false);
     const [itemImageLogo, setItemImageLogo] = useState('')
 
-    useEffect(
-        () => {
+    useMemo(() => {
+        try {
             if (image_logo) {
                 setItemImageLogo(image_logo + '?' + Date.now())
             }
-
+        } catch (e) {
+            console.log(e)
         }
-    )
+    }, [])
+
+
+    // useEffect(
+    //     () => {
+    //         if (image_logo) {
+    //             setItemImageLogo(image_logo + '?' + Date.now())
+    //         }
+    //     }
+    // )
 
     const toggleShow = () => setShowShow(!showShow);
 
