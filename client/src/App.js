@@ -1,6 +1,10 @@
 import './App.css';
 import {observer} from "mobx-react-lite";
 import {useEffect, useState} from "react";
+import AppRouter from "./components/AppRouter";
+import {Col, Row} from "react-bootstrap";
+import NavBar from "./components/NavBar";
+
 
 const App = observer(() => {
 
@@ -18,6 +22,15 @@ const App = observer(() => {
 
   return (
       <div>
+        <NavBar/>
+        <Row className={'Main-Field'}>
+          <Col
+              md={9}
+          >
+
+            <AppRouter/>
+          </Col>
+        </Row>
       </div>
   );
 })
