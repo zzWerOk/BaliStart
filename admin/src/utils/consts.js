@@ -57,10 +57,10 @@ export const TOPICS_ROUTE = '/topics'
 
 export const SIDEBAR_ISADMIN = [
     new sideBarItem('MAIN',MAIN_ROUTE),
-    new sideBarItem('Topics',TOPICS_ROUTE),
     new sideBarItem('Admin',ADMIN_ROUTE),
     new sideBarItem('User',USER_ROUTE),
     new sideBarItem('Guide',GUIDE_ROUTE),
+    new sideBarItem('Topics',TOPICS_ROUTE),
     new sideBarItem('Tours',TOURS_ROUTE),
     new sideBarItem('Map Point',MAPPOINT_ROUTE),
     // new sideBarItem('Login',AUTH_ROUTE),
@@ -68,13 +68,12 @@ export const SIDEBAR_ISADMIN = [
 
 export const SIDEBAR_ISAUTHUSER = [
     new sideBarItem('MAIN',MAIN_ROUTE),
-    new sideBarItem('User',USER_ROUTE),
-    new sideBarItem('Guide',GUIDE_ROUTE),
     new sideBarItem('Tours',TOURS_ROUTE),
     new sideBarItem('Map Point',MAPPOINT_ROUTE),
 ]
 
 export const SIDEBAR_NOTLOGGED = [
-    new sideBarItem('Login',AUTH_ROUTE)
+    new sideBarItem('Login',AUTH_ROUTE),
+    new sideBarItem('Register',REGISTRATION_ROUTE)
 ]
 

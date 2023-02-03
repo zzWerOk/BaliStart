@@ -1,5 +1,4 @@
 import './App.css';
-import {BrowserRouter, Redirect} from "react-router-dom";
 import {useHistory} from "react-router-dom";
 import AppRouter from "./components/AppRouter";
 import NavBar from "./components/NavBar";
@@ -10,7 +9,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {Context} from "./index";
 import {check, login} from "./http/userAPI";
 import SpinnerSM from "./components/SpinnerSM";
-import {AUTH_ROUTE, delay, MAIN_ROUTE} from "./utils/consts";
+import {delay, MAIN_ROUTE} from "./utils/consts";
 
 
 const App = observer(() => {
@@ -40,10 +39,17 @@ const App = observer(() => {
         <div>
             <NavBar/>
             <Row className={'Main-Field'}>
-                <Col md={3}>
-                    <SideBar/>
-                </Col>
-                <Col md={9}>
+                {(user.isAdmin || user.isGuide || user.isAuthUser) ?
+                    <Col md={3}>
+                        <SideBar/>
+                    </Col>
+                    :
+                    <></>
+                }
+                <Col
+                    md={(user.isAdmin || user.isGuide || user.isAuthUser)
+                        ? 9 : null}
+                >
                     <AppRouter/>
                 </Col>
             </Row>

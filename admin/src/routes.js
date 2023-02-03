@@ -6,7 +6,10 @@ import {
     LOGIN_ROUTE,
     MAIN_ROUTE,
     MAPPOINT_ROUTE,
-    REGISTRATION_ROUTE, TOPICS_ROUTE, TOURS_ROUTE, USER_ROUTE
+    REGISTRATION_ROUTE,
+    TOPICS_ROUTE,
+    TOURS_ROUTE,
+    USER_ROUTE
 } from "./utils/consts";
 import Auth from "./pages/Auth";
 import GuidePage from "./pages/GuidePage";
@@ -35,6 +38,10 @@ export const adminRoutes = [
         path: TOPICS_ROUTE,
         Component: TopicsPage
     },
+    {
+        path: MAIN_ROUTE,
+        Component: Main
+    },
 
 ]
 
@@ -43,8 +50,11 @@ export const publicRoutes = [
         path: AUTH_ROUTE,
         Component: Auth
     },
-
-    ]
+    {
+        path: REGISTRATION_ROUTE,
+        Component: Registration
+    },
+]
 
 export const authUserRoutes = [
     {

@@ -39,20 +39,23 @@ const NavBar = observer(() => {
                             {user
                                 ?
                                 <Nav>
-                                    <li className="nav-item">
-                                        <a className="nav-link active" aria-current="page" href="#">Home</a>
-                                    </li>
-                                    <li className="nav-item">
-                                        <a className="nav-link" href="#">Features</a>
-                                    </li>
                                     {
-                                        user.isAdmin ?
+                                        (user.isAdmin || user.is_guide || user.isAuthUser) ?
                                             <Nav>
+                                                <li className="nav-item">
+                                                    <a className="nav-link active" aria-current="page" href="#">Home</a>
+                                                </li>
+                                                <li className="nav-item">
+                                                    <a className="nav-link" href="#">Features</a>
+                                                </li>
                                                 <li className="nav-item">
                                                     <a className="nav-link" href="#">Pricing</a>
                                                 </li>
                                                 <li className="nav-item">
                                                     <a className="nav-link disabled">Disabled</a>
+                                                </li>
+                                                <li className="nav-item">
+                                                    <Button className=" active" onClick={logOut}>Log Out</Button>
                                                 </li>
                                             </Nav>
                                             :
@@ -60,9 +63,6 @@ const NavBar = observer(() => {
 
                                             </div>
                                     }
-                                    <li className="nav-item">
-                                        <Button className=" active" onClick={logOut}>Log Out</Button>
-                                    </li>
                                 </Nav>
                                 :
                                 <div>

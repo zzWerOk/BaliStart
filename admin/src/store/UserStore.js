@@ -1,25 +1,35 @@
 import {makeAutoObservable} from "mobx";
 
-export default class UserStore{
+export default class UserStore {
 
     constructor() {
         this._isAdmin = false
+        this._isGuide = false
         this._isAuthUser = false
         this._user = {}
         makeAutoObservable(this)
     }
 
-    setIsAuthUser(isAuthUser){
+    setIsAuthUser(isAuthUser) {
         this._isAuthUser = isAuthUser
     }
 
-    setIsAdmin(isAdmin){
+    setIsAdmin(isAdmin) {
         this._isAdmin = isAdmin
     }
 
-    setUser(user){
 
-        if(user.hasOwnProperty('id') && user.hasOwnProperty('email')) {
+    get isGuide() {
+        return this._isGuide;
+    }
+
+    set isGuide(value) {
+        this._isGuide = value;
+    }
+
+    setUser(user) {
+
+        if (user.hasOwnProperty('id') && user.hasOwnProperty('email')) {
 
             this._user = user
             if (user.hasOwnProperty('isAdmin')) {
@@ -27,36 +37,38 @@ export default class UserStore{
             }
 
             if (user.hasOwnProperty('isGuide')) {
-                this.setIsAuthUser(user.isGuide)
+                this.isGuide = user.isGuide
             }
+
+            this.setIsAuthUser(true)
 
         }
     }
 
-    get isAuthUser(){
+    get isAuthUser() {
         return this._isAuthUser
     }
 
-    get isAdmin(){
+    get isAdmin() {
         return this._isAdmin
     }
 
-    get currUserId(){
-        if(this._user) {
+    get currUserId() {
+        if (this._user) {
             return this._user.id
         }
         return null
     }
 
-    get user(){
+    get user() {
         return this._user
     }
 
-    logout(){
+    logout() {
         this._isAuthUser = false
         this._isAdmin = false
         this._user = {}
-        localStorage.setItem("token",'')
+        localStorage.setItem("token", '')
     }
 
 }

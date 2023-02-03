@@ -44,7 +44,10 @@ const SideBar = observer(() => {
                                 'active'
                                 :
                                 ' '}`} style={{cursor: 'pointer'}} key={item.link}>
-                                {item.name}
+                                <Link to={item.link}
+                                      className={`${navBarLink === item.link ? classes.linkeditem : classes.linkitem}`}
+                                      style={{display: 'block'}}>{item.name}</Link>
+
                             </ListGroupItem>
                         )
                         :
@@ -54,7 +57,11 @@ const SideBar = observer(() => {
                                 'active'
                                 :
                                 ' '}`} style={{cursor: 'pointer'}} key={item.link}>
-                                {item.name}
+
+                                <Link to={item.link}
+                                      className={`${navBarLink === item.link ? classes.linkeditem : classes.linkitem}`}
+                                      style={{display: 'block'}}>{item.name}</Link>
+
                             </ListGroupItem>
                         )
                 }

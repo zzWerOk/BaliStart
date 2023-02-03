@@ -3,7 +3,7 @@ import {Context} from "../index";
 import {Container} from "react-bootstrap";
 import {login} from "../http/userAPI";
 import {useHistory} from "react-router-dom";
-import {delay, MAIN_ROUTE} from "../utils/consts";
+import {AUTH_ROUTE, delay, MAIN_ROUTE, REGISTRATION_ROUTE} from "../utils/consts";
 import SpinnerSm from "../components/SpinnerSM";
 import {AxiosError} from "axios";
 
@@ -55,6 +55,9 @@ const Auth = () => {
                    style={{height: window.innerHeight - 54}}>
             <form className="shadow p-3 mb-5 bg-white rounded"
                   style={{minWidth: '450px'}}>
+                <div>
+                    <h4>Login</h4>
+                </div>
                 <div className="form-outline mb-4">
                     <input
                         type="email"
@@ -89,7 +92,7 @@ const Auth = () => {
                 </div>
 
                 <div className="text-center">
-                    <p>Not a member? <a href="#">Register</a></p>
+                    <p>Not a member? <a href={REGISTRATION_ROUTE}>Register</a></p>
                     <p>or sign up with:</p>
                     <button type="button" className="btn btn-link btn-floating mx-1">
                         <i className="fab fa-facebook-f"></i>
