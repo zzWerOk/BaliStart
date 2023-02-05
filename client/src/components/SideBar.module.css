@@ -1,0 +1,15 @@
+
+.linkitem{
+    color: #282c34;
+    text-decoration: none;
+}
+
+.linkitem:hover{
+    color: #bebebe;
+    text-decoration: none;
+}
+
+.linkeditem{
+    color: aliceblue;
+    text-decoration: none;
+}

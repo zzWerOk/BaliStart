@@ -1,0 +1,11 @@
+$textColor: #090909;
+$textColor_hover: #a23b3b;
+
+.textColor{
+    color: $textColor;
+
+    &:hover{
+        color: $textColor_hover;
+    }
+
+}

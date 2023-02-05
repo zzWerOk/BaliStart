@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import MainPadeFeed from "../components/mainpage/MainPadeFeed";
 
 const Main = () => {
     // const {navBarTitle} = useContext(Context)
@@ -10,7 +11,7 @@ const Main = () => {
 
     return (
         <div>
-            Main PAGE
+            <MainPadeFeed/>
         </div>
     );
 };
