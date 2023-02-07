@@ -1,7 +1,10 @@
 import React from 'react';
 import {Form} from "react-bootstrap";
+import classes from './FeedTopBar.module.css'
+const FeedTopBar = (props) => {
 
-const FeedTopBar = () => {
+    const {itemsTypeChangeHandler, itemsType} = props
+
     return (
         <div
             className={'d-flex'}
@@ -19,22 +22,28 @@ const FeedTopBar = () => {
                     verticalAlign: 'middle',
             }}
             >
-                <a
-                    href=""
-                    style={{
-                        padding: '10px 10px',
-                        verticalAlign: 'middle',
-                        color: 'white'
-                    }}
-                >Categories</a>
-                <a
-                    href=""
-                    style={{
-                        padding: '10px 10px',
-                        verticalAlign: 'middle',
-                        color: 'white'
-                    }}
-                >All posts</a>
+                {
+                    itemsType
+                        ?
+                        <span
+                            className={`${classes.feed_top_bar_a} ${itemsType === 'categories' ? classes.selected_a : ''} `}
+                            onClick={() => {
+                                itemsTypeChangeHandler('categories')
+                            }}
+                        >Categories</span>
+                        :
+                        null
+                }
+                {
+                    itemsType
+                        ?
+                        <span
+                            className={`${classes.feed_top_bar_a} ${itemsType === 'lastPosts' ? classes.selected_a : ''} `}
+                            onClick={() => {itemsTypeChangeHandler('lastPosts')}}
+                        >Last posts</span>
+                        :
+                        null
+                }
             </div>
             <Form className="d-flex">
                 <Form.Control

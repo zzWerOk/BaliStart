@@ -40,8 +40,6 @@ const TopicListsCell = (props) => {
             setItemImageLogo(item.image_logo + '?' + Date.now())
         }
 
-        console.log(item)
-
         onItemEditHandler(item)
     }
 

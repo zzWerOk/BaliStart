@@ -219,7 +219,11 @@ class UserController {
         if (!id) {
             return next(ApiError.badRequest("Ошибка параметра"))
         } else {
-            const currUser = await User.findOne({where: {id: id}})
+            const currUser = await User.findOne({
+                attributes: {exclude: ['password']},
+                where: {id: id}
+            })
+
             return res.json(currUser)
         }
     }

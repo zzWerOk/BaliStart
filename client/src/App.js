@@ -9,8 +9,6 @@ import SideBar from "./components/SideBar";
 
 const App = observer(() => {
 
-    // const history = useHistory()
-    // const {user} = useContext(Context)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -27,6 +25,7 @@ const App = observer(() => {
             <NavBar/>
             <Row
                 className={'Main-Field'}
+                style={{marginLeft: 0, marginRight: 0}}
             >
                 <Col>
                     <SideBar/>

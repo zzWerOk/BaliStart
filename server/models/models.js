@@ -84,7 +84,7 @@ const TopicsCategory = sequelize.define('topics_category', {
     description: {type: DataTypes.STRING},
     is_active: {type: DataTypes.BOOLEAN, defaultValue: true},
     is_for_tour: {type: DataTypes.BOOLEAN, defaultValue: false},
-
+    topics_count: {type: DataTypes.INTEGER},
 })
 
 const ToursCategory = sequelize.define('tours_category', {

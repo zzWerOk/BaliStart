@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
-import {Button, ListGroup} from "react-bootstrap";
+import {ListGroup} from "react-bootstrap";
 import TopicsCategoryItem_new from "./TopicsCategoryItem_new";
 import TopicsCategoryItem_ready from "./TopicsCategoryItem_ready";
 import {delay} from "../../utils/consts";
@@ -31,7 +31,7 @@ const TopicsCategoryPage = observer(() => {
             getTableUpdateByName('TopicsCategory').then(tuData => {
                 const lastDateTable = topicsCategoryStore.getSavedLastDateTableTopicsCategory()
 
-                if (tuData.date.toString() !== lastDateTable.toString() || topicsCategoryStore.getSavedCategoriesList().length === 0) {
+                // if (tuData.date.toString() !== lastDateTable.toString() || topicsCategoryStore.getSavedCategoriesList().length === 0) {
                     getAll().then(data => {
                         /**
                          Сохраняем список
@@ -47,10 +47,10 @@ const TopicsCategoryPage = observer(() => {
                      Сохраняем дату последнего изменения таблицы
                      **/
                     topicsCategoryStore.saveLastDateTableTopicsCategory(tuData.date)
-                } else {
-                    setItems_arr(topicsCategoryStore.getSavedCategoriesList())
-                    // console.log('Даты равны, получаем данные с LocalStorage')
-                }
+                // } else {
+                //     setItems_arr(topicsCategoryStore.getSavedCategoriesList())
+                //     // console.log('Даты равны, получаем данные с LocalStorage')
+                // }
 
             }).finally(() => {
                 setLoading(false)

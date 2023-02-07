@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import FeedCategory from "./feed/Feed_category";
 import FeedTopic from "./feed/Feed_topic";
+import SpinnerSm from "../SpinnerSM";
+import {Context} from "../../index";
 
 const feedItems = [
     {
@@ -46,28 +48,51 @@ const feedItems = [
         date: '11.02.2023 15:33',
     },
 ]
-const FeedItemsList = () => {
-    return (
-        <div>
+const FeedItemsList = (props) => {
+    const {itemsType} = props
 
-            {/*<div className="list-group">*/}
-            {/*    {feedItems.map(function (item, index) {*/}
-            {/*        return <FeedCategory item={item} key={index}/>*/}
-            {/*    })}*/}
-            {/*</div>*/}
+    const {topicsCategoryStore} = useContext(Context)
 
-            <ul
-                className="list-group list-group-flush"
-                style={{padding: '0 40px'}}
-            >
-                {feedItems.map(function (item, index) {
-                    return <FeedTopic item={item} key={index}/>
-                })}
-            </ul>
+    const [categoriesItemsArr, setCategoriesItemsArr] = useState([])
+    const [loading, setLoading] = useState(true)
 
-        </div>
-    );
-}
-    ;
+    useEffect(() => {
 
-    export default FeedItemsList;
+        setCategoriesItemsArr(topicsCategoryStore.getSavedCategoriesList())
+
+        setLoading(false)
+
+    }, [])
+
+    if (loading) {
+        return <SpinnerSm/>
+    } else {
+        return (
+            <div>
+
+                {
+                    itemsType === 'categories'
+                    ?
+                        <div className="list-group">
+                            {categoriesItemsArr.map(function (item, index) {
+                                return <FeedCategory item={item} key={index}/>
+                            })}
+                        </div>
+                        :
+                        <ul
+                            className="list-group list-group-flush"
+                            style={{padding: '0 40px'}}
+                        >
+                            {feedItems.map(function (item, index) {
+                                return <FeedTopic item={item} key={index}/>
+                            })}
+                        </ul>
+                }
+
+
+            </div>
+        );
+    }
+};
+
+export default FeedItemsList;

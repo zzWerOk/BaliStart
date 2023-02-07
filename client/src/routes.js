@@ -1,11 +1,14 @@
 // import Admin from "./pages/Admin";
 import {
-    MAIN_ROUTE,
+    CATEGORY_ROUTE,
+    MAIN_ROUTE, NOPAGE_ROUTE,
 } from "./utils/consts";
 // import Auth from "./pages/Auth";
 // import GuidePage from "./pages/GuidePage";
 // import Login from "./pages/Login";
 import Main from "./pages/Main";
+import Category from "./pages/Category";
+import NoPage from "./pages/NoPage";
 // import MapPointPage from "./pages/MapPointPage";
 // import Registration from "./pages/Registration";
 // import ToursPage from "./pages/ToursPage";
@@ -40,6 +43,14 @@ export const publicRoutes = [
     {
         path: MAIN_ROUTE,
         Component: Main
+    },
+    {
+        path: CATEGORY_ROUTE,
+        Component: Category
+    },
+    {
+        path: NOPAGE_ROUTE,
+        Component: NoPage
     },
     // {
     //     path: AUTH_ROUTE,

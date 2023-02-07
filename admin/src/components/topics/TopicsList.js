@@ -160,22 +160,25 @@ const TopicsList = (props) => {
 
                             <Dropdown.Menu>
 
-                                {topicCategoriesItems.map(item => {
+                                {topicCategoriesItems.map(function (item, index) {
                                     return item.id === -99
                                         ?
                                         <Dropdown.Divider
-                                            key={item.id}
+                                            // key={item.id}
+                                            key={index}
                                         />
                                         :
                                         <Dropdown.Item
-                                            key={item.id}
+                                            // key={item.id}
+                                            key={index}
                                             onClick={() => {
                                                 addNewTagHandler(item.id)
                                             }}
                                         >
                                             {item.category_name}
                                         </Dropdown.Item>
-                                })}
+                                }
+                                )}
                             </Dropdown.Menu>
                         </Dropdown>
 

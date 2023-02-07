@@ -65,10 +65,14 @@ class TopicsCategoryController {
     }
 
     async getAll(req, res) {
+        const {sort} = req.query
+
+        const sortTag = sort || 'DESC'
+
         const topicsCategoriesList = await TopicsCategory.findAndCountAll({
                 // limit: 10,
                 order: [
-                    ['id', 'DESC'],
+                    ['id', sortTag],
                     // ['name', 'ASC'],
                 ]
             }

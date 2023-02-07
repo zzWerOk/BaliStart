@@ -21,6 +21,9 @@ export const epochToDate = epoch => {
 }
 
 export const epochToDateWithTime = epoch => {
+    if(epoch === 0) {
+        return ''
+    }
     const date = new Date(epoch * 1);
 
     const year = date.getFullYear();
@@ -38,8 +41,8 @@ export const epochToDateWithTime = epoch => {
     return (day + "." + month + "." + year + " " + hours + ":" + minutes + ":" + seconds);
 }
 
-export const dateToEpoch = date => {
-    return new Date(date).getTime() / 1000
+export const dateToEpoch = (date) => {
+    return new Date(date).getTime() / 1000 || 0
 }
 
 
@@ -49,6 +52,8 @@ export const LOGIN_ROUTE = '/login'
 export const LOGOUT_ROUTE = '/logout'
 export const REGISTRATION_ROUTE = '/registration'
 export const MAIN_ROUTE = '/'
+export const NOPAGE_ROUTE = '/404'
+export const CATEGORY_ROUTE = '/category/:id'
 export const GUIDE_ROUTE = '/guide'
 export const TOURS_ROUTE = '/tours'
 export const MAPPOINT_ROUTE = '/mappoint'

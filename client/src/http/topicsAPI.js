@@ -1,8 +1,8 @@
 import {$authHost, $authHostUpload, $host} from "./index";
 
-export const getAll = async () => {
+export const getAll = async (tag_search) => {
 
-    let tag_search = localStorage.getItem("tag_search_Topics")
+    // let tag_search = localStorage.getItem("tag_search_Topics")
     let sort_code = localStorage.getItem("sort_code_Topics")
 
     const params = new URLSearchParams();
@@ -91,24 +91,6 @@ export const changeTopicAPI = async (
     image_logo_file,
 ) => {
     try {
-
-        // const a1 = ['1','3','5']
-        // const a2 = ['1','2','5']
-        //
-        // const diff1 = function(a1, a2) {
-        //     return a1.filter(i=>a2.indexOf(i)<0)
-        // }
-        // const diff2 = function(a1, a2) {
-        //     return a2.filter(i=>a1.indexOf(i)<0)
-        // }
-        //
-        // // const diff = function(a1, a2) {
-        // //     return a1.filter(i=>!a2.includes(i))
-        // //         .concat(a2.filter(i=>!a1.includes(i)))
-        // // }
-        // //
-        // console.log(diff(a1,a2))
-
 
         let formData = new FormData();
 
