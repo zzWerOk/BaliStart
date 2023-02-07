@@ -78,6 +78,19 @@ const Topics = sequelize.define('topics', {
     file_name: {type: DataTypes.STRING},
 })
 
+const TopicComments = sequelize.define('topic_comments', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    text: {type: DataTypes.STRING},
+    topic_id: {type: DataTypes.INTEGER},
+    topic_comment_id: {type: DataTypes.INTEGER},
+    created_by_user_id: {type: DataTypes.INTEGER},
+    created_date: {type: DataTypes.BIGINT},
+    file_name: {type: DataTypes.STRING},
+    reply_ids: {type: DataTypes.STRING},
+    on_topic_comment_reply_id: {type: DataTypes.INTEGER},
+    is_reply: {type: DataTypes.BOOLEAN, defaultValue: false},
+})
+
 const TopicsCategory = sequelize.define('topics_category', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     category_name: {type: DataTypes.STRING, allowNull: false, unique: true},
@@ -142,4 +155,5 @@ module.exports = {
     TopicsCategory,
     ToursCategory,
     ToursType,
+    TopicComments,
 }

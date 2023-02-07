@@ -1,5 +1,7 @@
 import {$authHost, $authHostUpload, $host} from "./index";
 
+const apiUrl = 'api/topics'
+
 export const getAll = async (tag_search) => {
 
     // let tag_search = localStorage.getItem("tag_search_Topics")
@@ -16,15 +18,22 @@ export const getAll = async (tag_search) => {
         params: params
     }
 
-    const {data} = await $host.get('api/topics/all', request)
+    const {data} = await $host.get(apiUrl+'/all', request)
     return data
 }
 
-export const getTopicData = async (id) => {
-    const {data} = await $host.get('api/topics/data/' + id)
+export const getTopicData = async (id, user_id = -1) => {
+    const {data} = await $host.get(apiUrl+'/topicdata', {params: {id, user_id}}).catch((e) => {
+        console.log('error ', e.response.data.message)
+    })
     return data
 }
 
+// export const getTopicData = async (id, user_id) => {
+//     const {data} = await $host.get('api/topics/data/', {params: {id: id}})
+//     return data
+// }
+//
 export const saveTopicAPI = async (
     name,
     description,
@@ -65,7 +74,7 @@ export const saveTopicAPI = async (
             return null
         }
 
-        const {data} = await $authHostUpload.post('api/topics/create', formData)
+        const {data} = await $authHostUpload.post(apiUrl+'/create', formData)
         return data
     } catch (e) {
         console.log('data error', e.message)
@@ -116,7 +125,7 @@ export const changeTopicAPI = async (
             return null
         }
 
-        const {data} = await $authHostUpload.post('api/topics/change', formData)
+        const {data} = await $authHostUpload.post(apiUrl+'/change', formData)
         return data
     } catch (e) {
         console.log('data error', e.message)
@@ -171,11 +180,11 @@ const addToFormData = (formData,
 }
 
 export const setActiveAPI = async (id, active) => {
-    const {data} = await $authHost.post('api/topics/active', {id, active})
+    const {data} = await $authHost.post(apiUrl+'/active', {id, active})
     return data
 }
 
 export const deleteTopicAPI = async (id) => {
-    const {data} = await $authHost.delete('api/topics/', {params: {id: id}})
+    const {data} = await $authHost.delete(apiUrl+'/', {params: {id: id}})
     return data
 }

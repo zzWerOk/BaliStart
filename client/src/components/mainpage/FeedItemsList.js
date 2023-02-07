@@ -89,7 +89,6 @@ const FeedItemsList = (props) => {
                         </ul>
                 }
 
-
             </div>
         );
     }

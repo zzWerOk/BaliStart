@@ -5,7 +5,6 @@ import App from './App';
 import {BrowserRouter} from "react-router-dom";
 import UserStore from "./store/UserStore";
 import TopicsCategoryStore from "./store/TopicsCategoryStore";
-import ScrollMemory from "react-router-scroll-memory";
 
 export const Context = createContext(null)
 
@@ -16,7 +15,6 @@ root.render(
         topicsCategoryStore: new TopicsCategoryStore(),
     }}>
         <BrowserRouter>
-            <ScrollMemory/>
             <App/>
         </BrowserRouter>
     </Context.Provider>

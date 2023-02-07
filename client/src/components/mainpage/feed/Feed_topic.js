@@ -1,12 +1,14 @@
 import React from 'react';
 import classes from "./Feed_topics.module.css";
-import {dateToEpoch, epochToDate, epochToDateWithTime} from "../../../utils/consts";
+import {dateToEpoch, epochToDateWithTime} from "../../../utils/consts";
+import {useHistory} from "react-router-dom";
 
 const FeedTopic = (props) => {
+    const history = useHistory()
 
     const {item} = props
 
-    console.log(item)
+    // console.log(item)
 
     return (
 
@@ -15,9 +17,11 @@ const FeedTopic = (props) => {
         >
 
 
-            <a href="#"
+            <a
                className={`flex-column align-items-start ${classes.textColor}`}
-                // style={{color: COLORS.text}}
+               onClick={() => {
+                   history.push('/topic/' + item.id)
+               }}
             >
                 <div className="d-flex w-100 justify-content-between">
                     <div></div>
@@ -26,7 +30,6 @@ const FeedTopic = (props) => {
                 </div>
                 <div
                     className="d-flex w-100 justify-content-between"
-                    // style={{paddingTop: '16px'}}
                 >
                     <h5 className="mb-1">{item.name}</h5>
                     <small>{epochToDateWithTime(dateToEpoch(item.updatedAt) * 1000) || ''}</small>

@@ -1,15 +1,13 @@
 const {TableUpdates, Topics, Files, User, TopicsCategory} = require("../models/models");
 const ApiError = require("../error/ApiError");
 const fs = require("fs");
-const uniqueFilename = require("unique-filename");
 const path = require("path");
-const {rows} = require("pg/lib/defaults");
 const {Op} = require("sequelize");
 const {createNewFile} = require("../utils/consts.js");
 const {reWrightFile, readFile, removeFile} = require("../utils/consts");
 
 const removeTopicsCountFromCategories = (removeArr) => {
-    if(removeArr) {
+    if (removeArr) {
         removeArr.map(topicCatId => {
             const topicCategoryItem = TopicsCategory.findOne({where: {id: topicCatId}})
             if (topicCategoryItem) {
@@ -29,7 +27,7 @@ const removeTopicsCountFromCategories = (removeArr) => {
 
 const addTopicsCountToCategories = (addArr) => {
 
-    if(addArr) {
+    if (addArr) {
         addArr.map(topicCatId => {
             const topicCategoryItem = TopicsCategory.findOne({where: {id: topicCatId}})
             if (topicCategoryItem) {
@@ -77,7 +75,7 @@ class TopicsController {
                     if (result.status === 'ok') {
                         const fileName = result.fileName
                         let imgFileName = ''
-                        if(result.imgFileName){
+                        if (result.imgFileName) {
                             imgFileName = result.imgFileName
                         }
 
@@ -132,7 +130,7 @@ class TopicsController {
 
                         return res.json({status: 'ok', id: newTopic.id})
 
-                    }else{
+                    } else {
                         return res.json({status: 'error', message: result.message})
                     }
                 }
@@ -186,11 +184,11 @@ class TopicsController {
                             const tagsArr = JSON.parse(tag)
                             const candidateTagsArr = JSON.parse(candidate.tag)
 
-                            const diffAdd = function(tagsArr, candidateTagsArr) {
-                                return tagsArr.filter(i=>candidateTagsArr.indexOf(i)<0)
+                            const diffAdd = function (tagsArr, candidateTagsArr) {
+                                return tagsArr.filter(i => candidateTagsArr.indexOf(i) < 0)
                             }
-                            const diffDelete = function(tagsArr, candidateTagsArr) {
-                                return candidateTagsArr.filter(i=>tagsArr.indexOf(i)<0)
+                            const diffDelete = function (tagsArr, candidateTagsArr) {
+                                return candidateTagsArr.filter(i => tagsArr.indexOf(i) < 0)
                             }
 
                             await addTopicsCountToCategories(diffAdd(tagsArr, candidateTagsArr))
@@ -206,7 +204,6 @@ class TopicsController {
                             //         }, {where: {id: topicCatId}})
                             //     }
                             // })
-
 
 
                             let imgFileName = ''
@@ -287,6 +284,63 @@ class TopicsController {
 
         }
         return next(ApiError.forbidden("Ошибка изменения..."))
+    }
+
+    async getTopicData(req, res, next) {
+        const {id, user_id = -1} = req.query
+        try {
+            if (!id) {
+                return next(ApiError.badRequest("Ошибка параметра"))
+            } else {
+                const candidate = await Topics.findOne({where: {id}})
+
+                if (candidate) {
+                    try {
+                        const readFileResult = readFile(candidate.file_name)
+                        if (readFileResult.hasOwnProperty('status')) {
+                            if (readFileResult.status === 'ok') {
+                                let topicFileData = JSON.parse(readFileResult.data)
+                                let topicData = {}
+
+                                const currUser = await User.findOne({
+                                    attributes: {exclude: ['password']},
+                                    where: {id: candidate.created_by_user_id}
+                                })
+
+
+                                topicData.name = candidate.name
+                                topicData.description = candidate.description
+                                topicData.categories = candidate.tag
+                                // image_logo: {type: DataTypes.STRING, allowNull: false},
+                                // images: {type: DataTypes.STRING},
+                                // videos: {type: DataTypes.STRING},
+                                // google_map_url: {type: DataTypes.STRING},
+                                topicData.active = candidate.active
+                                // created_by_user_id: {type: DataTypes.INTEGER},
+                                topicData.created_date = candidate.created_date
+                                // deleted_by_user_id: {type: DataTypes.INTEGER},
+                                // deleted_date: {type: DataTypes.BIGINT},
+                                topicData.image = candidate.file_name
+                                topicData.userName = currUser.name
+
+                                if ('' + candidate.created_by_user_id === '' + user_id) {
+                                    topicFileData.editable = true
+                                }
+
+                                topicData.data = topicFileData
+                                return res.json(JSON.stringify(topicData))
+                            }
+                        }
+                    } catch (e) {
+                    }
+                    return next(ApiError.internal("Ошибка чтения данных файла"))
+                }
+                return next(ApiError.internal("Topic not found"))
+
+            }
+        } catch (e) {
+            return next(ApiError.internal(e.message))
+        }
     }
 
     async getData(req, res, next) {

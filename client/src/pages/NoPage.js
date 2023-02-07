@@ -1,13 +1,6 @@
-import React, {useContext, useState} from 'react';
-import {Container} from "react-bootstrap";
+import React from 'react';
 
-import classes from './LoginPage.module.css'
-import SpinnerSm from "../components/SpinnerSM";
-import {Context} from "../index";
-import {AxiosError} from "axios";
-import {getById, loginApi, registerApi} from "../http/userAPI";
-
-const NoPage = (props) => {
+const NoPage = () => {
 
     return (
         <div>

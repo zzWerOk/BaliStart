@@ -1,0 +1,32 @@
+.topic_row{
+  margin: 25px 0!important;
+}
+.topic_row_top{
+  //margin: 25px 0 0;
+  margin: 25px 0!important;
+  margin-bottom: 0!important;
+
+}
+.topic_row_bottom{
+  //margin: 0 0 25px;
+  margin: 25px 0!important;
+  margin-top: 0!important;
+}
+.badge_outlined{
+  background-color: transparent!important;
+  border-color: #323a45;
+  border-width: 1px;
+  border-style: solid;
+  color: #323a45;
+  margin-right: 10px;
+
+  &:hover{
+    color: gray;
+    border-color: gray;
+  }
+
+
+}
+.badge_outlined_span{
+  margin-left: 10px;
+}

@@ -10,6 +10,7 @@ router.post('/active',authMiddleWare,topicController.setActive)
 router.get('/all', topicController.getAll)
 router.delete('/',checkIsAdmin, topicController.deleteTopic)
 router.get('/data/:id', topicController.getData)
+router.get('/topicdata/', topicController.getTopicData)
 router.get('/:id',authMiddleWare, topicController.getById)
 
 module.exports = router
