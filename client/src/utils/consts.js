@@ -33,7 +33,18 @@ export const epochToDateWithTime_seconds = epoch => {
 }
 
 export const epochToDateWithTime = epoch => {
-    const date = new Date(epoch * 1);
+
+    // console.log(epoch)
+    // 1675845044
+            // 1675845044
+            // 1675675403464
+    if(epoch < 9999999999){
+        epoch = epoch * 1000
+    }else{
+        epoch = epoch * 1
+    }
+
+    const date = new Date(epoch);
 
     const year = date.getFullYear();
     let month = date.getMonth() + 1;

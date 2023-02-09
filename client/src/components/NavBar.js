@@ -1,19 +1,24 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 
 import {Button, Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
-import {MAIN_ROUTE} from "../utils/consts";
+import {delay, MAIN_ROUTE} from "../utils/consts";
 import {observer} from "mobx-react-lite";
 import classes from './NavBar.module.css'
 import ModalPopUp from "./ModalPopUp";
 import LoginPage from "../pages/LoginPage";
 import {Context} from "../index";
+import {check} from "../http/userAPI";
 
 const NavBar = observer(() => {
     const {user} = useContext(Context)
 
     const [showModal, setShowModal] = useState(false)
+
+    // useEffect(() => {
+    //     console.log(user.name)
+    // }, [])
 
     const logOut = () => {
         user.logout()
@@ -65,13 +70,13 @@ const NavBar = observer(() => {
                     </Navbar.Collapse>
 
                     {user.isAuth
-                    ?
+                        ?
                         <div style={{display: 'inline-flex'}}>
                             <Nav.Item
                                 className={`d-flex justify-content-center align-items-center`}
                                 style={{marginRight: '15px'}}
                             >
-                                    {user.name}
+                                {user.name}
                             </Nav.Item>
                             <Nav.Item className={'d-flex justify-content-center align-items-center'}>
                                 <Button variant="outline-primary" onClick={() => {
@@ -79,7 +84,7 @@ const NavBar = observer(() => {
                                 }}>Logout</Button>
                             </Nav.Item>
                         </div>
-                    :
+                        :
                         <Button variant="outline-primary" onClick={() => {
                             setShowModal(true)
                         }}>Login</Button>

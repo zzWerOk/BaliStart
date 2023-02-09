@@ -49,6 +49,10 @@ export const registerApi = async (name, email, password) => {
     return data
 }
 
+export const getMyName = async () => {
+    const {data} = await $authHost.get(apiUrl+'/name')
+    return data
+}
 export const check = async () => {
     const {data} = await $authHost.get(apiUrl+'/auth')
     localStorage.setItem('token', data)

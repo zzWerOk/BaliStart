@@ -148,6 +148,18 @@ class UserController {
         }
     }
 
+    async getMyName(req, res) {
+
+        const currUser = req.user
+
+        if(currUser){
+            const candidate = await User.findOne({where: {email: req.user.email}})
+
+            return res.json({status: "ok", message: candidate.name})
+        }
+
+        return res.json({status: "error"})
+    }
     async auth(req, res, next) {
         const candidate = await User.findOne({where: {email: req.user.email}})
         if (!candidate) {

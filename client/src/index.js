@@ -5,6 +5,7 @@ import App from './App';
 import {BrowserRouter} from "react-router-dom";
 import UserStore from "./store/UserStore";
 import TopicsCategoryStore from "./store/TopicsCategoryStore";
+import TopicCommentsStore from "./store/TopicCommentsStore";
 
 export const Context = createContext(null)
 
@@ -13,6 +14,7 @@ root.render(
     <Context.Provider value={{
         user: new UserStore(),
         topicsCategoryStore: new TopicsCategoryStore(),
+        topicCommentsStore: new TopicCommentsStore(),
     }}>
         <BrowserRouter>
             <App/>

@@ -5,7 +5,7 @@ import classes from './LoginPage.module.css'
 import SpinnerSm from "../components/SpinnerSM";
 import {Context} from "../index";
 import {AxiosError} from "axios";
-import {getById, loginApi, registerApi} from "../http/userAPI";
+import {getById, getMyName, loginApi, registerApi} from "../http/userAPI";
 
 const LoginPage = (props) => {
 
@@ -32,15 +32,27 @@ const LoginPage = (props) => {
                 return
             }
 
-            getById(response.id).then((item) => {
+            getMyName().then((item) => {
+                user.setUser(response)
                 console.log(item)
-
+                if (item.hasOwnProperty('status')) {
+                    if (item.status === 'ok') {
+                        user.name = item.message
+                    }
+                }
                 setIsError('')
-                user.setUser(item)
                 onAuthFinish()
             }).catch(() => {
                 setIsError('Error')
             })
+
+            // getById(response.id).then((item) => {
+            //     setIsError('')
+            //     user.setUser(item)
+            //     onAuthFinish()
+            // }).catch(() => {
+            //     setIsError('Error')
+            // })
 
         } catch (e) {
             if (e instanceof AxiosError) {

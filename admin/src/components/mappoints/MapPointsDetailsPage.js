@@ -557,11 +557,11 @@ const MapPointsDetailsPage = observer((props) => {
                         </button>
                         <div style={{display: isDeleting ? "block" : "none"}}>
 
-                    <span
-                        style={{marginLeft: '25px', marginRight: '10px'}}
-                    >
-                        Sure?
-                    </span>
+                            <span
+                                style={{marginLeft: '25px', marginRight: '10px'}}
+                            >
+                                Sure?
+                            </span>
                             <button
                                 type="button"
                                 className="btn btn-outline-danger"

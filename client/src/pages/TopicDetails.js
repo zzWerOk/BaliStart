@@ -13,14 +13,18 @@ const TopicDetails = () => {
 
     const {user, topicsCategoryStore} = useContext(Context)
 
+    const commentsSortType = React.useRef(null)
+
     const [loading, setLoading] = useState(true)
     const [topic, setTopic] = useState({})
     const [topicData, setTopicData] = useState([])
     const [topicCategories, setTopicCategories] = useState([])
-
+    const [commentsSort, setCommentsSort] = useState(true)
 
     useEffect(() => {
         setLoading(true)
+
+        setCommentsSort(localStorage.getItem("sort_code_Topic" + id + "Comments") !== 'true');
 
         delay(0).then(() => {
 
@@ -32,6 +36,7 @@ const TopicDetails = () => {
                     setTopicData(dataJson.data)
                     delete dataJson.data
                     setTopic(dataJson)
+
 
                     try {
                         const currCategories = topicsCategoryStore.getSavedCategoriesList()
@@ -49,15 +54,8 @@ const TopicDetails = () => {
                         setTopicCategories(fullCategories)
                     } catch (e) {
                     }
-
-                    // console.log(dataJson)
-
-                    // `${process.env.REACT_APP_API_URL}/static/${itemImageLogo}`
-
                 }
 
-                // }).catch((e) => {
-                //     console.log(e)
             }).finally(() => {
                 setLoading(false)
             })
@@ -66,6 +64,10 @@ const TopicDetails = () => {
 
     }, [])
 
+    const commentsSortHandler = (value) => {
+        setCommentsSort(!value)
+        commentsSortType.sort(value)
+    }
 
     if (loading) {
 
@@ -109,7 +111,6 @@ const TopicDetails = () => {
                                 })
                             }
                         </div>
-                        {/*{topic.categories}*/}
                     </Row>
                     <Row className={classes.topic_row}>
                         <h6>
@@ -154,10 +155,43 @@ const TopicDetails = () => {
                         </h5>
                     </Row>
                     <Row className={classes.topic_row}>
-                        <AddNewCommentComponent />
+                        <AddNewCommentComponent topicId={id}/>
                     </Row>
                     <Row className={classes.topic_row}>
-                        <CommentsFeed topicId={id}/>
+                        <div>
+                            <a className={`badge badge-secondary ${classes.badge_outlined} ${classes.comment_btn}`}
+                               onClick={() => {
+                                   commentsSortHandler(commentsSort)
+                               }}
+                               type="button"
+                            >
+
+                                {
+                                    commentsSort
+                                        ?
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor"
+                                             className="bi bi-sort-up-alt" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3.5 13.5a.5.5 0 0 1-1 0V4.707L1.354 5.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 4.707V13.5zm4-9.5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"/>
+                                        </svg>
+                                        :
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor"
+                                             className="bi bi-sort-down-alt" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"/>
+                                        </svg>
+                                }
+
+                            </a>
+                        </div>
+                    </Row>
+                    <Row className={classes.topic_row}>
+                        <CommentsFeed
+                            topicId={id}
+                            commentsSortType={commentsSortType}
+                        />
                     </Row>
                 </Col>
                 <Col>

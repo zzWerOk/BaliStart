@@ -11,6 +11,7 @@ router.post('/active/',authMiddleWare,userController.setActive)
 router.get('/active/:id',authMiddleWare,userController.isActive)
 router.delete('/',checkIsAdmin,userController.deleteUser)
 router.get('/auth', authMiddleWare, userController.auth)
+router.get('/name', authMiddleWare, userController.getMyName)
 router.get('/all',authMiddleWare, userController.getAll)
 router.get('/:id',authMiddleWare, userController.getById)
 
