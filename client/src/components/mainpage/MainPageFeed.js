@@ -16,6 +16,7 @@ const MainPageFeed = () => {
             <FeedTopBar
                 itemsTypeChangeHandler={itemsTypeChangeHandler}
                 itemsType={itemsType}
+                isSearch={true}
             />
             <FeedAddNewPostBtn/>
             <FeedItemsList

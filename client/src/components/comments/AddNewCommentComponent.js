@@ -2,14 +2,25 @@ import React, {useContext, useEffect, useState} from 'react';
 
 import './AddNewCommentComponent.css'
 import {Button} from "react-bootstrap";
-import {delay} from "../../utils/consts";
-import {editComment, getAllByTopicId, shareComment} from "../../http/topicCommentsAPI";
+import {delay, epochToDateWithTime} from "../../utils/consts";
+import {editComment, shareComment} from "../../http/topicCommentsAPI";
 import {Context} from "../../index";
 
 const AddNewCommentComponent = (props) => {
-    const {user, topicCommentsStore} = useContext(Context)
+    const {user} = useContext(Context)
 
-    const {topicId, is_reply = false, topic_comment_id, setWrightCommentHandler, isEditComment, value} = props
+    const {
+        topicId,
+        is_reply = false,
+        topic_comment_id,
+        setWrightCommentHandler,
+        isEditComment,
+        value,
+        deleteCommentHandler,
+        isDeleting,
+        addNewCommentHandler,
+        // isCommentSending,
+    } = props
 
     const [commentText, setCommentText] = useState('')
     const [commentSending, setCommentSending] = useState(false)
@@ -27,8 +38,8 @@ const AddNewCommentComponent = (props) => {
             setCommentText(value)
         }
 
-        if (topic_comment_id) {
-            if (topic_comment_id > -1) {
+        if (topic_comment_id !== null && topic_comment_id !== undefined) {
+            if (topic_comment_id >= 0) {
                 setShowCancelBtn(true)
             }
         }
@@ -51,12 +62,31 @@ const AddNewCommentComponent = (props) => {
                 is_reply,
             ).then(data => {
 
-                console.log(data)
-
-            }).catch((e) => {
-                setCommentSendingErrorText(e.message)
-
+                if (data.hasOwnProperty('status')) {
+                    if (data.status === 'ok') {
+                        let newComment = {
+                            createdAt: epochToDateWithTime(Date.now()),
+                            created_by_user_name: user.name,
+                            editable: true,
+                            text: commentText,
+                            topic_comment_id: data.id,
+                        }
+                        if (addNewCommentHandler) {
+                            addNewCommentHandler(newComment)
+                            setCommentText('')
+                        } else if (is_reply) {
+                            setWrightCommentHandler(newComment)
+                        }
+                        return
+                    }
+                    // }else{
+                }
+                setCommentSendingErrorText('Comment add error')
                 setCommentSendingError(true)
+
+                // }).catch((e) => {
+                //     setCommentSendingErrorText(e.message)
+                //     setCommentSendingError(true)
             }).finally(() => {
                 setCommentSending(false)
             })
@@ -97,9 +127,11 @@ const AddNewCommentComponent = (props) => {
                 topicId,
                 topic_comment_id,
             ).then(data => {
-                cancelWrightCommentHandler(commentText)
-                console.log(data)
-
+                if (data.hasOwnProperty('status')) {
+                    if (data.status === 'ok') {
+                        cancelWrightCommentHandler(commentText)
+                    }
+                }
             }).catch((e) => {
                 setCommentSendingErrorText(e.message)
 
@@ -124,11 +156,15 @@ const AddNewCommentComponent = (props) => {
 
     const onShowDeleteBtnHandler = () => {
         setShowDeleteBtn(true)
+        setTimeout(() => {
+            setShowDeleteBtn(false)
+        }, 5000)
+
     }
 
     const cancelWrightCommentHandler = (text) => {
         if (!isEditComment) {
-            setWrightCommentHandler(topic_comment_id)
+            setWrightCommentHandler()
         } else if (isEditComment && text) {
             setWrightCommentHandler(text)
         } else {
@@ -142,7 +178,9 @@ const AddNewCommentComponent = (props) => {
         <div className="container bootdey">
             <div className="col-md-12 bootstrap snippets">
                 <div className="panel">
-                    <div className="panel-body">
+                    <div className="panel-body"
+                         style={{padding: '0 25px 20px'}}
+                    >
 
                         <textarea
                             className={`form-control ${commentSendingError ? "send-error" : ""}`}
@@ -150,16 +188,14 @@ const AddNewCommentComponent = (props) => {
                             onChange={e => commentHandler(e.target.value)}
                             placeholder="What are you thinking?"
                             value={commentText}
-                            disabled={!!commentSending}
+                            disabled={!!commentSending || !!isDeleting}
                         >
 
                         </textarea>
 
                         <div className={'d-flex justify-content-between'}>
                             <div className={'d-flex justify-content-around'}>
-
                                 {
-
                                     showCancelBtn
                                         ?
                                         <Button className={'btn-sm'}
@@ -167,7 +203,7 @@ const AddNewCommentComponent = (props) => {
                                                 onClick={() => {
                                                     cancelWrightCommentHandler()
                                                 }}
-                                                disabled={!!commentSending}
+                                                disabled={!!commentSending || !!isDeleting}
                                         >
                                             Cancel
                                         </Button>
@@ -187,7 +223,7 @@ const AddNewCommentComponent = (props) => {
                                                 type="button"
                                                 className={`btn btn-sm `}
                                                 variant={"outline-danger"}
-                                                disabled={!!commentSending}
+                                                disabled={!!commentSending || !!isDeleting}
                                                 onClick={onShowDeleteBtnHandler}
                                             >
                                                 Delete
@@ -195,12 +231,14 @@ const AddNewCommentComponent = (props) => {
 
                                             {
                                                 showDeleteBtn
-                                                ?
+                                                    ?
                                                     <Button
                                                         className="btn-sm"
-                                                        variant={"outline-danger"}
-                                                        disabled={!!commentSending}
-                                                        // onClick={deleteHandler}
+                                                        variant={"danger"}
+                                                        disabled={!!commentSending || !!isDeleting}
+                                                        onClick={() => {
+                                                            deleteCommentHandler(topicId, topic_comment_id)
+                                                        }}
                                                     >
                                                         Yes
                                                     </Button>
@@ -220,7 +258,7 @@ const AddNewCommentComponent = (props) => {
                                     onClick={() => {
                                         sendCommentHandler()
                                     }}
-                                    disabled={!!commentSending}
+                                    disabled={!!commentSending || !!isDeleting}
                             >
                                 Share
                             </Button>

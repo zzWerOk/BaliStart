@@ -12,10 +12,12 @@ module.exports.removeFile = function (fileName) {
 // const removeFile = (fileName) => {
 
     try {
-        const filePath = path.resolve(__dirname, '..', "data", fileName)
 
-        fs.unlinkSync(filePath)
+        if(fileName) {
+            const filePath = path.resolve(__dirname, '..', "data", fileName)
 
+            fs.unlinkSync(filePath)
+        }
         return {status: 'ok'}
     } catch (e) {
         throw e
@@ -36,8 +38,7 @@ module.exports.readFile = function (fileName) {
 
 }
 
-module.exports.reWrightFile = function (textData, tableName, fileName, next) {
-// const reWrightFile = (textData, tableName, fileName, next) => {
+module.exports.reWrightFile = function (textData, tableName, fileName) {
     try {
         let dirName = getDirName(tableName)
 
@@ -66,8 +67,7 @@ module.exports.reWrightFile = function (textData, tableName, fileName, next) {
     return {error: "Ошибка создания файла"}
 }
 
-module.exports.createNewFile = function (textData, tableName, img, next) {
-// export const createNewFile = (textData, tableName, img, next) => {
+module.exports.createNewFile = function (textData, tableName, img) {
     try {
         let dirName = getDirName(tableName)
 
@@ -96,8 +96,7 @@ module.exports.createNewFile = function (textData, tableName, img, next) {
         if (img) {
             try {
                 imgFileName = fileName.split('\\')[1]
-                img.mv(path.resolve(__dirname, '..', "static", imgFileName)).then(r => {
-                })
+                img.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
                 return {'status': 'ok', fileName, imgFileName}
             } catch (e) {
                 return {status: 'error', message: e.message}
@@ -114,7 +113,7 @@ module.exports.createNewFile = function (textData, tableName, img, next) {
 
 getDirName = function (tableName) {
 // export const getDirName = (tableName) => {
-    let dirName = 'static'
+    let dirName
 
     switch (tableName) {
         case 'Topics':

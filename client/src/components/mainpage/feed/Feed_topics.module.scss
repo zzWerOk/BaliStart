@@ -1,11 +1,17 @@
 $textColor: #090909;
 $textColor_hover: #a23b3b;
 
+.pointer{
+    cursor: pointer;
+}
+
 .textColor{
-    color: $textColor;
+    color: $textColor!important;
+
+    cursor: pointer;
 
     &:hover{
-        color: $textColor_hover;
+        color: $textColor_hover!important;
     }
 
 }

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import classes from "../../pages/TopicDetails.module.css";
 import AddNewCommentComponent from "./AddNewCommentComponent";
 import {dateToEpoch, epochToDateWithTime} from "../../utils/consts";
@@ -6,30 +6,45 @@ import {dateToEpoch, epochToDateWithTime} from "../../utils/consts";
 const CommentField = (props) => {
     const {
         comment,
-        replies,
         topicId,
         wrightComment,
+        wrightCommentId,
         setWrightCommentHandler,
         editComment,
-        setEditCommentHandler
+        editCommentId,
+        setEditCommentHandler,
+        deleteCommentHandler,
+        isDeleting,
+        sortCode,
     } = props
 
-    const [commentText, setCommentText] = useState('')
 
     useEffect(() => {
 
-        setCommentText(comment.text)
-
     }, [])
 
-    const wrightCommentHandler = () => {
-        setWrightCommentHandler(comment.topic_comment_id)
+    const wrightCommentHandler = (replyComment) => {
+
+        if (replyComment) {
+            if (!comment.hasOwnProperty('replies')) {
+                comment.replies = []
+            }
+
+            if (!sortCode) {
+                comment.replies.push(replyComment)
+            } else {
+                comment.replies.unshift(replyComment)
+            }
+        }
+        setWrightCommentHandler(comment.topic_comment_id, replyComment)
     }
 
     const editCommentHandler = (text) => {
-        setEditCommentHandler(comment.topic_comment_id)
         if (text) {
-            setCommentText(text)
+            comment.text = text
+            setEditCommentHandler(comment.topic_comment_id, text)
+        }else{
+            setEditCommentHandler(comment.topic_comment_id)
         }
     }
 
@@ -52,17 +67,21 @@ const CommentField = (props) => {
                 {
                     editComment
                         ?
-                        <AddNewCommentComponent
+                        <AddNewCommentComponent //editComment
                             topicId={topicId}
                             is_reply={true}
                             topic_comment_id={comment.topic_comment_id}
                             setWrightCommentHandler={editCommentHandler}
-                            value={editComment ? commentText : ''}
+                            // value={editComment ? commentText : ''}
+                            value={editComment ? comment.text : ''}
                             isEditComment={editComment}
+                            deleteCommentHandler={deleteCommentHandler}
+                            isDeleting={isDeleting}
                         />
                         :
                         <p>
-                            {commentText}
+                            {/*{commentText}*/}
+                            {comment.text}
                         </p>
                 }
 
@@ -77,7 +96,6 @@ const CommentField = (props) => {
                         {/*</a>*/}
                     </div>
 
-
                     {
                         editComment
                             ?
@@ -85,22 +103,29 @@ const CommentField = (props) => {
                             :
                             wrightComment
                                 ?
-                                <AddNewCommentComponent
+                                <AddNewCommentComponent //wrightComment
                                     topicId={topicId}
                                     is_reply={true}
                                     topic_comment_id={comment.topic_comment_id}
                                     setWrightCommentHandler={wrightCommentHandler}
+                                    isDeleting={isDeleting}
+
                                 />
                                 :
                                 <div className={'d-flex justify-content-between'}>
                                     {
                                         comment.editable
                                             ?
-                                            <a className={`badge badge-secondary ${classes.badge_outlined} ${classes.comment_btn}`}
+                                            <a className={`badge badge-secondary 
+                                                ${isDeleting ? null : classes.badge_outlined} 
+                                                ${isDeleting ? null : classes.comment_btn} 
+                                            `}
                                                onClick={() => {
-                                                   editCommentHandler()
+                                                   if (!isDeleting) {
+                                                       editCommentHandler()
+                                                   }
                                                }}
-                                               type="button"
+                                               type={isDeleting ? `` : "button"}
                                             >
                                             <span>
                                                 Edit
@@ -110,11 +135,17 @@ const CommentField = (props) => {
                                             <div></div>
                                     }
 
-                                    <a className={`badge badge-secondary ${classes.badge_outlined} ${classes.comment_btn}`}
+                                    <a className={`badge badge-secondary 
+                                                ${isDeleting ? null : classes.badge_outlined} 
+                                                ${isDeleting ? null : classes.comment_btn} 
+                                            `}
                                        onClick={() => {
-                                           wrightCommentHandler()
+                                           if (!isDeleting) {
+                                               wrightCommentHandler()
+                                           }
+
                                        }}
-                                       type="button"
+                                       type={isDeleting ? `` : "button"}
                                     >
                                     <span>
                                         Comment
@@ -123,6 +154,7 @@ const CommentField = (props) => {
 
                                 </div>
                     }
+
                     {
                         wrightComment || editComment
                             ?
@@ -132,9 +164,28 @@ const CommentField = (props) => {
                     }
 
                     {
-                        replies.map(item => {
-                            return item
-                        })
+                        comment.replies
+                            ?
+                            comment.replies.map(function (item, index) {
+                                return <CommentField
+                                    key={index}
+                                    topicId={topicId}
+                                    comment={item}
+                                    // replies={repliesArr}
+                                    wrightComment={item.topic_comment_id === wrightCommentId}
+                                    wrightCommentId={wrightCommentId}
+                                    setWrightCommentHandler={setWrightCommentHandler}
+                                    editComment={item.topic_comment_id === editCommentId}
+                                    editCommentId={editCommentId}
+                                    setEditCommentHandler={setEditCommentHandler}
+                                    deleteCommentHandler={deleteCommentHandler}
+                                    isDeleting={isDeleting}
+                                    sortCode={sortCode}
+                                />
+
+                            })
+                            :
+                            null
                     }
                 </div>
 
@@ -142,6 +193,7 @@ const CommentField = (props) => {
             </div>
         </div>
     );
+
 };
 
 export default CommentField;

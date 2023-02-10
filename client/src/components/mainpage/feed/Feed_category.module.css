@@ -1,3 +1,6 @@
+.pointer {
+  cursor: pointer; }
+
 .textColor {
   color: #090909; }
   .textColor:hover {

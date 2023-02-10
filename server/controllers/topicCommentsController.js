@@ -11,8 +11,8 @@ const convertCommentItemFroTopic = async (commentsItem, currUser) => {
         const user = await User.findOne({where: {id: commentsItem.created_by_user_id}})
         convertedItem.created_by_user_name = user.name
 
-        if(currUser){
-            if(currUser.id === user.id){
+        if (currUser) {
+            if (currUser.id === user.id) {
                 convertedItem.editable = true
             }
         }
@@ -53,11 +53,6 @@ const getCommentReplies = async (commentsIds, topic_id, currUser, sort_code) => 
                 topic_comment_id: item,
                 topic_id
             },
-            // order: [
-            //     sortOrder
-            //     // ['id', 'ASC'],
-            //     // ['name', 'DESC'],
-            // ]
 
         })
 
@@ -71,20 +66,53 @@ const getCommentReplies = async (commentsIds, topic_id, currUser, sort_code) => 
 
     switch (sort_code) {
         case 'date':
-            replies.sort(function(a, b){return a.createdAt - b.createdAt});
+            replies.sort(function (a, b) {
+                return a.createdAt - b.createdAt
+            });
             break
         case 'redate':
-            replies.sort(function(a, b){return b.createdAt - a.createdAt});
+            replies.sort(function (a, b) {
+                return b.createdAt - a.createdAt
+            });
             break
         case 'id':
-            replies.sort(function(a, b){return a.topic_comment_id - b.topic_comment_id});
+            replies.sort(function (a, b) {
+                return a.topic_comment_id - b.topic_comment_id
+            });
             break
         case 'reid':
-            replies.sort(function(a, b){return b.topic_comment_id - a.topic_comment_id});
+            replies.sort(function (a, b) {
+                return b.topic_comment_id - a.topic_comment_id
+            });
             break
     }
 
+    return replies
+}
 
+const removeCommentReplies = async (commentsIds, topic_id) => {
+    let replies = []
+    const replyIds = JSON.parse(commentsIds)
+
+    for (let i = 0; i < replyIds.length; i++) {
+        const item = replyIds[i]
+
+        replies.push(item)
+
+        const replyComment = await TopicComments.findOne({
+            where: {
+                topic_comment_id: item,
+                topic_id
+            },
+
+        })
+
+        if (replyComment) {
+            let newItem = JSON.parse(JSON.stringify(replyComment))
+
+            replies.push(...await removeCommentReplies(newItem.reply_ids, topic_id))
+        }
+    }
 
     return replies
 }
@@ -107,16 +135,34 @@ class TopicCommentsController {
 
             if (text && topic_id && currUser) {
 
-                const topicComments = await TopicComments.findAndCountAll({
+                let topicComments = await TopicComments.count({
                     where: {
                         topic_id
                     },
                 })
+                let alreadyExists = await TopicComments.count({
+                    where: {
+                        topic_comment_id: topicComments,
+                        topic_id: topic_id,
+                    }
+                })
+
+                if (alreadyExists > 0) {
+                    while (alreadyExists > 0) {
+                        topicComments++
+                        alreadyExists = await TopicComments.count({
+                            where: {
+                                topic_comment_id: topicComments,
+                                topic_id: topic_id,
+                            }
+                        })
+                    }
+                }
 
                 const comment = await TopicComments.create({
                     text,
                     topic_id,
-                    topic_comment_id: topicComments.count,
+                    topic_comment_id: topicComments,
                     created_by_user_id: currUser.id,
                     created_date: Date.now(),
                     on_topic_comment_reply_id,
@@ -134,7 +180,10 @@ class TopicCommentsController {
                     })
                     if (candidate) {
                         let replyIds = JSON.parse(candidate.reply_ids) || []
-                        replyIds.push(comment.topic_comment_id)
+
+                        if (replyIds.indexOf(comment.topic_comment_id) === -1) {
+                            replyIds.push(comment.topic_comment_id)
+                        }
 
                         // candidate.reply_ids = JSON.stringify(replyIds)
 
@@ -182,13 +231,13 @@ class TopicCommentsController {
                     }
                 })
                 if (candidate) {
-                    if(candidate.created_by_user_id === currUser.id || currUser.isAdmin) {
+                    if (candidate.created_by_user_id === currUser.id || currUser.isAdmin) {
                         candidate.text = text
 
-                        candidate.save()
+                        await candidate.save()
 
                         return res.json({status: 'ok'})
-                    }else{
+                    } else {
                         return next(ApiError.forbidden("Нет прав для редактирования"))
                     }
                 }
@@ -203,7 +252,7 @@ class TopicCommentsController {
     }
 
     async getAll(req, res) {
-        const {sort_code='reid', topic_id} = req.query
+        const {sort_code = 'reid', topic_id} = req.query
         const currUser = req.user
 
         if (topic_id) {
@@ -235,7 +284,7 @@ class TopicCommentsController {
                         is_reply: false,
                         topic_id
                     },
-                    limit: 10,
+                    // limit: 10,
                     order: [
                         sortOrder
                         // ['id', 'ASC'],
@@ -269,19 +318,26 @@ class TopicCommentsController {
 
 
     async deleteComment(req, res, next) {
-        const {id} = req.query
+        const {topic_id, id} = req.query
         const currUser = req.user
 
         try {
-            if (!id) {
-                return next(ApiError.badRequest("Ошибка параметра"))
-            } else {
+            if (id && topic_id && currUser) {
+                // return next(ApiError.badRequest("Ошибка параметра"))
+                // } else {
 
-                const candidate = await TopicComments.findOne({where: {id}})
+                const candidate = await TopicComments.findOne({
+                    where: {
+                        topic_comment_id: id,
+                        topic_id,
+                    }
+                })
+
 
                 if (candidate) {
 
-                    if(candidate.created_by_user_id === currUser.id || currUser.isAdmin) {
+
+                    if (candidate.created_by_user_id === currUser.id || currUser.isAdmin) {
 
                         try {
                             let imgFileName = candidate.file_name.split('\\')[1]
@@ -290,10 +346,13 @@ class TopicCommentsController {
                         } catch (e) {
                         }
 
+                        /** Удаление файла коментария **/
                         const result = removeFile(candidate.file_name)
+
                         if (result.hasOwnProperty('status')) {
                             if (result.status === 'ok') {
 
+                                /** Удаление записи в таблице о файле коментария **/
                                 await Files.destroy({
                                     where: {
                                         table_name: 'TopicComments',
@@ -301,29 +360,53 @@ class TopicCommentsController {
                                     }
                                 })
 
-                                if (candidate.is_reply && candidate.on_topic_comment_reply_id > -1) {
-                                    const replyCandidate = await TopicComments.findOne({where: {id: candidate.on_topic_comment_reply_id}})
-                                    if (replyCandidate) {
-                                        let replyIds = JSON.parse(replyCandidate.reply_ids)
-                                        replyIds.push(candidate.id)
+                                /** Удаление текущего id из записи реплаев с комментария **/
 
-                                        const filtered = replyIds.filter(function (value) {
-                                            return ("" + value.id) === ("" + candidate.id)
-                                        })
+                                /** Если текущий коментарий ответ на другой коментарий **/
+                                if (candidate.is_reply) {
+                                    // const commentForDeleteOnTopicCommentReplyId = candidate.topic_comment_id
+                                    const commentForEdit = await TopicComments.findOne({
+                                        where: {
+                                            topic_comment_id: candidate.on_topic_comment_reply_id,
+                                            topic_id: candidate.topic_id,
+                                        }
+                                    })
 
-                                        replyCandidate.reply_ids = JSON.stringify(filtered)
-                                        replyCandidate.save()
+                                    const arr = JSON.parse(commentForEdit.reply_ids).filter(function (value) {
+                                        return value !== candidate.topic_comment_id;
+                                    })
+                                    // return res.json({status: "error", message: arr})
+
+                                    if (commentForEdit) {
+                                        commentForEdit.reply_ids = JSON.stringify(arr)
+                                        await commentForEdit.save()
                                     }
                                 }
 
-                                const count = await TopicComments.destroy({where: {id: id}})
+
+                                /** Посчет кол-ва коментариев на данный коментарий **/
+                                let count = 0
+                                const commentsIdsToRemove = await removeCommentReplies(candidate.reply_ids, topic_id)
+
+                                for (let i = 0; i < commentsIdsToRemove.length; i++) {
+                                    count = count + await TopicComments.destroy({
+                                        where: {
+                                            topic_comment_id: commentsIdsToRemove[i],
+                                            topic_id: candidate.topic_id,
+                                        }
+                                    })
+                                }
+
+                                count = count + await TopicComments.destroy({where: {id: candidate.id}})
                                 return res.json({status: "ok", message: `Удалено записей: ${count}`})
                             }
                         }
-                    }else{
+                    } else {
                         return next(ApiError.forbidden("Нет прав для удаления"))
                     }
                 }
+            } else {
+                return next(ApiError.badRequest("Ошибка параметра"))
             }
         } catch (e) {
             return res.json({status: "error", message: e.message})

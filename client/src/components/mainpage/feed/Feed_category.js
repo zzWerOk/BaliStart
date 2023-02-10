@@ -1,6 +1,6 @@
 import React from 'react';
 import classes from "./Feed_category.module.css";
-import {CATEGORY_ROUTE, dateToEpoch, epochToDate} from "../../../utils/consts";
+import {dateToEpoch, epochToDate} from "../../../utils/consts";
 import {useHistory} from "react-router-dom";
 
 const FeedCategory = (props) => {
@@ -10,9 +10,10 @@ const FeedCategory = (props) => {
 
     return (
         <div
+            // className={`${classes.pointer}`}
             style={{padding: '10px 20px '}}
         >
-            <a className={`list-group-item  flex-column align-items-start ${classes.textColor} text-truncate`}
+            <a className={`list-group-item  flex-column align-items-start ${classes.textColor}  ${classes.pointer} text-truncate`}
                style={{padding: '16px!important 24px!important'}}
                onClick={() => {
                    history.push('/category/' + item.id)

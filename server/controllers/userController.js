@@ -47,7 +47,7 @@ class UserController {
         }
     }
 
-    async setRole(req, res, next) {
+    async setRole(req, res) {
         const {id, role} = req.body
 
         if (id && role) {
@@ -103,7 +103,7 @@ class UserController {
         }
     }
 
-    async login(req, res, next) {
+    async login(req, res) {
         const {email, password} = req.body
 
         if (email && password) {
@@ -240,10 +240,10 @@ class UserController {
         }
     }
 
-    async getAll(req, res, next) {
+    async getAll(req, res) {
         const usersList = await User.findAndCountAll({
                 attributes: {exclude: ['password']},
-                limit: 10,
+                // limit: 10,
                 order: [
                     ['id', 'ASC'],
                     // ['name', 'DESC'],

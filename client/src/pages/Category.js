@@ -6,7 +6,6 @@ import SpinnerSm from "../components/SpinnerSM";
 import FeedTopic from "../components/mainpage/feed/Feed_topic";
 import FeedTopBar from "../components/mainpage/FeedTopBar";
 import FeedAddNewPostBtn from "../components/mainpage/FeedAddNewPostBtn";
-import FeedItemsList from "../components/mainpage/FeedItemsList";
 
 const Category = () => {
     let {id} = useParams();
@@ -39,12 +38,23 @@ const Category = () => {
 
             {
 
-                topicsList.length === 0 ? <span>
-                            Нет записей
-                        </span> :
+                topicsList.length === 0
+                    ?
+                    <div style={{marginTop: '20px'}}>
+                        <FeedTopBar
+                            isSearch={false}
+                            isBackBtn={true}
+                            backBtnTitle={'Back'}
+                        />
+                        <span>Нет записей</span>
+                    </div>
+                    :
 
                     <div style={{marginTop: '20px'}}>
                         <FeedTopBar
+                            isSearch={true}
+                            isBackBtn={true}
+                            backBtnTitle={'Back'}
                         />
                         <FeedAddNewPostBtn/>
                         <ul

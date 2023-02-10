@@ -5,3 +5,8 @@
   padding: 10px 10px;
   vertical-align: middle;
   color: white; }
+
+.back_btn {
+  color: white !important; }
+  .back_btn:hover {
+    color: #3b3b3b !important; }

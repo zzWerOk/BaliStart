@@ -1,4 +1,4 @@
-const {TableUpdates, Topics, Files, User, TopicsCategory} = require("../models/models");
+const {TableUpdates, Topics, Files, User, TopicsCategory, TopicComments} = require("../models/models");
 const ApiError = require("../error/ApiError");
 const fs = require("fs");
 const path = require("path");
@@ -407,18 +407,44 @@ class TopicsController {
 
             let newRows = []
 
-            const usersArr = await User.findAll()
+            for (let i = 0; i < topicsCategoriesList.rows.length; i++) {
+                const item = topicsCategoriesList.rows[i]
 
-            topicsCategoriesList.rows.map(item => {
                 let newItem = JSON.parse(JSON.stringify(item))
 
-                usersArr.map(currUser => {
-                    if (currUser.id === item.created_by_user_id) {
-                        newItem.created_by_user_name = currUser.name
-                        newRows.push(newItem)
-                    }
+                const user = await User.findOne({where: {id: item.created_by_user_id}})
+                newItem.created_by_user_name = user.name
+
+                newItem.commentsCount = await TopicComments.count({
+                    where: {
+                        topic_id: newItem.id,
+                    },
                 })
-            })
+
+                // commentsCount
+                // createdAt
+                // created_by_user_name
+                // description
+                // image_logo
+                // name
+                // tag
+                // delete newItem.id
+                newItem.updatedAt = newItem.createdAt
+
+                delete newItem.active
+                delete newItem.created_by_user_id
+                delete newItem.created_date
+                delete newItem.deleted_by_user_id
+                delete newItem.deleted_date
+                delete newItem.file_name
+                delete newItem.google_map_url
+                delete newItem.images
+                delete newItem.userId
+                delete newItem.videos
+
+                newRows.push(newItem)
+
+            }
 
             return res.json({
                 count: newRows.length,
