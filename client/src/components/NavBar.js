@@ -1,15 +1,14 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 
 import {Button, Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
-import {delay, MAIN_ROUTE} from "../utils/consts";
+import {MAIN_ROUTE} from "../utils/consts";
 import {observer} from "mobx-react-lite";
 import classes from './NavBar.module.css'
 import ModalPopUp from "./ModalPopUp";
 import LoginPage from "../pages/LoginPage";
 import {Context} from "../index";
-import {check} from "../http/userAPI";
 
 const NavBar = observer(() => {
     const {user} = useContext(Context)
@@ -38,7 +37,7 @@ const NavBar = observer(() => {
     return (
         <div>
 
-            <Navbar bg="light" expand="lg">
+            <Navbar bg="light" expand="lg" className={'fixed-top z-depth-5'}>
                 <Container fluid>
                     <Navbar.Brand href={MAIN_ROUTE}>Bali Start</Navbar.Brand>
                     <h1 className={classes.title}>

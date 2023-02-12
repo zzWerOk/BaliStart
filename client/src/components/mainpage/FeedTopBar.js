@@ -11,6 +11,7 @@ const FeedTopBar = (props) => {
         isSearch,
         isBackBtn,
         backBtnTitle,
+        rightSideBarElements,
     } = props
 
     let history = useHistory();
@@ -24,6 +25,7 @@ const FeedTopBar = (props) => {
                 backgroundColor: '#332d2d',
                 color: 'white',
                 minHeight: '50px',
+                maxHeight: '50px',
             }}
         >
             <div
@@ -42,7 +44,7 @@ const FeedTopBar = (props) => {
                            onClick={() => {
                                history.goBack()
                            }}
-                           // type="button"
+                            // type="button"
                         >
 
                             {/*<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"*/}
@@ -58,7 +60,7 @@ const FeedTopBar = (props) => {
                                  style={{height: '100%', marginLeft: '-5px'}}
                             >
                                 <path
-                                      d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                                    d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
                             </svg>
                             <small
                                 style={{height: '100%'}}
@@ -110,6 +112,13 @@ const FeedTopBar = (props) => {
                         {/*    variant="outline-secondary"*/}
                         {/*>Search</Button>*/}
                     </Form>
+                    :
+                    null
+            }
+            {
+                rightSideBarElements
+                    ?
+                    rightSideBarElements
                     :
                     null
             }

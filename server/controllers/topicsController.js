@@ -307,6 +307,12 @@ class TopicsController {
                                     where: {id: candidate.created_by_user_id}
                                 })
 
+                                topicData.commentsCount = await TopicComments.count({
+                                    where: {
+                                        topic_id: candidate.id,
+                                    },
+                                })
+
 
                                 topicData.name = candidate.name
                                 topicData.description = candidate.description
@@ -315,7 +321,7 @@ class TopicsController {
                                 // images: {type: DataTypes.STRING},
                                 // videos: {type: DataTypes.STRING},
                                 // google_map_url: {type: DataTypes.STRING},
-                                topicData.active = candidate.active
+                                // topicData.active = candidate.active
                                 // created_by_user_id: {type: DataTypes.INTEGER},
                                 topicData.created_date = candidate.created_date
                                 // deleted_by_user_id: {type: DataTypes.INTEGER},
@@ -323,7 +329,7 @@ class TopicsController {
                                 topicData.image = candidate.file_name
                                 topicData.userName = currUser.name
 
-                                if ('' + candidate.created_by_user_id === '' + user_id) {
+                                if (candidate.created_by_user_id === user_id) {
                                     topicFileData.editable = true
                                 }
 

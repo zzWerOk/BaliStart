@@ -29,11 +29,6 @@ export const getTopicData = async (id, user_id = -1) => {
     return data
 }
 
-// export const getTopicData = async (id, user_id) => {
-//     const {data} = await $host.get('api/topics/data/', {params: {id: id}})
-//     return data
-// }
-//
 export const saveTopicAPI = async (
     name,
     description,

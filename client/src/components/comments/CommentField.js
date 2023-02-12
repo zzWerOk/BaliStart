@@ -80,7 +80,6 @@ const CommentField = (props) => {
                         />
                         :
                         <p>
-                            {/*{commentText}*/}
                             {comment.text}
                         </p>
                 }
@@ -112,12 +111,13 @@ const CommentField = (props) => {
 
                                 />
                                 :
-                                <div className={'d-flex justify-content-between'}>
+                                <div className={'d-flex justify-content-between'}
+                                style={{marginBottom: '30px'}}
+                                >
                                     {
                                         comment.editable
                                             ?
                                             <a className={`badge badge-secondary 
-                                                ${isDeleting ? null : classes.badge_outlined} 
                                                 ${isDeleting ? null : classes.comment_btn} 
                                             `}
                                                onClick={() => {
@@ -136,7 +136,6 @@ const CommentField = (props) => {
                                     }
 
                                     <a className={`badge badge-secondary 
-                                                ${isDeleting ? null : classes.badge_outlined} 
                                                 ${isDeleting ? null : classes.comment_btn} 
                                             `}
                                        onClick={() => {
@@ -155,13 +154,13 @@ const CommentField = (props) => {
                                 </div>
                     }
 
-                    {
-                        wrightComment || editComment
-                            ?
-                            null
-                            :
-                            <hr/>
-                    }
+                    {/*{*/}
+                    {/*    wrightComment || editComment*/}
+                    {/*        ?*/}
+                    {/*        null*/}
+                    {/*        :*/}
+                    {/*        <hr/>*/}
+                    {/*}*/}
 
                     {
                         comment.replies

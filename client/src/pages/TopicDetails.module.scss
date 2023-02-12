@@ -14,15 +14,15 @@
 }
 .badge_outlined{
   background-color: transparent!important;
-  border-color: #323a45;
-  border-width: 1px;
-  border-style: solid;
-  color: #323a45;
-  margin-right: 10px;
+  border-color: white!important;//#323a45;
+  border-width: 1px!important;
+  border-style: solid!important;
+  color: white!important;//#323a45;
+  margin-left: 10px!important;
 
   &:hover{
-    color: gray;
-    border-color: gray;
+    color: gray!important;
+    border-color: gray!important;
   }
 
 
@@ -30,8 +30,25 @@
 
 .comment_btn{
   margin-top: -15px;
+  color: #282c34!important;
+  background-color: transparent!important;
+  border-color: #323a45!important;
+  border-width: 1px!important;
+  border-style: solid!important;
 }
 
 .badge_outlined_span{
   margin-left: 10px;
+
+}
+
+.topic_data{
+  margin-left: 30px!important;
+  margin-right: 30px!important;
+}
+
+.tolowercase {
+  //text-transform: unset !important;
+
+  text-transform: lowercase!important;
 }

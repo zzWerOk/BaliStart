@@ -6,7 +6,7 @@ import {Col, Row} from "react-bootstrap";
 import NavBar from "./components/NavBar";
 import SideBar from "./components/SideBar";
 import {delay} from "./utils/consts";
-import {check, getById, getMyName} from "./http/userAPI";
+import {check, getMyName} from "./http/userAPI";
 import {Context} from "./index";
 
 
@@ -16,7 +16,7 @@ const App = observer(() => {
     const {user} = useContext(Context)
 
     useEffect(() => {
-        delay(0).then(r => {
+        delay(0).then(() => {
             check().then(data => {
                 user.setUser(data)
 
@@ -45,24 +45,29 @@ const App = observer(() => {
     return (
         <div
         >
-            <NavBar/>
-            <Row
-                className={'Main-Field'}
-                style={{marginLeft: 0, marginRight: 0}}
-            >
-                <Col>
-                    <SideBar/>
-                </Col>
-                <Col
-                    md={7}
-                    style={{padding: 0, backgroundColor: 'white'}}
+            <header>
+                <NavBar/>
+            </header>
+            <main role={'main'}>
+                <Row
+                    className={'Main-Field'}
+                    style={{marginLeft: 0, marginRight: 0,}}
                 >
-                    <AppRouter/>
-                </Col>
-                <Col>
-                    <SideBar/>
-                </Col>
-            </Row>
+                    <Col>
+                        <SideBar/>
+                    </Col>
+                    <Col
+
+                        md={7}
+                        style={{padding: 0, backgroundColor: 'white'}}
+                    >
+                        <AppRouter/>
+                    </Col>
+                    <Col>
+                        <SideBar/>
+                    </Col>
+                </Row>
+            </main>
         </div>
     );
 })

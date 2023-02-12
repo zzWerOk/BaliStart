@@ -11,6 +11,7 @@ const AddNewCommentComponent = (props) => {
 
     const {
         topicId,
+        addNewCommentHandler,
         is_reply = false,
         topic_comment_id,
         setWrightCommentHandler,
@@ -18,7 +19,6 @@ const AddNewCommentComponent = (props) => {
         value,
         deleteCommentHandler,
         isDeleting,
-        addNewCommentHandler,
         // isCommentSending,
     } = props
 
@@ -174,17 +174,18 @@ const AddNewCommentComponent = (props) => {
 
 
     return (<div>
-        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet"/>
-        <div className="container bootdey">
-            <div className="col-md-12 bootstrap snippets">
-                <div className="panel">
-                    <div className="panel-body"
-                         style={{padding: '0 25px 20px'}}
-                    >
+            <link href={"https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"} rel="stylesheet"/>
+            <div className="container bootdey">
+                <div className="col-md-12 bootstrap snippets">
+                    <div className="panel">
+                        <div className="panel-body"
+                             style={{padding: '0 25px 0px'}}
+                        >
 
                         <textarea
                             className={`form-control ${commentSendingError ? "send-error" : ""}`}
                             rows="2"
+                            style={{marginBottom: '5px'}}
                             onChange={e => commentHandler(e.target.value)}
                             placeholder="What are you thinking?"
                             value={commentText}
@@ -193,89 +194,92 @@ const AddNewCommentComponent = (props) => {
 
                         </textarea>
 
-                        <div className={'d-flex justify-content-between'}>
-                            <div className={'d-flex justify-content-around'}>
-                                {
-                                    showCancelBtn
-                                        ?
-                                        <Button className={'btn-sm'}
-                                                variant={"outline-warning"}
-                                                onClick={() => {
-                                                    cancelWrightCommentHandler()
-                                                }}
-                                                disabled={!!commentSending || !!isDeleting}
-                                        >
-                                            Cancel
-                                        </Button>
-                                        :
-                                        null
-                                }
-
-                                {
-                                    showCancelBtn && isEditComment
-                                        ?
-
-                                        <div
-                                            style={{marginLeft: '15px'}}
-                                        >
-
-                                            <Button
-                                                type="button"
-                                                className={`btn btn-sm `}
-                                                variant={"outline-danger"}
-                                                disabled={!!commentSending || !!isDeleting}
-                                                onClick={onShowDeleteBtnHandler}
+                            <div className={'d-flex justify-content-between'}>
+                                <div className={'d-flex justify-content-around'}>
+                                    {
+                                        showCancelBtn
+                                            ?
+                                            <Button className={'btn btn-sm'}
+                                                    variant={"outline-secondary"}
+                                                    onClick={() => {
+                                                        cancelWrightCommentHandler()
+                                                    }}
+                                                    disabled={!!commentSending || !!isDeleting}
                                             >
-                                                Delete
+                                                Cancel
                                             </Button>
+                                            :
+                                            null
+                                    }
 
-                                            {
-                                                showDeleteBtn
-                                                    ?
-                                                    <Button
-                                                        className="btn-sm"
-                                                        variant={"danger"}
-                                                        disabled={!!commentSending || !!isDeleting}
-                                                        onClick={() => {
-                                                            deleteCommentHandler(topicId, topic_comment_id)
-                                                        }}
-                                                    >
-                                                        Yes
-                                                    </Button>
-                                                    :
-                                                    null
-                                            }
+                                    {
+                                        showCancelBtn && isEditComment
+                                            ?
 
-                                        </div>
+                                            <div
+                                                style={{marginLeft: '15px'}}
+                                            >
 
-                                        :
-                                        null
-                                }
+                                                <Button
+                                                    type="button"
+                                                    className={`btn btn-sm `}
+                                                    variant={"outline-danger"}
+                                                    style={{marginLeft: '25px'}}
+                                                    disabled={!!commentSending || !!isDeleting}
+                                                    onClick={onShowDeleteBtnHandler}
+                                                >
+                                                    Delete
+                                                </Button>
+
+                                                {
+                                                    showDeleteBtn
+                                                        ?
+                                                        <Button
+                                                            className="btn  btn-sm "
+                                                            variant={"outline-danger"}
+                                                            style={{marginLeft: '5px'}}
+                                                            disabled={!!commentSending || !!isDeleting}
+                                                            onClick={() => {
+                                                                deleteCommentHandler(topicId, topic_comment_id)
+                                                            }}
+                                                        >
+                                                            Yes
+                                                        </Button>
+                                                        :
+                                                        null
+                                                }
+
+                                            </div>
+
+                                            :
+                                            null
+                                    }
+                                </div>
+
+                                <Button className={'pull-right btn-sm'}
+                                        variant={commentSendingError ? "danger" : "outline-primary"}
+                                        onClick={() => {
+                                            sendCommentHandler()
+                                        }}
+                                        disabled={!!commentSending || !!isDeleting}
+                                >
+                                    Share
+                                </Button>
                             </div>
-
-                            <Button className={'pull-right btn-sm'}
-                                    variant={commentSendingError ? "danger" : "outline-primary"}
-                                    onClick={() => {
-                                        sendCommentHandler()
-                                    }}
-                                    disabled={!!commentSending || !!isDeleting}
+                            <label
+                                className={`form-label ${commentSendingError ? "send-error" : ""}`}
+                                style={{color: '#dc3545'}}
                             >
-                                Share
-                            </Button>
+                                {commentSendingErrorText}
+                            </label>
                         </div>
-                        <label
-                            className={`form-label ${commentSendingError ? "send-error" : ""}`}
-                            style={{color: '#dc3545'}}
-                        >
-                            {commentSendingErrorText}
-                        </label>
                     </div>
+
                 </div>
-
             </div>
-        </div>
 
-    </div>);
+        </div>
+    );
 };
 
 export default AddNewCommentComponent;
