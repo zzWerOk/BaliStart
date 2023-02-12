@@ -1,4 +1,4 @@
-const {TopicComments, User, Files} = require('../models/models')
+const {TopicComments, User, Files, Topics} = require('../models/models')
 const ApiError = require('../error/ApiError')
 const path = require("path");
 const fs = require("fs");
@@ -255,64 +255,75 @@ class TopicCommentsController {
         const {sort_code = 'reid', topic_id} = req.query
         const currUser = req.user
 
-        if (topic_id) {
+        try {
 
-            let sortOrder = ['id', 'DESC']
-            switch (sort_code) {
-                case 'user':
-                    sortOrder = ['created_by_user_id', 'ASC']
-                    break
-                case 'reuser':
-                    sortOrder = ['created_by_user_id', 'DESC']
-                    break
-                case 'date':
-                    sortOrder = ['created_date', 'ASC']
-                    break
-                case 'redate':
-                    sortOrder = ['created_date', 'DESC']
-                    break
-                case 'id':
-                    sortOrder = ['id', 'ASC']
-                    break
-                case 'reid':
-                    sortOrder = ['id', 'DESC']
-                    break
-            }
+            if (Number.isInteger(parseInt(topic_id))) {
 
-            const commentsList = await TopicComments.findAndCountAll({
-                    where: {
-                        is_reply: false,
-                        topic_id
-                    },
-                    // limit: 10,
-                    order: [
-                        sortOrder
-                        // ['id', 'ASC'],
-                        // ['name', 'DESC'],
-                    ]
-                }
-            )
-            let newRows = []
-
-            for (let i = 0; i < commentsList.count; i++) {
-                const item = commentsList.rows[i]
-
-                let newItem = JSON.parse(JSON.stringify(item))
-
-                if (newItem.reply_ids) {
-                    newItem.replies = await getCommentReplies(newItem.reply_ids || '[]', newItem.topic_id, currUser, sort_code)
+                let sortOrder = ['id', 'DESC']
+                switch (sort_code) {
+                    case 'user':
+                        sortOrder = ['created_by_user_id', 'ASC']
+                        break
+                    case 'reuser':
+                        sortOrder = ['created_by_user_id', 'DESC']
+                        break
+                    case 'date':
+                        sortOrder = ['created_date', 'ASC']
+                        break
+                    case 'redate':
+                        sortOrder = ['created_date', 'DESC']
+                        break
+                    case 'id':
+                        sortOrder = ['id', 'ASC']
+                        break
+                    case 'reid':
+                        sortOrder = ['id', 'DESC']
+                        break
                 }
 
-                newRows.push(await convertCommentItemFroTopic(newItem, currUser))
-            }
+                // const isIdUnique = id =>
+                //     Topics.findOne({ where: { id} })
+                //         .then(token => token !== null)
+                //         .then(isUnique => isUnique);
+                //
+                // if(isIdUnique(topic_id)) {
+                const commentsList = await TopicComments.findAndCountAll({
+                        where: {
+                            is_reply: false,
+                            topic_id
+                        },
+                        // limit: 10,
+                        order: [
+                            sortOrder
+                            // ['id', 'ASC'],
+                            // ['name', 'DESC'],
+                        ]
+                    }
+                )
+                let newRows = []
 
-            return res.json({
-                count: newRows.length,
-                'rows': newRows
-            })
+                for (let i = 0; i < commentsList.count; i++) {
+                    const item = commentsList.rows[i]
+
+                    let newItem = JSON.parse(JSON.stringify(item))
+
+                    if (newItem.reply_ids) {
+                        newItem.replies = await getCommentReplies(newItem.reply_ids || '[]', newItem.topic_id, currUser, sort_code)
+                    }
+
+                    newRows.push(await convertCommentItemFroTopic(newItem, currUser))
+                }
+
+                return res.json({
+                    count: newRows.length,
+                    'rows': newRows
+                })
+                // }
+            }
+            return res.json({status: "error", message: `Param error`})
+        }catch (e) {
+            return res.json({status: "error", message: e.message})
         }
-        return res.json({status: "error", message: `Param error`})
-
         // return res.json(commentsList)
     }
 

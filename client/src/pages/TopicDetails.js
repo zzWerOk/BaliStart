@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {useParams} from "react-router-dom";
-import {delay, epochToDateWithTime} from "../utils/consts";
+import {useHistory, useParams} from "react-router-dom";
+import {delay, epochToDateWithTime, NOPAGE_ROUTE} from "../utils/consts";
 import {getTopicData} from "../http/topicsAPI";
 import {Context} from "../index";
 import {Col, Row} from "react-bootstrap";
@@ -19,9 +19,9 @@ import TopicDetailImagesComponent from "../components/topics/components/TopicDet
 import TopicDetailGoogleMapUrlComponent from "../components/topics/components/TopicDetailGoogleMapUrlComponent";
 
 
-
 const TopicDetails = () => {
     let {id} = useParams();
+    const history = useHistory()
 
     const {user, topicsCategoryStore} = useContext(Context)
 
@@ -36,9 +36,22 @@ const TopicDetails = () => {
         delay(0).then(() => {
 
             getTopicData(id, user.id).then(data => {
+                let dataJson
 
-                let dataJson = JSON.parse(data)
-                if (dataJson.hasOwnProperty('name')) {
+
+                try {
+                    dataJson = JSON.parse(data)
+                } catch (e) {
+                    dataJson = data
+                }
+
+                if (dataJson.hasOwnProperty('status')) {
+                    if (dataJson.status === 'error') {
+                        if(dataJson.message === 'topic not found'){
+                            history.push(NOPAGE_ROUTE)
+                        }
+                    }
+                }else if (dataJson.hasOwnProperty('name')) {
                     setTopicData(dataJson.data)
                     console.log(dataJson.data)
                     delete dataJson.data
@@ -62,6 +75,8 @@ const TopicDetails = () => {
                     }
                 }
 
+            }).catch((e) => {
+                console.log(e)
             }).finally(() => {
                 setLoading(false)
             })
@@ -228,11 +243,11 @@ const TopicDetails = () => {
                                 </p>
                             </Row>
                             <Row className={`${classes.topic_row} ${classes.topic_data}`}>
-                                    {
-                                        topicData.map(function (item, index) {
-                                            return getTopicDetailsElement(item, index)
-                                        })
-                                    }
+                                {
+                                    topicData.map(function (item, index) {
+                                        return getTopicDetailsElement(item, index)
+                                    })
+                                }
                             </Row>
                             <Row className={classes.topic_row}>
                                 <hr/>

@@ -24,7 +24,7 @@ export const getAll = async (tag_search) => {
 
 export const getTopicData = async (id, user_id = -1) => {
     const {data} = await $host.get(apiUrl+'/topicdata', {params: {id, user_id}}).catch((e) => {
-        console.log('error ', e.response.data.message)
+        console.log('error ', e.response.data)
     })
     return data
 }

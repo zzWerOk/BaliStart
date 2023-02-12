@@ -289,60 +289,65 @@ class TopicsController {
     async getTopicData(req, res, next) {
         const {id, user_id = -1} = req.query
         try {
-            if (!id) {
-                return next(ApiError.badRequest("Ошибка параметра"))
-            } else {
-                const candidate = await Topics.findOne({where: {id}})
+            if (Number.isInteger(parseInt(id))) {
 
-                if (candidate) {
-                    try {
-                        const readFileResult = readFile(candidate.file_name)
-                        if (readFileResult.hasOwnProperty('status')) {
-                            if (readFileResult.status === 'ok') {
-                                let topicFileData = JSON.parse(readFileResult.data)
-                                let topicData = {}
+                if (!id) {
+                    return next(ApiError.badRequest("Ошибка параметра"))
+                } else {
+                    const candidate = await Topics.findOne({where: {id}})
 
-                                const currUser = await User.findOne({
-                                    attributes: {exclude: ['password']},
-                                    where: {id: candidate.created_by_user_id}
-                                })
+                    if (candidate) {
+                        try {
+                            const readFileResult = readFile(candidate.file_name)
+                            if (readFileResult.hasOwnProperty('status')) {
+                                if (readFileResult.status === 'ok') {
+                                    let topicFileData = JSON.parse(readFileResult.data)
+                                    let topicData = {}
 
-                                topicData.commentsCount = await TopicComments.count({
-                                    where: {
-                                        topic_id: candidate.id,
-                                    },
-                                })
+                                    const currUser = await User.findOne({
+                                        attributes: {exclude: ['password']},
+                                        where: {id: candidate.created_by_user_id}
+                                    })
+
+                                    topicData.commentsCount = await TopicComments.count({
+                                        where: {
+                                            topic_id: candidate.id,
+                                        },
+                                    })
 
 
-                                topicData.name = candidate.name
-                                topicData.description = candidate.description
-                                topicData.categories = candidate.tag
-                                // image_logo: {type: DataTypes.STRING, allowNull: false},
-                                // images: {type: DataTypes.STRING},
-                                // videos: {type: DataTypes.STRING},
-                                // google_map_url: {type: DataTypes.STRING},
-                                // topicData.active = candidate.active
-                                // created_by_user_id: {type: DataTypes.INTEGER},
-                                topicData.created_date = candidate.created_date
-                                // deleted_by_user_id: {type: DataTypes.INTEGER},
-                                // deleted_date: {type: DataTypes.BIGINT},
-                                topicData.image = candidate.file_name
-                                topicData.userName = currUser.name
+                                    topicData.name = candidate.name
+                                    topicData.description = candidate.description
+                                    topicData.categories = candidate.tag
+                                    // image_logo: {type: DataTypes.STRING, allowNull: false},
+                                    // images: {type: DataTypes.STRING},
+                                    // videos: {type: DataTypes.STRING},
+                                    // google_map_url: {type: DataTypes.STRING},
+                                    // topicData.active = candidate.active
+                                    // created_by_user_id: {type: DataTypes.INTEGER},
+                                    topicData.created_date = candidate.created_date
+                                    // deleted_by_user_id: {type: DataTypes.INTEGER},
+                                    // deleted_date: {type: DataTypes.BIGINT},
+                                    topicData.image = candidate.file_name
+                                    topicData.userName = currUser.name
 
-                                if (candidate.created_by_user_id === user_id) {
-                                    topicFileData.editable = true
+                                    if (candidate.created_by_user_id === user_id) {
+                                        topicFileData.editable = true
+                                    }
+
+                                    topicData.data = topicFileData
+                                    return res.json(JSON.stringify(topicData))
                                 }
-
-                                topicData.data = topicFileData
-                                return res.json(JSON.stringify(topicData))
                             }
+                        } catch (e) {
                         }
-                    } catch (e) {
+                        return next(ApiError.internal("Ошибка чтения данных файла"))
                     }
-                    return next(ApiError.internal("Ошибка чтения данных файла"))
-                }
-                return next(ApiError.internal("Topic not found"))
+                    return next(ApiError.internal("Topic not found"))
 
+                }
+            }else{
+                return res.json({status: 'error', message: 'topic not found'})
             }
         } catch (e) {
             return next(ApiError.internal(e.message))

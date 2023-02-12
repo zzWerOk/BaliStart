@@ -45,7 +45,7 @@ const TopicLinkComponent = (props) => {
 
     const newItemAddHandler = () => {
         let itemsArr = JSON.parse(links)
-        itemsArr.push({"type":"","link":""})
+        itemsArr.push({"type":"in","link":""})
         setLinks(JSON.stringify(itemsArr))
 
         item.items = JSON.stringify(itemsArr)

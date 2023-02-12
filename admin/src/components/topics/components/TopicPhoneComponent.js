@@ -89,7 +89,7 @@ const TopicPhoneComponent = (props) => {
                                             onChange={e => handleSelect(e.target.value, index)}
                                     >
                                         <option disabled>Выбери тип связи</option>
-                                        <option value="waw">WhatsApp</option>
+                                        <option value="wa">WhatsApp</option>
                                         <option value="vb">Viber</option>
                                         <option value="tg">Telegram</option>
                                         <option value="ph">Phone call + sms</option>
