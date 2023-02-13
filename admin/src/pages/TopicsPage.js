@@ -8,7 +8,7 @@ import {getAll} from "../http/topicsAPI";
 import TopicsList from "../components/topics/TopicsList";
 import TopicListsCell from "../components/topics/TopicListsCell";
 
-const ToursPage = () => {
+const TopicsPage = () => {
     const {topicsCategoryStore} = useContext(Context)
 
     const {navBarTitle} = useContext(Context)
@@ -27,6 +27,7 @@ const ToursPage = () => {
 
             if (data.hasOwnProperty('rows')) {
 
+
                 topicsStore.saveTopicsListRows(data.rows)
 
                 /**
@@ -40,21 +41,21 @@ const ToursPage = () => {
     }
 
     useEffect(() => {
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             getTableUpdateByName('Topics').then(tuData => {
-                const lastDateTable = topicsStore.getSavedLastDateTableTopics()
+                // const lastDateTable = topicsStore.getSavedLastDateTableTopics()
 
-                if (tuData.date !== lastDateTable) {
+                // if (tuData.date !== lastDateTable) {
                     getAllData()
                     /**
                      Сохраняем дату последнего изменения таблицы
                      **/
                     topicsStore.saveLastDateTableTopics(tuData.date)
-                } else {
-                    topicsStore.loadTopicsList()
-                    setLoading(false)
-                }
+                // } else {
+                //     topicsStore.loadTopicsList()
+                //     setLoading(false)
+                // }
 
             })
 
@@ -100,4 +101,4 @@ const ToursPage = () => {
     }
 }
 
-export default ToursPage;
+export default TopicsPage;

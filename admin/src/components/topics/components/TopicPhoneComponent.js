@@ -4,7 +4,7 @@ import SpinnerSM from "../../SpinnerSM";
 const TopicPhoneComponent = (props) => {
     const {item, dataItemEditHandler} = props
 
-    const [isSaving, stIsSaving] = useState(false)
+    // const [isSaving, stIsSaving] = useState(false)
     const [phoneName, setPhoneName] = useState('')
     const [phones, setPhones] = useState('[{"type":"","phone":""}]')
     const [loading, setLoading] = useState(true)
@@ -45,7 +45,7 @@ const TopicPhoneComponent = (props) => {
 
     const newItemAddHandler = () => {
         let itemsArr = JSON.parse(phones)
-        itemsArr.push({"type":"","phone":""})
+        itemsArr.push({"type": "", "phone": ""})
         setPhones(JSON.stringify(itemsArr))
 
         item.items = JSON.stringify(itemsArr)
@@ -73,7 +73,7 @@ const TopicPhoneComponent = (props) => {
                     className="form-control"
                     placeholder='Phone name'
                     value={phoneName}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleName(e.target.value)}
                 />
                 <div>
@@ -82,29 +82,33 @@ const TopicPhoneComponent = (props) => {
                         JSON.parse(phones).map(function (listItem, index) {
                             return <div key={index} style={{display: "flex"}}>
                                 <div style={{display: "flex"}}>
-                                    <select className="form-select"
-                                            disabled={!!isSaving}
-                                            aria-label="Default select example"
-                                            value={listItem.type}
-                                            onChange={e => handleSelect(e.target.value, index)}
-                                    >
-                                        <option disabled>Выбери тип связи</option>
-                                        <option value="wa">WhatsApp</option>
-                                        <option value="vb">Viber</option>
-                                        <option value="tg">Telegram</option>
-                                        <option value="ph">Phone call + sms</option>
-                                        <option value="al">All</option>
-                                    </select>
+                                    <div className={'col-7'}>
+                                        <select className="form-select"
+                                                // disabled={!!isSaving}
+                                                aria-label="Default select example"
+                                                value={listItem.type}
+                                                onChange={e => handleSelect(e.target.value, index)}
+                                        >
+                                            <option disabled>Выбери тип связи</option>
+                                            <option value="wa">WhatsApp</option>
+                                            <option value="vb">Viber</option>
+                                            <option value="tg">Telegram</option>
+                                            <option value="ph">Phone call + sms</option>
+                                            <option value="al">All</option>
+                                        </select>
+                                    </div>
 
-                                    <input
-                                        type="phoneText"
-                                        id="phoneText"
-                                        className="form-control"
-                                        placeholder='Phone No'
-                                        value={listItem.phone}
-                                        disabled={!!isSaving}
-                                        onChange={e => itemPhonesEdit(e.target.value, index)}
-                                    />
+                                    <div className={'col-6'}>
+                                        <input
+                                            type="phoneText"
+                                            id="phoneText"
+                                            className="form-control"
+                                            placeholder='Phone No'
+                                            value={listItem.phone}
+                                            // disabled={!!isSaving}
+                                            onChange={e => itemPhonesEdit(e.target.value, index)}
+                                        />
+                                    </div>
 
                                     <button
                                         type="button"
@@ -141,6 +145,6 @@ const TopicPhoneComponent = (props) => {
             </div>
         );
     }
-};
+    };
 
-export default TopicPhoneComponent;
+    export default TopicPhoneComponent;

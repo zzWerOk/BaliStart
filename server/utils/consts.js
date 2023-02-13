@@ -95,7 +95,8 @@ module.exports.createNewFile = function (textData, tableName, img) {
         let imgFileName = ''
         if (img) {
             try {
-                imgFileName = fileName.split('\\')[1]
+                // imgFileName = fileName.split('\\')[1]
+                imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
                 img.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
                 return {'status': 'ok', fileName, imgFileName}
             } catch (e) {

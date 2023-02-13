@@ -1,6 +1,6 @@
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
 import TopicCL from "../../classes/topicCL";
-import {Button, Dropdown, DropdownButton, Image, Row, ToggleButton} from "react-bootstrap";
+import {Button, Dropdown, Image, Row, ToggleButton} from "react-bootstrap";
 import noImageLogo from '../../img/nophoto.jpg'
 import TopicItemCard from "./components/TopicItemCard";
 import TopicTextComponent from "./components/TopicTextComponent";
@@ -20,8 +20,11 @@ import {ReactComponent as CircleOkIco} from "../../img/svg/circle_ok.svg"
 import {ReactComponent as CloseIco} from "../../img/svg/close.svg"
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
-import {changeTopicAPI, deleteTopicAPI, getTopicData, saveTopicAPI, setActiveAPI} from "../../http/topicsAPI";
+import {changeTopicAPI, deleteTopicAPI, getTopicData, saveTopicAPI} from "../../http/topicsAPI";
 import {MDBFile} from "mdb-react-ui-kit";
+
+import './TopicDetailsPage.css'
+import './FAB.css'
 
 const dropDownItems = [
     {
@@ -68,13 +71,13 @@ const dropDownItems = [
 let currTopic = null
 
 const TopicDetailsPage = observer((props) => {
-    const {item, onItemEditHandler, deleteTopic} = props
+
+
+    const {item, onItemEditHandler, deleteTopic, scrollToTop} = props
 
     const {topicDetailsStore} = useContext(Context)
     const {topicsCategoryStore} = useContext(Context)
 
-    const [canBeShared, setCanBeShared] = useState(true)
-    const [setActiveError, setSetActiveError] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
     const [saveError, setSaveError] = useState(false)
@@ -88,6 +91,8 @@ const TopicDetailsPage = observer((props) => {
     const [newImageLogo, setNewImageLogo] = useState(false)
     const [topicCategoriesItems, setTopicCategoriesItems] = useState([])
     const [topicCategoriesItems_load, setTopicCategoriesItems_load] = useState(true)
+
+    const [showFab, setShowFab] = useState(false)
 
     useEffect(
         () => {
@@ -110,7 +115,7 @@ const TopicDetailsPage = observer((props) => {
             // setItemImageLogo(currTopic.image_logo + '?' + Date.now())
 
             if (Object.keys(currTopic.dataJSON).length === 0) {
-                delay(0).then(r => {
+                delay(0).then(() =>{
                     if (currTopic.id > -1) {
                         getTopicData(currTopic.id).then(data => {
                             if (data.hasOwnProperty('status')) {
@@ -248,7 +253,7 @@ const TopicDetailsPage = observer((props) => {
         if (newCategory) {
             const found = topicTags.find(element => element === newCategory.id)
             if (found) {
-                const filtered = topicTags.filter(function (value, index, arr) {
+                const filtered = topicTags.filter(function (value) {
                     return value !== found;
                 })
                 setTopicTags(filtered)
@@ -280,7 +285,7 @@ const TopicDetailsPage = observer((props) => {
     const deleteDataItemByIndex = (index) => {
         const currItem = itemData[index]
 
-        const filtered = itemData.filter(function (value, index, arr) {
+        const filtered = itemData.filter(function (value) {
             return value !== currItem;
         })
 
@@ -326,7 +331,7 @@ const TopicDetailsPage = observer((props) => {
         setIsSaving(true)
         setDeleteError(false)
 
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             if (currTopic.id > 0) {
                 deleteTopicAPI(
@@ -354,7 +359,7 @@ const TopicDetailsPage = observer((props) => {
 
         setIsSaving(true)
         setSaveError(false)
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             if (currTopic.id < 0) {
                 saveTopicAPI(
@@ -444,6 +449,18 @@ const TopicDetailsPage = observer((props) => {
         onItemEditHandler(currTopic.getAsJson())
     }
 
+    /** Определение нижней позиции для показа FAB**/
+    const listInnerRef = useRef();
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            const entry = entries[0];
+            setShowFab(!entry.isIntersecting)
+        });
+        observer.observe(listInnerRef.current);
+
+    }, []);
+
+
     return (
         <div>
 
@@ -462,25 +479,26 @@ const TopicDetailsPage = observer((props) => {
                     0 favs
                 </div>
             </Row>
-
-            <Row>
+            <Row className={'topic-detail-row'}>
                 <div
-                    className={'col-sm-5 justify-content-start '}
+                    className={'col-12 justify-content-between '}
                     style={{display: 'flex'}}
                 >
-                    <input
-                        type="categoryName"
-                        id="formTopicName"
-                        className="form-control"
-                        placeholder='Category'
-                        value={currName}
-                        disabled={!!isSaving}
-                        onChange={e => onNameHandler(e.target.value)}
-                    />
+                    <div className={'col-10'}>
+                        <input
+                            type="topicName"
+                            id="formTopicName"
+                            className="form-control"
+                            placeholder='Topic name'
+                            value={currName}
+                            disabled={!!isSaving}
+                            onChange={e => onNameHandler(e.target.value)}
+                        />
+                    </div>
                     <ToggleButton
                         id="toggle-active"
                         type="checkbox"
-                        variant={setActiveError ? "outline-danger" : "outline-primary"}
+                        variant={"outline-primary"}
                         checked={isActive}
                         value={'1'}
                         disabled={!!isSaving}
@@ -514,19 +532,19 @@ const TopicDetailsPage = observer((props) => {
                     </ToggleButton>
                 </div>
             </Row>
-            <Row>
-                <div className={'col-lg-10 justify-content-center '}>
-                    <textarea
-                        name="topicDescription"
-                        id="topicDescription"
-                        cols="50" rows="3"
-                        onChange={e => onDescriptionHandler(e.target.value)}
-                        value={currDescription}
-                        disabled={!!isSaving}
+            <Row className={'topic-detail-row'}>
+                <div className={'col-12 justify-content-center '}>
+                    <textarea className={'col-12'}
+                              name="topicDescription"
+                              id="topicDescription"
+                              rows="3"
+                              onChange={e => onDescriptionHandler(e.target.value)}
+                              value={currDescription}
+                              disabled={!!isSaving}
                     />
                 </div>
             </Row>
-            <Row>
+            <Row className={'topic-detail-row'}>
                 {topicCategoriesItems_load
                     ?
                     <SpinnerSM/>
@@ -552,45 +570,48 @@ const TopicDetailsPage = observer((props) => {
                                         onClick={() => {
                                             addNewTagHandler(item.id)
                                         }}
-                                    >{item.category_name}</Dropdown.Item>
+                                    >{item.category_name}
+                                    </Dropdown.Item>
                                 })}
                             </Dropdown.Menu>
                         </Dropdown>
 
-                        {
-                            topicTags.map(item => {
-                                return <Button
-                                    key={item}
-                                    className="badge btn-secondary"
-                                    disabled={!!isSaving}
-                                    style={{
-                                        margin: '0 3px'
-                                    }}
-                                >
-                                    {getTagNameById(item)}
-                                    <CloseIco
-                                        onClick={() => {
-                                            deleteNewTagHandler(item)
-                                        }}
-                                        fill='white'
+                        <div>
+                            {
+                                topicTags.map(item => {
+                                    return <Button
+                                        key={item}
+                                        className="badge btn-secondary"
+                                        disabled={!!isSaving}
                                         style={{
-                                            width: '36px',
-                                            height: '16px',
-                                            marginBottom: '2px',
-                                            marginTop: '2px',
-                                            marginLeft: '-5px',
-                                            marginRight: '-15px',
+                                            margin: '0 3px'
                                         }}
-                                    />
-                                </Button>
-                            })
-                        }
+                                    >
+                                        {getTagNameById(item)}
+                                        <CloseIco
+                                            onClick={() => {
+                                                deleteNewTagHandler(item)
+                                            }}
+                                            fill='white'
+                                            style={{
+                                                width: '36px',
+                                                height: '16px',
+                                                marginBottom: '2px',
+                                                marginTop: '2px',
+                                                marginLeft: '-5px',
+                                                marginRight: '-15px',
+                                            }}
+                                        />
+                                    </Button>
+                                })
+                            }
+                        </div>
 
                     </div>
                 }
 
             </Row>
-            <Row>
+            <Row className={'topic-detail-row'}>
                 <div
                     className={'d-flex align-items-center justify-content-center'}
                 >
@@ -633,7 +654,7 @@ const TopicDetailsPage = observer((props) => {
                     />
                 </div>
             </Row>
-            <Row>
+            <Row className={'topic-detail-row'}>
                 <div>
 
                     {itemData.map(function (item, index) {
@@ -644,6 +665,7 @@ const TopicDetailsPage = observer((props) => {
                                 default : {
                                     child = <TopicTextComponent
                                         item={item}
+                                        isSaving={isSaving}
                                         dataItemEditHandler={dataItemEditHandler}
                                     />
                                     break
@@ -651,6 +673,7 @@ const TopicDetailsPage = observer((props) => {
                                 case 'comment': {
                                     child = <TopicCommentComponent
                                         item={item}
+                                        isSaving={isSaving}
                                         dataItemEditHandler={dataItemEditHandler}
                                     />
                                     break
@@ -658,6 +681,7 @@ const TopicDetailsPage = observer((props) => {
                                 case 'list': {
                                     child = <TopicListComponent
                                         item={item}
+                                        isSaving={isSaving}
                                         dataItemEditHandler={dataItemEditHandler}
                                     />
                                     break
@@ -665,6 +689,7 @@ const TopicDetailsPage = observer((props) => {
                                 case 'link': {
                                     child = <TopicLinkComponent
                                         item={item}
+                                        isSaving={isSaving}
                                         dataItemEditHandler={dataItemEditHandler}
                                     />
                                     break
@@ -672,6 +697,7 @@ const TopicDetailsPage = observer((props) => {
                                 case 'email': {
                                     child = <TopicEmailComponent
                                         item={item}
+                                        isSaving={isSaving}
                                         dataItemEditHandler={dataItemEditHandler}
                                     />
                                     break
@@ -679,6 +705,7 @@ const TopicDetailsPage = observer((props) => {
                                 case 'phone': {
                                     child = <TopicPhoneComponent
                                         item={item}
+                                        isSaving={isSaving}
                                         dataItemEditHandler={dataItemEditHandler}
                                     />
                                     break
@@ -686,6 +713,7 @@ const TopicDetailsPage = observer((props) => {
                                 case 'images': {
                                     child = <TopicImagesComponent
                                         item={item}
+                                        isSaving={isSaving}
                                         dataItemEditHandler={dataItemEditHandler}
                                     />
                                     break
@@ -693,6 +721,7 @@ const TopicDetailsPage = observer((props) => {
                                 case 'googleMapUrl': {
                                     child = <TopicGoogleMapUrlComponent
                                         item={item}
+                                        isSaving={isSaving}
                                         dataItemEditHandler={dataItemEditHandler}
                                     />
                                     break
@@ -719,15 +748,17 @@ const TopicDetailsPage = observer((props) => {
                     />
                 </div>
             </Row>
-            <Row>
+            <Row className={'col-12 d-flex justify-content-center topic-detail-row'}
+                 ref={listInnerRef}
+            >
                 <Button
-                    className={`btn ${saveError ? 'btn-danger' : 'btn-primary'}  btn-lg w-75 btn-block`}
+                    className={`btn ${saveError ? 'btn-danger' : 'btn-primary'} col-8 btn-lg btn-block`}
                     disabled={!!isSaving}
                     onClick={saveHandler}
                 >Save</Button>
             </Row>
-            <Row>
-                <div style={{display: "flex"}}>
+            <Row className={'topic-detail-row'}>
+                <div className={"d-flex justify-content-start"}>
                     <button
                         type="button"
                         className={`btn ${deleteError ? 'btn-danger' : 'btn-outline-danger'} w-25 `}
@@ -755,6 +786,63 @@ const TopicDetailsPage = observer((props) => {
                 </div>
 
             </Row>
+
+            {
+                showFab && scrollToTop
+                    ?
+                    <div id="container-floating">
+
+                        <div className="nd1 nds"
+                             onClick={() => {
+                                 scrollToTop()
+                             }}
+                        >
+                            <p className="letter">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     className="bi bi-chevron-compact-up" viewBox="0 0 16 16">
+                                    <path fillRule="evenodd"
+                                          d="M7.776 5.553a.5.5 0 0 1 .448 0l6 3a.5.5 0 1 1-.448.894L8 6.56 2.224 9.447a.5.5 0 1 1-.448-.894l6-3z"/>
+                                </svg>
+                            </p>
+                        </div>
+
+                        <div id="floating-button"
+                             onClick={!isSaving ? saveHandler : null}
+                        >
+                            <p className="plus">+</p>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#fff"
+                                 className="bi bi-box-arrow-down edit" viewBox="0 0 16 16">
+                                <path fillRule="evenodd"
+                                      d="M3.5 10a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 0 0 1h2A1.5 1.5 0 0 0 14 9.5v-8A1.5 1.5 0 0 0 12.5 0h-9A1.5 1.5 0 0 0 2 1.5v8A1.5 1.5 0 0 0 3.5 11h2a.5.5 0 0 0 0-1h-2z"/>
+                                <path fillRule="evenodd"
+                                      d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    :
+                    scrollToTop
+                        ?
+                        <div id="container-floating">
+
+                            <div id="floating-button"
+                                 onClick={() => {
+                                     scrollToTop()
+                                 }}
+                            >
+                                <p className="upper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#fff"
+                                         className="bi bi-chevron-compact-up" viewBox="0 0 16 16">
+                                        <path fillRule="evenodd"
+                                              d="M7.776 5.553a.5.5 0 0 1 .448 0l6 3a.5.5 0 1 1-.448.894L8 6.56 2.224 9.447a.5.5 0 1 1-.448-.894l6-3z"/>
+                                    </svg>
+                                </p>
+                            </div>
+                        </div>
+                        :
+                        null
+
+            }
+
         </div>
     );
 });

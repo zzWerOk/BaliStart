@@ -1,7 +1,6 @@
-const {TableUpdates, MapPoint, Topics, User, Files} = require("../models/models");
+const {TableUpdates, MapPoint, User, Files} = require("../models/models");
 const ApiError = require("../error/ApiError");
 const {createNewFile, readFile, reWrightFile, removeFile} = require("../utils/consts");
-const {Op} = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 
@@ -93,7 +92,6 @@ class MapPointController {
                 topics='[]',
                 active,
                 created_by_user_id,
-                created_date,
                 data_text = '',
             } = req.body
 
@@ -115,7 +113,8 @@ class MapPointController {
                             let imgFileName = ''
                             try {
                                 if (img) {
-                                    imgFileName = candidate.file_name.split('\\')[1]
+                                    // imgFileName = candidate.file_name.split('\\')[1]
+                                    imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                                     await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
                                 }
                             } catch (e) {
@@ -173,7 +172,7 @@ class MapPointController {
 
     async getAll(req, res, next) {
         try {
-            const {tag_search, sort_code} = req.query
+            const {sort_code} = req.query
             let sortOrder = ['id', 'ASC']
 
             switch (sort_code) {
@@ -258,7 +257,8 @@ class MapPointController {
                 if (candidate) {
 
                     try {
-                        let imgFileName = candidate.file_name.split('\\')[1]
+                        // let imgFileName = candidate.file_name.split('\\')[1]
+                        const imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                         const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
                         fs.unlinkSync(imgFilePath)
                     } catch (e) {

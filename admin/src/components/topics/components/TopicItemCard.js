@@ -1,6 +1,5 @@
 import React from 'react';
-import {Dropdown, DropdownButton} from "react-bootstrap";
-import {values} from "mobx";
+import {Dropdown} from "react-bootstrap";
 
 const TopicItemCard = (props) => {
     const {child, index, dropDownItems, title, changeItemType, deleteDataItemByIndex} = props
@@ -16,10 +15,10 @@ const TopicItemCard = (props) => {
     return (
         <div
             key={index}
-            className="card border-dark w-75 "
+            className="card border-dark w-100 "
             style={{display: 'flex' ,flexDirection: 'row'}}
         >
-            <div className="w-50 ">
+            <div className="col-11 ">
                 <Dropdown>
                     <Dropdown.Toggle
                         variant="secondary"
@@ -45,7 +44,7 @@ const TopicItemCard = (props) => {
                     {child}
                 </div>
             </div>
-            <div className="w-50"
+            <div className="col-1"
             >
                 <button
                     type="button"

@@ -1,7 +1,7 @@
 const {TableUpdates, User, Tours, Files} = require("../models/models");
 const {Op} = require("sequelize");
 const ApiError = require("../error/ApiError");
-const {readFile, removeFile, createNewFile, reWrightFile} = require("../utils/consts");
+const {removeFile, createNewFile} = require("../utils/consts");
 const path = require("path");
 const fs = require("fs");
 
@@ -125,7 +125,8 @@ class ToursController {
                     let imgFileName = ''
                     try {
                         if (img) {
-                            imgFileName = candidate.file_name.split('\\')[1]
+                            // imgFileName = candidate.file_name.split('\\')[1]
+                            imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                             await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
                         }
                     } catch (e) {
@@ -278,7 +279,8 @@ class ToursController {
                 if (candidate) {
 
                     try {
-                        let imgFileName = candidate.file_name.split('\\')[1]
+                        // let imgFileName = candidate.file_name.split('\\')[1]
+                        const imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                         const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
                         fs.unlinkSync(imgFilePath)
                     } catch (e) {

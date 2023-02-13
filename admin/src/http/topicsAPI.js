@@ -16,7 +16,7 @@ export const getAll = async () => {
         params: params
     }
 
-    const {data} = await $host.get('api/topics/all', request)
+    const {data} = await $authHost.get('api/topics/adminall', request)
     return data
 }
 
@@ -92,24 +92,6 @@ export const changeTopicAPI = async (
 ) => {
     try {
 
-        // const a1 = ['1','3','5']
-        // const a2 = ['1','2','5']
-        //
-        // const diff1 = function(a1, a2) {
-        //     return a1.filter(i=>a2.indexOf(i)<0)
-        // }
-        // const diff2 = function(a1, a2) {
-        //     return a2.filter(i=>a1.indexOf(i)<0)
-        // }
-        //
-        // // const diff = function(a1, a2) {
-        // //     return a1.filter(i=>!a2.includes(i))
-        // //         .concat(a2.filter(i=>!a1.includes(i)))
-        // // }
-        // //
-        // console.log(diff(a1,a2))
-
-
         let formData = new FormData();
 
         formData.append("id", id);
@@ -135,6 +117,9 @@ export const changeTopicAPI = async (
         }
 
         const {data} = await $authHostUpload.post('api/topics/change', formData)
+
+        console.log(data)
+
         return data
     } catch (e) {
         console.log('data error', e.message)

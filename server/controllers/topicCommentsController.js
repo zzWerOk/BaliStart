@@ -1,4 +1,4 @@
-const {TopicComments, User, Files, Topics} = require('../models/models')
+const {TopicComments, User, Files} = require('../models/models')
 const ApiError = require('../error/ApiError')
 const path = require("path");
 const fs = require("fs");
@@ -351,7 +351,8 @@ class TopicCommentsController {
                     if (candidate.created_by_user_id === currUser.id || currUser.isAdmin) {
 
                         try {
-                            let imgFileName = candidate.file_name.split('\\')[1]
+                            // let imgFileName = candidate.file_name.split('\\')[1]
+                            const imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                             const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
                             fs.unlinkSync(imgFilePath)
                         } catch (e) {

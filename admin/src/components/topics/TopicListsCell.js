@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Col, Image, Row} from "react-bootstrap";
 import ModalPopUp from "../modal/ModalPopUp";
 import TopicDetailsPage from "./TopicDetailsPage";
@@ -14,19 +14,21 @@ const TopicListsCell = (props) => {
     const [loading, setLoading] = useState(true)
     const [itemImageLogo, setItemImageLogo] = useState('')
 
+    const modalScroll = useRef(null)
+
     useEffect(
         () => {
             setCurrItem(item)
             setItemImageLogo(item.image_logo)
             setLoading(false)
-        }, []
-    )
+        }, [])
 
     const topicPageCardComponent = (data) => (
         <TopicDetailsPage
             item={data}
             onItemEditHandler={onItemEditHandlerCell}
             deleteTopic={deleteTopic}
+            scrollToTop={scrollModalToTop}
         />
     )
 
@@ -41,6 +43,10 @@ const TopicListsCell = (props) => {
         }
 
         onItemEditHandler(item)
+    }
+
+    const scrollModalToTop = () => {
+        modalScroll.scrollToTop()
     }
 
     if (loading) {
@@ -115,8 +121,8 @@ const TopicListsCell = (props) => {
                         </Row>
                         <Row className={'h-50'}>
                             <div>
-                                <h1>{item.name}</h1>
-                                <h4>{item.description}</h4>
+                                <h1 className={'col-12 text-truncate'}>{item.name}</h1>
+                                <h4 className={'col-12 text-truncate'}>{item.description}</h4>
                             </div>
                         </Row>
                         <Row className={'h-25 align-items-center justify-content-center '}
@@ -142,7 +148,9 @@ const TopicListsCell = (props) => {
                     title={currItem.name}
                     item={currItem}
                     child={topicPageCardComponent}
+                    modalScroll={modalScroll}
                 />
+
 
             </div>
         );

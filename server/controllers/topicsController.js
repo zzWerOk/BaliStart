@@ -62,13 +62,25 @@ class TopicsController {
                 dataText,
             } = req.body
 
+            let created_by_user_admin_id = created_by_user_id
+            const currUser = req.user
+            let userAdmin = null
+            try {
+                if (currUser) {
+                    userAdmin = await User.findOne({where: {id: currUser.id}})
+                    created_by_user_admin_id = userAdmin.id
+                }else{
+                    return next(ApiError.forbidden("Не авторизован"))
+                }
+            } catch (e) {
+            }
+
             let img
             if (req.files) {
                 img = req.files.img
             }
 
-
-            if (name && created_by_user_id) {
+            if (name && created_by_user_admin_id) {
                 const result = createNewFile(dataText, 'Topics', img)
 
                 if (result.hasOwnProperty('status')) {
@@ -88,7 +100,7 @@ class TopicsController {
                             videos: videos,
                             google_map_url: google_map_url,
                             active: active,
-                            created_by_user_id: created_by_user_id,
+                            created_by_user_id: created_by_user_admin_id,
                             created_date: created_date,
                             deleted_by_user_id: deleted_by_user_id,
                             deleted_date: deleted_date,
@@ -104,19 +116,6 @@ class TopicsController {
                             const tagsArr = JSON.parse(tag)
                             await addTopicsCountToCategories(tagsArr)
 
-                            // tagsArr.map(topicCatId => {
-                            //     const topicCategoryItem = TopicsCategory.findOne({where: {id: topicCatId}})
-                            //     if (topicCategoryItem) {
-                            //
-                            //         const topicsCount = topicCategoryItem.topics_count + 1 || 1
-                            //         // topicCategoryItem.topics_count = topicsCount;
-                            //         // topicCategoryItem.save();
-                            //
-                            //         TopicsCategory.update({
-                            //             topics_count: topicsCount,
-                            //         }, {where: {id: topicCatId}})
-                            //     }
-                            // })
 
                         } catch (e) {
                         }
@@ -160,18 +159,31 @@ class TopicsController {
                 google_map_url,
                 active,
                 created_by_user_id,
-                created_date,
+                // created_date = 0,
                 deleted_by_user_id,
-                deleted_date,
+                deleted_date = 0,
                 dataText,
             } = req.body
+
+            let created_by_user_admin_id = created_by_user_id
+            const currUser = req.user
+            let userAdmin = null
+            try {
+                if (currUser) {
+                    userAdmin = await User.findOne({where: {id: currUser.id}})
+                    created_by_user_admin_id = userAdmin.id
+                }else{
+                    return next(ApiError.forbidden("Не авторизован"))
+                }
+            } catch (e) {
+            }
 
             let img
             if (req.files) {
                 img = req.files.img
             }
 
-            if (id && name && created_by_user_id) {
+            if (id && name && created_by_user_admin_id) {
 
                 const candidate = await Topics.findOne({where: {id}})
 
@@ -194,28 +206,24 @@ class TopicsController {
                             await addTopicsCountToCategories(diffAdd(tagsArr, candidateTagsArr))
                             await removeTopicsCountFromCategories(diffDelete(tagsArr, candidateTagsArr))
 
-                            // diffAdd.map(topicCatId => {
-                            //     const topicCategoryItem = TopicsCategory.findOne({where: {id: topicCatId}})
-                            //     if (topicCategoryItem) {
-                            //         const topicsCount = topicCategoryItem.topics_count + 1 || 1
-                            //
-                            //         TopicsCategory.update({
-                            //             topics_count: topicsCount,
-                            //         }, {where: {id: topicCatId}})
-                            //     }
-                            // })
-
-
                             let imgFileName = ''
                             try {
                                 if (img) {
-                                    imgFileName = candidate.file_name.split('\\')[1]
+                                    // imgFileName = candidate.file_name.split('\\')[1]
+                                    // imgFileName = candidate.file_name.substring(0, candidate.file_name.lastIndexOf("/") + 1);
+                                    imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                                     await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
                                 }
                             } catch (e) {
-                                return res.json({status: 'error', message: 'save image error', e: e.message})
+                                return res.json({
+                                    status: 'error',
+                                    message: 'save image error',
+                                    e: e.message,
+                                    imgFileName: "" + candidate.file_name
+                                })
                             }
 
+                            // return res.json({status: 'error', message: 'save image error', created_date: "" + created_date})
                             await Topics.update({
                                 name: name,
                                 description: description,
@@ -224,11 +232,12 @@ class TopicsController {
                                 videos: videos,
                                 google_map_url: google_map_url,
                                 active: active,
-                                created_by_user_id: created_by_user_id,
-                                created_date: created_date,
+                                // created_by_user_id: created_by_user_admin_id,
+                                // created_date: BigInt(created_date),
                                 deleted_by_user_id: deleted_by_user_id,
-                                deleted_date: deleted_date
+                                deleted_date: BigInt(deleted_date)
                             }, {where: {id: id}})
+
 
                             try {
                                 if (img) {
@@ -315,6 +324,17 @@ class TopicsController {
                                         },
                                     })
 
+                                    // let imgFileName = ''
+                                    // try {
+                                    //     if (candidate.file_name.indexOf('/') !== -1) {
+                                    //         imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+                                    //     } else {
+                                    //         imgFileName = candidate.file_name
+                                    //     }
+                                    // }catch (e) {}
+                                    // topicData.image = imgFileName
+
+                                    topicData.image = candidate.image_logo
 
                                     topicData.name = candidate.name
                                     topicData.description = candidate.description
@@ -328,7 +348,7 @@ class TopicsController {
                                     topicData.created_date = candidate.created_date
                                     // deleted_by_user_id: {type: DataTypes.INTEGER},
                                     // deleted_date: {type: DataTypes.BIGINT},
-                                    topicData.image = candidate.file_name
+                                    // topicData.image = candidate.file_name
                                     topicData.userName = currUser.name
 
                                     if (candidate.created_by_user_id === user_id) {
@@ -346,7 +366,7 @@ class TopicsController {
                     return next(ApiError.internal("Topic not found"))
 
                 }
-            }else{
+            } else {
                 return res.json({status: 'error', message: 'topic not found'})
             }
         } catch (e) {
@@ -409,6 +429,7 @@ class TopicsController {
                         // ['name', 'ASC'],
                     ],
                     where: {
+                        active: true,
                         tag: {
                             [Op.like]: '%' + tagSearch + '%'
                         }
@@ -423,8 +444,23 @@ class TopicsController {
 
                 let newItem = JSON.parse(JSON.stringify(item))
 
+
                 const user = await User.findOne({where: {id: item.created_by_user_id}})
-                newItem.created_by_user_name = user.name
+                if(!user){
+                    newItem.created_by_user_name = '-'
+                }else {
+                    newItem.created_by_user_name = user.name
+                }
+
+                // let imgFileName = ''
+                // if(newItem.file_name.indexOf('/') !== -1) {
+                //     imgFileName = newItem.file_name.substring(newItem.file_name.lastIndexOf("/") + 1, newItem.file_name.length);
+                // }else{
+                //     imgFileName = newItem.file_name
+                // }
+                // newItem.image = imgFileName
+
+                newItem.image = newItem.image_logo
 
                 newItem.commentsCount = await TopicComments.count({
                     where: {
@@ -443,8 +479,130 @@ class TopicsController {
                 newItem.updatedAt = newItem.createdAt
 
                 delete newItem.active
+                delete newItem.image_logo
                 delete newItem.created_by_user_id
                 delete newItem.created_date
+                delete newItem.deleted_by_user_id
+                delete newItem.deleted_date
+                delete newItem.file_name
+                delete newItem.google_map_url
+                delete newItem.images
+                delete newItem.userId
+                delete newItem.videos
+
+                newRows.push(newItem)
+
+            }
+
+            return res.json({
+                count: newRows.length,
+                'rows': newRows
+            })
+        } catch (e) {
+            // return res.json({'status': 'error', 'message': e.message})
+
+            // return next(ApiError.internal("Ошибка параметра"))
+            return next(ApiError.internal(e.message))
+        }
+    }
+
+    async getAllAdmin(req, res, next) {
+        try {
+            const {tag_search, sort_code} = req.query
+            const currUser = req.user
+
+            let userAdmin = null
+            try {
+                if (currUser) {
+                    userAdmin = await User.findOne({where: {id: currUser.id}})
+                    if(!userAdmin.is_admin){
+                        return next(ApiError.forbidden("Не админимтратор"))
+                    }
+                }
+            } catch (e) {
+            }
+
+            let sortOrder = ['id', 'ASC']
+
+            let tagSearch = tag_search
+            if (!tagSearch) {
+                tagSearch = ''
+            }
+
+            switch (sort_code) {
+                case 'user':
+                    sortOrder = ['created_by_user_id', 'ASC']
+                    break
+                case 'reuser':
+                    sortOrder = ['created_by_user_id', 'DESC']
+                    break
+                case 'date':
+                    sortOrder = ['created_date', 'ASC']
+                    break
+                case 'redate':
+                    sortOrder = ['created_date', 'DESC']
+                    break
+                case 'id':
+                    sortOrder = ['id', 'ASC']
+                    break
+                case 'reid':
+                    sortOrder = ['id', 'DESC']
+                    break
+            }
+
+            const topicsCategoriesList = await Topics.findAndCountAll({
+                    // limit: 10,
+                    // attributes: ['tag', tagSearch],
+                    order: [sortOrder
+                        // ['id', 'ASC'],
+                        // ['name', 'DESC'],
+                        // ['name', 'ASC'],
+                    ],
+                    where: {
+                        tag: {
+                            [Op.like]: '%' + tagSearch + '%'
+                        }
+                    }
+                }
+            )
+
+            let newRows = []
+
+            for (let i = 0; i < topicsCategoriesList.rows.length; i++) {
+                const item = topicsCategoriesList.rows[i]
+
+                let newItem = JSON.parse(JSON.stringify(item))
+
+                const user = await User.findOne({where: {id: item.created_by_user_id}})
+
+                if(user) {
+                    newItem.created_by_user_name = user.name
+                }else{
+                    newItem.created_by_user_name = '-'
+                }
+
+                newItem.commentsCount = await TopicComments.count({
+                    where: {
+                        topic_id: newItem.id,
+                    },
+                })
+
+                // commentsCount
+                // createdAt
+                // created_by_user_name
+                // description
+                // image_logo
+                // name
+                // tag
+                // delete newItem.id
+                newItem.updatedAt = newItem.createdAt
+
+                if (!userAdmin) {
+                    delete newItem.created_date
+                }
+
+                delete newItem.active
+                delete newItem.created_by_user_id
                 delete newItem.deleted_by_user_id
                 delete newItem.deleted_date
                 delete newItem.file_name
@@ -524,7 +682,10 @@ class TopicsController {
                 if (candidate) {
 
                     try {
-                        let imgFileName = candidate.file_name.split('\\')[1]
+                        // let imgFileName = candidate.file_name.split('\\')[1]
+                        // imgFileName = candidate.file_name.substring(0, candidate.file_name.lastIndexOf("/") + 1);
+                        const imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+
                         const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
                         fs.unlinkSync(imgFilePath)
                     } catch (e) {

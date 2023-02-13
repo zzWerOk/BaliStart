@@ -4,7 +4,7 @@ import SpinnerSM from "../../SpinnerSM";
 const TopicLinkComponent = (props) => {
     const {item, dataItemEditHandler} = props
 
-    const [isSaving, stIsSaving] = useState(false)
+    // const [isSaving, stIsSaving] = useState(false)
     const [linkName, setLinkName] = useState('')
     const [links, setLinks] = useState('[{"type":"","link":""}]')
     const [loading, setLoading] = useState(true)
@@ -45,7 +45,7 @@ const TopicLinkComponent = (props) => {
 
     const newItemAddHandler = () => {
         let itemsArr = JSON.parse(links)
-        itemsArr.push({"type":"in","link":""})
+        itemsArr.push({"type": "in", "link": ""})
         setLinks(JSON.stringify(itemsArr))
 
         item.items = JSON.stringify(itemsArr)
@@ -73,42 +73,45 @@ const TopicLinkComponent = (props) => {
                     className="form-control"
                     placeholder='Link name'
                     value={linkName}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleName(e.target.value)}
                 />
                 <div>
                     {
-                        // item.items.map(function (listItem, index) {
                         JSON.parse(links).map(function (listItem, index) {
                             return <div key={index} style={{display: "flex"}}>
-                                <div style={{display: "flex"}}>
-                                    <select className="form-select"
-                                            disabled={!!isSaving}
-                                            aria-label="Default select example"
-                                            value={listItem.type}
-                                            onChange={e => handleSelect(e.target.value, index)}
-                                    >
-                                        <option disabled>Выбери тип ссылки</option>
-                                        <option value="fb">Facebook</option>
-                                        <option value="gg">Google</option>
-                                        <option value="vk">VK</option>
-                                        <option value="tg">Telegram</option>
-                                        <option value="in">Internet</option>
-                                    </select>
+                                <div style={{display: "flex"}}
+                                >
+                                    <div className={'col-7'}>
+                                        <select className="form-select"
+                                                // disabled={!!isSaving}
+                                                aria-label="Default select example"
+                                                value={listItem.type}
+                                                onChange={e => handleSelect(e.target.value, index)}
+                                        >
+                                            <option disabled>Выбери тип ссылки</option>
+                                            <option value="fb">Facebook</option>
+                                            <option value="gg">Google</option>
+                                            <option value="vk">VK</option>
+                                            <option value="tg">Telegram</option>
+                                            <option value="in">Internet</option>
+                                        </select>
+                                    </div>
 
-                                    <input
-                                        type="linkText"
-                                        id="linkText"
-                                        className="form-control"
-                                        placeholder='Link'
-                                        value={listItem.link}
-                                        disabled={!!isSaving}
-                                        onChange={e => itemLinksEdit(e.target.value, index)}
-                                    />
-
+                                    <div className={'col-10'}>
+                                        <input
+                                            type="linkText"
+                                            id="linkText"
+                                            className="form-control "
+                                            placeholder='Link'
+                                            value={listItem.link}
+                                            // disabled={!!isSaving}
+                                            onChange={e => itemLinksEdit(e.target.value, index)}
+                                        />
+                                    </div>
                                     <button
                                         type="button"
-                                        className="btn btn-outline-danger"
+                                        className="btn btn-outline-danger col-auto"
                                         onClick={() => {
                                             itemDeleteHandler(index)
                                         }}
@@ -141,6 +144,6 @@ const TopicLinkComponent = (props) => {
             </div>
         );
     }
-};
+    };
 
-export default TopicLinkComponent;
+    export default TopicLinkComponent;

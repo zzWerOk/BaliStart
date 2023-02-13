@@ -29,6 +29,7 @@ const TopicDetails = () => {
     const [topic, setTopic] = useState({})
     const [topicData, setTopicData] = useState([])
     const [topicCategories, setTopicCategories] = useState([])
+    const [itemImage, setItemImage] = useState('')
 
     useEffect(() => {
         setLoading(true)
@@ -47,15 +48,19 @@ const TopicDetails = () => {
 
                 if (dataJson.hasOwnProperty('status')) {
                     if (dataJson.status === 'error') {
-                        if(dataJson.message === 'topic not found'){
+                        if (dataJson.message === 'topic not found') {
                             history.push(NOPAGE_ROUTE)
                         }
                     }
-                }else if (dataJson.hasOwnProperty('name')) {
+                } else if (dataJson.hasOwnProperty('name')) {
                     setTopicData(dataJson.data)
-                    console.log(dataJson.data)
                     delete dataJson.data
                     setTopic(dataJson)
+
+                    if (dataJson.image) {
+                        // console.log(process.env.REACT_APP_API_URL + '/static/' + dataJson.image + '?' + Date.now())
+                        setItemImage(process.env.REACT_APP_API_URL + '/static/' + dataJson.image + '?' + Date.now())
+                    }
 
                     try {
                         const currCategories = topicsCategoryStore.getSavedCategoriesList()
@@ -232,16 +237,27 @@ const TopicDetails = () => {
                                     }
                                 </div>
                             </Row>
-                            <Row className={`${classes.topic_row} text-muted`}>
-                                <h1 className={'display-4 font-italic'}>
-                                    {topic.name}
-                                </h1>
-                            </Row>
-                            <Row className={`${classes.topic_row} text-muted`}>
-                                <p className={'lead my-3'}>
-                                    {topic.description}
-                                </p>
-                            </Row>
+                            <div
+                                style={{
+                                    // backgroundImage: `${process.env.REACT_APP_API_URL}/static/${itemImage}`,
+                                    background: `linear-gradient(rgba(0, 0, 0, 0.5),rgba(0, 0, 0, 0.5)), url(${itemImage})`,
+                                    // backgroundImage: `url(${itemImage})` ,
+                                    backgroundSize: 'cover',
+                                    minHeight: '250px',
+                                }}
+                            >
+                                <Row className={`${classes.topic_row} text-muted`} style={{paddingTop: '20px'}}>
+                                    <h1 className={'display-4 font-italic'}  style={{color: `white`,}}>
+                                        {topic.name}
+                                    </h1>
+                                </Row>
+                                <Row className={`${classes.topic_row} text-muted`}  style={{paddingBottom: '20px'}}>
+                                    {/*<p className={'lead my-3'} style={{color: `${itemImage === '' ? null : 'white'}`,}}>*/}
+                                    <p className={'lead my-3'} style={{color: `white`,}}>
+                                        {topic.description}
+                                    </p>
+                                </Row>
+                            </div>
                             <Row className={`${classes.topic_row} ${classes.topic_data}`}>
                                 {
                                     topicData.map(function (item, index) {
@@ -263,9 +279,6 @@ const TopicDetails = () => {
                                 />
                             </Row>
                         </Col>
-                        {/*<Col>*/}
-                        {/*    Side panel*/}
-                        {/*</Col>*/}
                     </div>
                 </div>
             </div>
