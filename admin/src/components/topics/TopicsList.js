@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Button, Dropdown, Row, ToggleButton} from "react-bootstrap";
+import {Button, Dropdown, Row,} from "react-bootstrap";
 import {Context} from "../../index";
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
@@ -14,7 +14,6 @@ const sortItems = [
 ]
 
 const TopicsList = (props) => {
-    // const {topicsStore} = useContext(Context)
     const {user} = useContext(Context)
 
     const {redrawPage, getAllData, categoriesStore, topicsStore, ItemsListsCell} = props
@@ -25,17 +24,14 @@ const TopicsList = (props) => {
     const [selectedName, setSelectedName] = useState('')
 
     const [selectedTagName, setSelectedTagName] = useState('')
-    const [selectedTagId, setSelectedTagId] = useState('')
 
     const [topicCategoriesItems, setTopicCategoriesItems] = useState([])
-    const [topicCategoriesItems_load, setTopicCategoriesItems_load] = useState(true)
 
     useEffect(() =>
     {
 
-        delay(0).then(r => {
+        delay(0).then(() => {
             let topicsArr = topicsStore.getTopicsList
-            // let topicsArr = topicsStore.getSavedTopics_List
             if (!topicsArr) {
                 topicsArr = []
             }
@@ -53,14 +49,14 @@ const TopicsList = (props) => {
 
             ])
 
-            const filtered = categoriesStore.getSavedCategoriesList().filter(function (value, index, arr) {
+            const filtered = categoriesStore.getSavedCategoriesList().filter(function (value) {
                 return ("" + value.id) === ("" + topicsStore.tag_search)
             })
 
             setSelectedTagName(filtered.length > 0 ? filtered[0].category_name : '')
 
             setSelectedCode(topicsStore.sort_code)
-            setSelectedName(sortItems.filter(function (value, index, arr) {
+            setSelectedName(sortItems.filter(function (value) {
                 return value.code === topicsStore.sort_code;
             })[0].name)
 
@@ -89,8 +85,6 @@ const TopicsList = (props) => {
                 newArr[i] = item
             }
         }
-
-
         setItemsList(newArr)
         topicsStore.setListFromArr(newArr)
 
@@ -115,7 +109,7 @@ const TopicsList = (props) => {
             }
         }
 
-        setSelectedTagId(newCategory.id)
+        // setSelectedTagId(newCategory.id)
 
         newCategory.id === -1
             ?

@@ -359,7 +359,7 @@ class TopicCommentsController {
                         }
 
                         /** Удаление файла коментария **/
-                        const result = removeFile(candidate.file_name)
+                        const result = removeFile("data/" + candidate.file_name)
 
                         if (result.hasOwnProperty('status')) {
                             if (result.status === 'ok') {
@@ -387,7 +387,6 @@ class TopicCommentsController {
                                     const arr = JSON.parse(commentForEdit.reply_ids).filter(function (value) {
                                         return value !== candidate.topic_comment_id;
                                     })
-                                    // return res.json({status: "error", message: arr})
 
                                     if (commentForEdit) {
                                         commentForEdit.reply_ids = JSON.stringify(arr)

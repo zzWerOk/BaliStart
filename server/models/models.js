@@ -126,7 +126,7 @@ const Files = sequelize.define('files', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     table_name: {type: DataTypes.STRING, allowNull: false},
     file_name: {type: DataTypes.STRING, allowNull: false, unique: true},
-
+    md5: {type: DataTypes.STRING, allowNull: false},
 })
 
 User.hasOne(Guide)

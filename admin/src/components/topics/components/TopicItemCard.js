@@ -2,6 +2,7 @@ import React from 'react';
 import {Dropdown} from "react-bootstrap";
 
 const TopicItemCard = (props) => {
+
     const {child, index, dropDownItems, title, changeItemType, deleteDataItemByIndex} = props
 
     const selectType = (id, type) => {
@@ -16,7 +17,7 @@ const TopicItemCard = (props) => {
         <div
             key={index}
             className="card border-dark w-100 "
-            style={{display: 'flex' ,flexDirection: 'row'}}
+            style={{display: 'flex', flexDirection: 'row'}}
         >
             <div className="col-11 ">
                 <Dropdown>

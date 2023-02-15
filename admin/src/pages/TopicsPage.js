@@ -3,7 +3,6 @@ import {Context} from "../index";
 import TopicsCategories from "../components/TopicsCategories";
 import SpinnerSM from "../components/SpinnerSM";
 import {delay} from "../utils/consts";
-import {getTableUpdateByName} from "../http/tableUpdatesAPI";
 import {getAll} from "../http/topicsAPI";
 import TopicsList from "../components/topics/TopicsList";
 import TopicListsCell from "../components/topics/TopicListsCell";
@@ -27,12 +26,8 @@ const TopicsPage = () => {
 
             if (data.hasOwnProperty('rows')) {
 
-
                 topicsStore.saveTopicsListRows(data.rows)
 
-                /**
-                 Сохраняем список пользователей преобразовав его в строку
-                 **/
             }
         }).finally(() => {
             topicsStore.loadTopicsList()
@@ -43,21 +38,14 @@ const TopicsPage = () => {
     useEffect(() => {
         delay(0).then(() => {
 
-            getTableUpdateByName('Topics').then(tuData => {
-                // const lastDateTable = topicsStore.getSavedLastDateTableTopics()
-
-                // if (tuData.date !== lastDateTable) {
+            // getTableUpdateByName('Topics').then(tuData => {
                     getAllData()
                     /**
                      Сохраняем дату последнего изменения таблицы
                      **/
-                    topicsStore.saveLastDateTableTopics(tuData.date)
-                // } else {
-                //     topicsStore.loadTopicsList()
-                //     setLoading(false)
-                // }
+                    // topicsStore.saveLastDateTableTopics(tuData.date)
 
-            })
+            // })
 
         })
     }, [])

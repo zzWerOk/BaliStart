@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import SpinnerSM from "../../SpinnerSM";
 
 const TopicPhoneComponent = (props) => {
     const {item, dataItemEditHandler} = props
@@ -62,7 +61,7 @@ const TopicPhoneComponent = (props) => {
     }
 
     if (loading) {
-        return <SpinnerSM/>
+        // return <SpinnerSM/>
     } else {
 
         return (
@@ -134,6 +133,9 @@ const TopicPhoneComponent = (props) => {
                     type="button"
                     className="btn btn-info"
                     onClick={newItemAddHandler}
+                    style={{
+                        marginTop: '10px',
+                    }}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          className="bi bi-plus" viewBox="0 0 16 16">

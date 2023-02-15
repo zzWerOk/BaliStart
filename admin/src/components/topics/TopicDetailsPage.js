@@ -89,10 +89,14 @@ const TopicDetailsPage = observer((props) => {
     const [isActive, setIsActive] = useState(true)
     const [itemImageLogo, setItemImageLogo] = useState('')
     const [newImageLogo, setNewImageLogo] = useState(false)
+    const [imagesAdd, setImagesAdd] = useState({})
     const [topicCategoriesItems, setTopicCategoriesItems] = useState([])
     const [topicCategoriesItems_load, setTopicCategoriesItems_load] = useState(true)
 
     const [showFab, setShowFab] = useState(false)
+    const [redraw, setRedraw] = useState(false)
+
+    const redrawItemTrigger = useRef(null)
 
     useEffect(
         () => {
@@ -112,25 +116,24 @@ const TopicDetailsPage = observer((props) => {
                 }
             }
 
-            // setItemImageLogo(currTopic.image_logo + '?' + Date.now())
-
             if (Object.keys(currTopic.dataJSON).length === 0) {
-                delay(0).then(() =>{
-                    if (currTopic.id > -1) {
-                        getTopicData(currTopic.id).then(data => {
-                            if (data.hasOwnProperty('status')) {
-                                if (data.status === 'ok') {
-                                    currTopic.data = data.data
-                                }
-                            }
-                        }).finally(() => {
-                            setItemData(currTopic.dataJSON)
-                            setTopicCategoriesItems_load(false)
-                        })
-                    } else {
-                        setTopicCategoriesItems_load(false)
-                    }
-                })
+                getTopicDataHandler()//start
+                // delay(0).then(() => {
+                //     if (currTopic.id > -1) {
+                //         getTopicData(currTopic.id).then(data => {
+                //             if (data.hasOwnProperty('status')) {
+                //                 if (data.status === 'ok') {
+                //                     currTopic.data = data.data
+                //                 }
+                //             }
+                //         }).finally(() => {
+                //             setItemData(currTopic.dataJSON)
+                //             setTopicCategoriesItems_load(false)
+                //         })
+                //     } else {
+                //         setTopicCategoriesItems_load(false)
+                //     }
+                // })
             } else {
                 setItemData(currTopic.dataJSON)
                 setTopicCategoriesItems_load(false)
@@ -138,6 +141,37 @@ const TopicDetailsPage = observer((props) => {
 
         }, []
     )
+
+    const getTopicDataHandler = (id) => {
+        // delay(0).then(() => {
+        let currTopicId = currTopic.id
+        if (id) {
+            currTopicId = id
+            currTopic.newId = id
+
+        }
+        // console.log('----getTopicDataHandler----- id ',currTopicId)
+        if (currTopicId > -1) {
+            getTopicData(currTopicId).then(data => {
+                // console.log('----getTopicDataHandler----- ',data)
+                if (data.hasOwnProperty('status')) {
+                    if (data.status === 'ok') {
+                        currTopic.data = data.data
+                    }
+                }
+            }).finally(() => {
+                onItemEditHandler(currTopic.getAsJson(), newImageLogo)
+                setItemData([...currTopic.dataJSON])
+
+                setRedraw(!redraw)
+                setImagesAdd({})
+                setTopicCategoriesItems_load(false)
+            })
+        } else {
+            setTopicCategoriesItems_load(false)
+        }
+        // })
+    }
 
     const onNameHandler = (value) => {
         setCurrName(value)
@@ -169,7 +203,7 @@ const TopicDetailsPage = observer((props) => {
                 newItem = {"type": type, "name": "", "text": ""}
                 break
             case "list":
-                newItem = {"type": type, "name": "", "items": '[""]'}
+                newItem = {"type": type, "name": "", "items": '[]'}
                 break
             case "link":
                 newItem = {"type": type, "name": "", "items": '[{"type":"","link":""}]'}
@@ -181,7 +215,7 @@ const TopicDetailsPage = observer((props) => {
                 newItem = {"type": type, "name": "", "items": '[{"type":"","phone":""}]'}
                 break
             case "images":
-                newItem = {"type": type, "name": "", "items": '[""]'}
+                newItem = {"type": type, "name": "", "items": '[]'}
                 break
             case "googleMapUrl":
                 newItem = {"type": type, "name": "", "url": ""}
@@ -378,6 +412,7 @@ const TopicDetailsPage = observer((props) => {
                     currTopic.deleted_date,
                     currTopic.data,
                     currTopic.image_logo_file,
+                    imagesAdd,
                 ).then(data => {
                     if (data.hasOwnProperty('status')) {
                         if (data.status === 'ok') {
@@ -389,7 +424,13 @@ const TopicDetailsPage = observer((props) => {
                                 setItemImageLogo(data.image_logo + '?' + Date.now())
                             }
 
-                            changeTopicId(data.id)
+                            getTopicDataHandler(data.id)//saveTopicAPI
+
+                            // changeTopicId(data.id)
+
+
+                            // currTopic.newId = data.id
+
                         }
                     }
                 }).catch(() => {
@@ -414,8 +455,8 @@ const TopicDetailsPage = observer((props) => {
                     currTopic.deleted_date,
                     currTopic.data,
                     currTopic.image_logo_file,
+                    imagesAdd,
                 ).then(data => {
-
                     if (data.hasOwnProperty('status')) {
                         if (data.status === 'ok') {
                             currTopic.isSaved = true
@@ -425,7 +466,12 @@ const TopicDetailsPage = observer((props) => {
                                 setItemImageLogo(data.image_logo + '?' + Date.now())
                             }
 
-                            onItemEditHandler(currTopic.getAsJson(), newImageLogo)
+                            getTopicDataHandler()//changeTopicAPI
+
+                            // onItemEditHandler(currTopic.getAsJson(), newImageLogo)
+
+
+                            // setRedraw(!redraw)
                         }
                     }
                 }).catch(() => {
@@ -447,6 +493,55 @@ const TopicDetailsPage = observer((props) => {
         currTopic.image_logo_file = fileName
         currTopic.isSaved = false
         onItemEditHandler(currTopic.getAsJson())
+    }
+
+    const onFilesDeleteHandler = (imageListIndex, imageIndex) => {
+        let currImagesList = imagesAdd
+        if (!currImagesList.hasOwnProperty(imageListIndex)) {
+            currImagesList[imageListIndex] = {}
+        }
+        let currList = currImagesList[imageListIndex]
+        delete currList[imageIndex]
+
+        let newCurrList = {}
+        Object.keys(currList).forEach(function (key) {
+            newCurrList[Object.keys(newCurrList).length] = currList[key]
+        });
+
+        currImagesList[imageListIndex] = newCurrList
+        setImagesAdd(currImagesList)
+        // console.log(currImagesList)
+
+    }
+
+    const onFilesAddHandler = (fileName, imageListIndex) => {
+
+        if (fileName) {
+            let currImagesList = imagesAdd
+            if (!currImagesList.hasOwnProperty(imageListIndex)) {
+                currImagesList[imageListIndex] = {}
+            }
+            let currList = currImagesList[imageListIndex]
+
+            let isThere = false
+            Object.keys(currList).forEach(function (key) {
+                let currFile = currList[key]
+                if (currFile.name === fileName.name &&
+                    currFile.lastModified === fileName.lastModified &&
+                    currFile.size === fileName.size &&
+                    currFile.type === fileName.type) {
+                    isThere = true
+                }
+            });
+
+
+            if (!isThere) {
+                currList[Object.keys(currList).length] = fileName
+                currImagesList[imageListIndex] = currList
+                setImagesAdd(currImagesList)
+            }
+            return !isThere
+        }
     }
 
     /** Определение нижней позиции для показа FAB**/
@@ -655,98 +750,120 @@ const TopicDetailsPage = observer((props) => {
                 </div>
             </Row>
             <Row className={'topic-detail-row'}>
-                <div>
+                {/*<div>*/}
 
-                    {itemData.map(function (item, index) {
-                        if (item.hasOwnProperty('type')) {
-                            let child = null
-                            item.index = index
-                            switch (item.type) {
-                                default : {
-                                    child = <TopicTextComponent
-                                        item={item}
-                                        isSaving={isSaving}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
+                    {/*{itemData.map(function (item, index) {*/}
+                    {
+                        // currTopic
+                        //     ?
+                        // currTopic.dataJSON.map(function (item, index) {
+                        itemData.map(function (item, index) {
+                            let itemKey = index
+
+                            // console.log('currTopic.dataJSON ', item)
+                            if (item.hasOwnProperty('type')) {
+                                let child = null
+                                item.index = index
+                                switch (item.type) {
+                                    default : {
+                                        child = <TopicTextComponent
+                                            item={item}
+                                            isSaving={isSaving}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                        />
+                                        break
+                                    }
+                                    case 'comment': {
+                                        child = <TopicCommentComponent
+                                            item={item}
+                                            isSaving={isSaving}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                        />
+                                        break
+                                    }
+                                    case 'list': {
+                                        child = <TopicListComponent
+                                            item={item}
+                                            isSaving={isSaving}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                        />
+                                        break
+                                    }
+                                    case 'link': {
+                                        child = <TopicLinkComponent
+                                            item={item}
+                                            isSaving={isSaving}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                        />
+                                        break
+                                    }
+                                    case 'email': {
+                                        child = <TopicEmailComponent
+                                            item={item}
+                                            isSaving={isSaving}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                        />
+                                        break
+                                    }
+                                    case 'phone': {
+                                        child = <TopicPhoneComponent
+                                            item={item}
+                                            isSaving={isSaving}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                        />
+                                        break
+                                    }
+                                    case 'images': {
+                                        // itemKey = itemKey + Date.now()
+                                        itemKey = itemKey + " " + item.items
+                                        console.log(item)
+                                        console.log(itemKey)
+                                        child = <TopicImagesComponent
+                                            item={item}
+                                            index={index}
+                                            isSaving={isSaving}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                            onFilesAddHandler={onFilesAddHandler}
+                                            onFilesDeleteHandler={onFilesDeleteHandler}
+                                            redrawItemTrigger={redrawItemTrigger}
+                                        />
+                                        break
+                                    }
+                                    case 'googleMapUrl': {
+                                        child = <TopicGoogleMapUrlComponent
+                                            item={item}
+                                            isSaving={isSaving}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                        />
+                                        break
+                                    }
                                 }
-                                case 'comment': {
-                                    child = <TopicCommentComponent
-                                        item={item}
-                                        isSaving={isSaving}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'list': {
-                                    child = <TopicListComponent
-                                        item={item}
-                                        isSaving={isSaving}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'link': {
-                                    child = <TopicLinkComponent
-                                        item={item}
-                                        isSaving={isSaving}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'email': {
-                                    child = <TopicEmailComponent
-                                        item={item}
-                                        isSaving={isSaving}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'phone': {
-                                    child = <TopicPhoneComponent
-                                        item={item}
-                                        isSaving={isSaving}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'images': {
-                                    child = <TopicImagesComponent
-                                        item={item}
-                                        isSaving={isSaving}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
-                                case 'googleMapUrl': {
-                                    child = <TopicGoogleMapUrlComponent
-                                        item={item}
-                                        isSaving={isSaving}
-                                        dataItemEditHandler={dataItemEditHandler}
-                                    />
-                                    break
-                                }
+
+
+                                return <TopicItemCard
+                                    key={itemKey + redraw}
+                                    // key={index}
+                                    // key={Date.now()}
+                                    index={index}
+                                    child={child}
+                                    dropDownItems={dropDownItems}
+                                    changeItemType={changeItemType}
+                                    deleteDataItemByIndex={deleteDataItemByIndex}
+                                    title={getDropDownTitleByType(item.type)}
+                                >
+                                </TopicItemCard>
                             }
-
-                            return <TopicItemCard
-                                key={index}
-                                index={index}
-                                child={child}
-                                dropDownItems={dropDownItems}
-                                changeItemType={changeItemType}
-                                deleteDataItemByIndex={deleteDataItemByIndex}
-                                title={getDropDownTitleByType(item.type)}
-                            >
-                            </TopicItemCard>
-                        }
-                    })}
+                        })
+                        // :
+                        // null
+                    }
 
                     <TopicAddNewBtn
                         disabled={!!isSaving}
                         addNewItemHandler={addNewItemHandler}
                         dropDownItems={dropDownItems}
                     />
-                </div>
+                {/*</div>*/}
             </Row>
             <Row className={'col-12 d-flex justify-content-center topic-detail-row'}
                  ref={listInnerRef}

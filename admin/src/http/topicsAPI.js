@@ -6,10 +6,10 @@ export const getAll = async () => {
     let sort_code = localStorage.getItem("sort_code_Topics")
 
     const params = new URLSearchParams();
-    if(tag_search) {
+    if (tag_search) {
         params.append("tag_search", tag_search);
     }
-    if(sort_code) {
+    if (sort_code) {
         params.append("sort_code", sort_code);
     }
     const request = {
@@ -40,6 +40,7 @@ export const saveTopicAPI = async (
     deleted_date,
     dataText,
     image_logo_file,
+    imagesAdd,
 ) => {
 
     try {
@@ -58,9 +59,10 @@ export const saveTopicAPI = async (
             deleted_by_user_id,
             deleted_date,
             dataText,
+            imagesAdd,
         )
 
-        if(!formData){
+        if (!formData) {
             console.log('FormData error...')
             return null
         }
@@ -89,6 +91,7 @@ export const changeTopicAPI = async (
     deleted_date,
     dataText,
     image_logo_file,
+    imagesAdd,
 ) => {
     try {
 
@@ -109,16 +112,17 @@ export const changeTopicAPI = async (
             deleted_by_user_id,
             deleted_date,
             dataText,
+            imagesAdd,
         )
 
-        if(!formData){
+        if (!formData) {
             console.log('FormData error...')
             return null
         }
 
         const {data} = await $authHostUpload.post('api/topics/change', formData)
 
-        console.log(data)
+        // console.log(data)
 
         return data
     } catch (e) {
@@ -141,6 +145,7 @@ const addToFormData = (formData,
                        deleted_by_user_id,
                        deleted_date,
                        dataText,
+                       imagesAdd,
 ) => {
     try {
         formData.append("name", name);
@@ -158,13 +163,33 @@ const addToFormData = (formData,
         formData.append("dataText", dataText);
 
         if (image_logo !== '') {
-        if (image_logo !== undefined) {
-            try {
-                formData.append("img", image_logo, "imageFile");
-            } catch (e) {
-                console.log('File apply error: ', e.message)
+            if (image_logo !== undefined) {
+                try {
+                    formData.append("img", image_logo, "imageFile");
+                } catch (e) {
+                    console.log('File apply error: ', e.message)
+                }
             }
         }
+
+        if(imagesAdd){
+            let imagesCount = 0
+            // let arrCount = 0
+
+            Object.keys(imagesAdd).map(function(key) {
+                let currFilesList = imagesAdd[key]
+                Object.keys(currFilesList).map(function(itemKey) {
+                    let currFile = currFilesList[itemKey]
+                    try {
+                        if (currFile.name && currFile.size) {
+                            formData.append("img" + imagesCount, currFile, currFile.name + ' ' + key);
+                            imagesCount++
+                        }
+                    }catch (e) {}
+                });
+                // arrCount++
+            });
+            formData.append("new_images_count", imagesCount);
         }
 
         return formData

@@ -1,11 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {delay} from "../../../utils/consts";
-import SpinnerSM from "../../SpinnerSM";
 
 const TopicTextComponent = (props) => {
     const {item, dataItemEditHandler} = props
 
-    const [isSaving, setIsSaving] = useState(false)
     const [textName, setTextName] = useState('')
     const [textText, setTextText] = useState('')
     const [loading, setLoading] = useState(true)
@@ -29,7 +26,7 @@ const TopicTextComponent = (props) => {
     }
 
     if (loading) {
-        return <SpinnerSM/>
+        // return <SpinnerSM/>
     } else {
 
         return (
@@ -40,7 +37,7 @@ const TopicTextComponent = (props) => {
                     className="form-control"
                     placeholder='Text name'
                     value={textName}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleName(e.target.value)}
                 />
                 <input
@@ -49,7 +46,7 @@ const TopicTextComponent = (props) => {
                     className="form-control"
                     placeholder='Text'
                     value={textText}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleText(e.target.value)}
                 />
             </div>

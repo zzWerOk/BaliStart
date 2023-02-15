@@ -264,7 +264,7 @@ class MapPointController {
                     } catch (e) {
                     }
 
-                    const result = removeFile(candidate.file_name)
+                    const result = removeFile("data/" + candidate.file_name)
                     if (result.hasOwnProperty('status')) {
                         if (result.status === 'ok') {
                             await Files.destroy({where: {table_name: 'MapPoint', file_name: candidate.file_name}})

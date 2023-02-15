@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import SpinnerSM from "../../SpinnerSM";
 
 const TopicEmailComponent = (props) => {
     const {item, dataItemEditHandler} = props
 
-    const [isSaving, stIsSaving] = useState(false)
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -29,7 +27,7 @@ const TopicEmailComponent = (props) => {
     }
 
     if (loading) {
-        return <SpinnerSM/>
+        // return <SpinnerSM/>
     } else {
 
         return (
@@ -40,7 +38,7 @@ const TopicEmailComponent = (props) => {
                     className="form-control"
                     placeholder='Email name'
                     value={name}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleName(e.target.value)}
                 />
                 <input
@@ -49,7 +47,7 @@ const TopicEmailComponent = (props) => {
                     className="form-control"
                     placeholder='Email'
                     value={email}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleEmail(e.target.value)}
                 />
             </div>

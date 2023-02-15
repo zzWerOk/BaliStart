@@ -3,30 +3,24 @@ const fs = require("fs")
 const {Files} = require("../models/models")
 const uniqueFilename = require("unique-filename")
 
-// require {path} = "path";
-// import fs from "fs";
-// import {Files} from "../models/models";
-// import uniqueFilename from "unique-filename";
-
-module.exports.removeFile = function (fileName) {
-// const removeFile = (fileName) => {
+removeFile = function (fileName) {
 
     try {
 
-        if(fileName) {
-            const filePath = path.resolve(__dirname, '..', "data", fileName)
+        if (fileName) {
+            // const filePath = path.resolve(__dirname, '..', "data", fileName)
+            const filePath = path.resolve(__dirname, '..', fileName)
 
             fs.unlinkSync(filePath)
         }
         return {status: 'ok'}
     } catch (e) {
-        throw e
+        // throw e
     }
 
 }
 
-module.exports.readFile = function (fileName) {
-// const readFile = (fileName) => {
+readFile = function (fileName) {
 
     try {
         const filePath = path.resolve(__dirname, '..', "data", fileName)
@@ -38,25 +32,33 @@ module.exports.readFile = function (fileName) {
 
 }
 
-module.exports.reWrightFile = function (textData, tableName, fileName) {
+reWrightFile = async function (textData, tableName, fileName) {
     try {
         let dirName = getDirName(tableName)
 
         const dirPath = path.resolve(__dirname, '..', "data")
-        fs.mkdir(dirPath, (err) => {
-            if (err) {
-                return {err}
-            }
-        });
-        fs.mkdir(dirPath + "/" + dirName, (err) => {
-            if (err) {
-                return {err}
-            }
-        });
+        // fs.mkdir(dirPath, (err) => {
+        //     if (err) {
+        //         return {err}
+        //     }
+        // });
+        // fs.mkdir(dirPath + "/" + dirName, (err) => {
+        //     if (err) {
+        //         return {err}
+        //     }
+        // });
+
+        // fs.mkdir(dirPath + "/" + dirName,  { recursive: true },(err) => {
+        //     if (err) {
+        //         return {err}
+        //     }
+        // });
+
+        fs.mkdirSync(dirPath + "/" + dirName,  { recursive: true });
 
         const filePath = path.resolve(__dirname, '..', "data", fileName)
 
-        fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
+        await fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
             return {error: 'error', message: err}
         })
 
@@ -67,37 +69,60 @@ module.exports.reWrightFile = function (textData, tableName, fileName) {
     return {error: "Ошибка создания файла"}
 }
 
-module.exports.createNewFile = function (textData, tableName, img) {
+createNewFile = async function (textData, tableName, img) {
     try {
         let dirName = getDirName(tableName)
 
         const fileName = getFreeFileName(dirName)
+
         const dirPath = path.resolve(__dirname, '..', "data")
-        fs.mkdir(dirPath, (err) => {
-            if (err) {
-                return {err}
-            }
-        });
-        fs.mkdir(dirPath + "/" + dirName, (err) => {
-            if (err) {
-                return {err}
-            }
-        });
+        // // fs.mkdir(dirPath, { recursive: true },(err) => {
+        // //     if (err) {
+        // //         return {err}
+        // //     }
+        // // });
+        // fs.mkdir(dirPath + "/" + dirName,  { recursive: true },(err) => {
+        //     if (err) {
+        //         return {err}
+        //     }
+        // });
+        // // fs.mkdirSync(dirPath + "/" + dirName,  { recursive: true });
+        // // await fs.promises.mkdir(dirPath + "/" + dirName, { recursive: true })
+        //
+        // // let fullPath = dirPath + "/" + dirName
+        // // fullPath.split('/').reduce(
+        // //     (directories, directory) => {
+        // //         directories += `${directory}/`;
+        // //         if (!fs.existsSync(directories)) {
+        // //             fs.mkdirSync(directories);
+        // //         }
+        // //         return directories;
+        // //     },
+        // //     '',
+        // // );
+
+        fs.mkdirSync(dirPath + "/" + dirName,  { recursive: true });
 
         const filePath = path.resolve(__dirname, '..', "data", fileName)
 
-        fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
+        await fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
             return {error: 'error', message: err}
         })
 
-        addNewFileNameToTable(tableName, fileName)
+        let imageMd5 = ''
+
+        if (img) {
+            imageMd5 = img.md5 || ''
+        }
+
+        await addNewFileNameToTable(tableName, fileName, imageMd5)
 
         let imgFileName = ''
         if (img) {
             try {
                 // imgFileName = fileName.split('\\')[1]
                 imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
-                img.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
+                await img.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
                 return {'status': 'ok', fileName, imgFileName}
             } catch (e) {
                 return {status: 'error', message: e.message}
@@ -107,9 +132,9 @@ module.exports.createNewFile = function (textData, tableName, img) {
         return {status: 'ok', fileName}
 
     } catch (e) {
-        // return {error: e.message}
+        return {error: e.message}
     }
-    return {error: "Ошибка создания файла"}
+    // return {error: "Ошибка создания файла"}
 }
 
 getDirName = function (tableName) {
@@ -149,8 +174,17 @@ getFreeFileName = function (dirName) {
 
     return fileName
 }
-
-addNewFileNameToTable = function (tableName, fileName, next) {
+addNewFileNameToTable = async function (tableName, fileName, next, md5 = '') {
 // export const addNewFileNameToTable = (tableName, fileName, next) => {
-    Files.create({table_name: tableName, file_name: fileName}).then(next)
+    Files.create({table_name: tableName, file_name: fileName, md5}).then(next)
 }
+
+module.exports = {
+    getFreeFileName,
+    getDirName,
+    readFile,
+    removeFile,
+    reWrightFile,
+    createNewFile,
+}
+

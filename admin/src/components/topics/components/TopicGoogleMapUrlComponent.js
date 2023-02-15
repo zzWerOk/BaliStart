@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import SpinnerSM from "../../SpinnerSM";
 
 const TopicGoogleMapUrlComponent = (props) => {
     const {item, dataItemEditHandler} = props
 
-    const [isSaving, stIsSaving] = useState(false)
     const [mapUrlName, setMapUrlName] = useState('')
     const [mapUrl, setMapUrl] = useState('')
     const [loading, setLoading] = useState(true)
@@ -28,7 +26,7 @@ const TopicGoogleMapUrlComponent = (props) => {
     }
 
     if (loading) {
-        return <SpinnerSM/>
+        // return <SpinnerSM/>
     } else {
 
         return (
@@ -39,7 +37,7 @@ const TopicGoogleMapUrlComponent = (props) => {
                     className="form-control"
                     placeholder='googleMapUrl name'
                     value={mapUrlName}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleName(e.target.value)}
                 />
                 <input
@@ -48,7 +46,7 @@ const TopicGoogleMapUrlComponent = (props) => {
                     className="form-control"
                     placeholder='googleMapUrl text'
                     value={mapUrl}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleMapUrl(e.target.value)}
                 />
             </div>

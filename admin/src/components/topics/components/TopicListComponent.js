@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import SpinnerSM from "../../SpinnerSM";
 
 const TopicListComponent = (props) => {
     const {item, dataItemEditHandler} = props
 
-    const [isSaving, stIsSaving] = useState(false)
+    // const [isSaving, stIsSaving] = useState(false)
     const [items, setItems] = useState('[""]')
     const [listName, setListName] = useState('')
     const [loading, setLoading] = useState(true)
@@ -46,7 +45,7 @@ const TopicListComponent = (props) => {
     }
 
     if (loading) {
-        return <SpinnerSM/>
+        // return <SpinnerSM/>
     } else {
 
         return (
@@ -58,7 +57,7 @@ const TopicListComponent = (props) => {
                         className="form-control"
                         placeholder='List name'
                         value={listName}
-                        disabled={!!isSaving}
+                        // disabled={!!isSaving}
                         onChange={e => handleName(e.target.value)}
                     />
                 </div>
@@ -74,7 +73,7 @@ const TopicListComponent = (props) => {
                                     className="form-control"
                                     placeholder='List item'
                                     value={listItem}
-                                    disabled={!!isSaving}
+                                    // disabled={!!isSaving}
                                     onChange={e => itemsEditHandler(e.target.value, index)}
                                 />
 
@@ -102,6 +101,9 @@ const TopicListComponent = (props) => {
                     type="button"
                     className="btn btn-info"
                     onClick={newItemAddHandler}
+                    style={{
+                        marginTop: '10px',
+                    }}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          className="bi bi-plus" viewBox="0 0 16 16">

@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const {Op} = require("sequelize");
 const {createNewFile} = require("../utils/consts.js");
-const {reWrightFile, readFile, removeFile} = require("../utils/consts");
+const {reWrightFile, readFile, removeFile, getFreeFileName, getDirName} = require("../utils/consts");
 
 const removeTopicsCountFromCategories = (removeArr) => {
     if (removeArr) {
@@ -23,6 +23,66 @@ const removeTopicsCountFromCategories = (removeArr) => {
 
         })
     }
+}
+
+const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
+    let dataText_json = JSON.parse(dataText)
+    console.log('')
+    console.log('')
+    console.log('')
+    console.log(dataText_json)
+    console.log('')
+
+    // dataText_json.map(function (item) {
+    for(let i = 0;i < dataText_json.length;i++) {
+        let item = dataText_json[i]
+        if (item.hasOwnProperty('type')) {
+            if (item.type === 'images') {
+
+                // if (item.hasOwnProperty('type')) {
+                //     if (item.type === 'images') {
+                let imagesArr = JSON.parse(item.items)
+                const arrIndex = item.index
+
+                newImagesArr.map(function (image) {
+                    const imageArrIndex = image.name.substring(image.name.lastIndexOf(" ") + 1, image.name.length);
+                    let imageArrName = image.name.replace(' ' + imageArrIndex, '')
+
+                    imagesArr = imagesArr.filter(function (value) {
+                        return value !== imageArrName;
+                    })
+                    console.log('image.name ',image.name)
+                    if (("" + imageArrIndex) === (arrIndex + "")) {
+
+                        const md5 = image.md5
+                        let dirName = getDirName('img')
+                        const fileName = getFreeFileName(dirName)
+                        const imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
+                        image.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
+
+                        imagesArr.push(imgFileName)
+
+                        Files.create({
+                            table_name: 'Topic ' + topicId,
+                            file_name: fileName,
+                            md5
+                        }).then()
+                    }
+                })
+                item.items = JSON.stringify(imagesArr)
+                // }
+                // }
+            }
+        }
+        dataText_json[i] = item
+    // })
+    }
+
+    console.log('')
+    console.log(dataText_json)
+    console.log('')
+
+    return JSON.stringify(dataText_json)
 }
 
 const addTopicsCountToCategories = (addArr) => {
@@ -60,6 +120,7 @@ class TopicsController {
                 deleted_by_user_id,
                 deleted_date,
                 dataText,
+                new_images_count,
             } = req.body
 
             let created_by_user_admin_id = created_by_user_id
@@ -69,19 +130,30 @@ class TopicsController {
                 if (currUser) {
                     userAdmin = await User.findOne({where: {id: currUser.id}})
                     created_by_user_admin_id = userAdmin.id
-                }else{
+                } else {
                     return next(ApiError.forbidden("Не авторизован"))
                 }
             } catch (e) {
             }
 
             let img
+            let newImagesArr = []
             if (req.files) {
                 img = req.files.img
+
+                if (new_images_count) {
+                    if (new_images_count > 0) {
+                        for (let i = 0; i < new_images_count; i++) {
+                            const newImg = req.files['img' + i]
+                            newImagesArr.push(newImg)
+                        }
+                    }
+                }
             }
 
             if (name && created_by_user_admin_id) {
-                const result = createNewFile(dataText, 'Topics', img)
+
+                const result = await createNewFile(dataText, 'Topics', img)
 
                 if (result.hasOwnProperty('status')) {
                     if (result.status === 'ok') {
@@ -107,6 +179,16 @@ class TopicsController {
                             file_name: fileName,
                         })
 
+                        try {
+                            if (new_images_count > 0) {
+                                const newDataText = saveTopicImageFile(dataText, newImagesArr, newTopic.id)// create
+                                await reWrightFile(newDataText, 'Topics', newTopic.file_name, null)
+                            }
+                        } catch (e) {
+                            console.log(e)
+                        }
+
+
                         /**
                          Обновление таблиц
                          **/
@@ -115,7 +197,6 @@ class TopicsController {
 
                             const tagsArr = JSON.parse(tag)
                             await addTopicsCountToCategories(tagsArr)
-
 
                         } catch (e) {
                         }
@@ -163,6 +244,7 @@ class TopicsController {
                 deleted_by_user_id,
                 deleted_date = 0,
                 dataText,
+                new_images_count,
             } = req.body
 
             let created_by_user_admin_id = created_by_user_id
@@ -172,15 +254,25 @@ class TopicsController {
                 if (currUser) {
                     userAdmin = await User.findOne({where: {id: currUser.id}})
                     created_by_user_admin_id = userAdmin.id
-                }else{
+                } else {
                     return next(ApiError.forbidden("Не авторизован"))
                 }
             } catch (e) {
             }
 
             let img
+            let newImagesArr = []
             if (req.files) {
                 img = req.files.img
+
+                if (new_images_count) {
+                    if (new_images_count > 0) {
+                        for (let i = 0; i < new_images_count; i++) {
+                            const newImg = req.files['img' + i]
+                            newImagesArr.push(newImg)
+                        }
+                    }
+                }
             }
 
             if (id && name && created_by_user_admin_id) {
@@ -188,7 +280,68 @@ class TopicsController {
                 const candidate = await Topics.findOne({where: {id}})
 
                 if (candidate) {
-                    const result = reWrightFile(dataText, 'Topics', candidate.file_name, null)
+                    let newDataText = dataText
+
+                    const readFileResult = readFile(candidate.file_name)
+                    if (readFileResult.hasOwnProperty('status')) {
+                        if (readFileResult.status === 'ok') {
+                            let topicFileData = JSON.parse(readFileResult.data)
+                            let newTopicFileData = JSON.parse(dataText)
+
+                            let topicDataImages = []
+                            let newTopicDataImages = []
+
+                            topicFileData.map(function (item) {
+                                if (item.hasOwnProperty('type')) {
+                                    if (item.type === 'images') {
+                                        topicDataImages = [...topicDataImages, ...JSON.parse(item.items)]
+                                    }
+                                }
+                            })
+
+                            newTopicFileData.map(function (item) {
+                                if (item.hasOwnProperty('type')) {
+                                    if (item.type === 'images') {
+                                        newTopicDataImages = [...newTopicDataImages, ...JSON.parse(item.items)]
+                                    }
+                                }
+                            })
+
+                            const res = topicDataImages.filter(item => !newTopicDataImages.includes(item));
+
+                            res.map(async currImageForDelete => {
+                                /** Grab image of topic data **/
+                                const topicDataImage_db = await Files.findAll({
+                                    where: {
+                                        table_name: 'Topic ' + id,
+                                        file_name: 'static/' + currImageForDelete,
+                                    }
+                                })
+                                /** Remove images of topic data from drive **/
+                                topicDataImage_db.map(item => {
+                                    removeFile(item.file_name)
+                                })
+                                /** Remove images of topic data from DB **/
+                                await Files.destroy({
+                                    where: {
+                                        table_name: 'Topic ' + id,
+                                        file_name: 'static/' + currImageForDelete,
+                                    }
+                                })
+                            })
+
+                        }
+                    }
+
+                    try {
+                        if (new_images_count > 0) {
+                            newDataText = saveTopicImageFile(dataText, newImagesArr, candidate.id)// change
+                        }
+                    } catch (e) {
+                        console.log(e)
+                    }
+
+                    const result = await reWrightFile(newDataText, 'Topics', candidate.file_name, null)
 
                     if (result.hasOwnProperty('status')) {
                         if (result.status === 'ok') {
@@ -324,16 +477,6 @@ class TopicsController {
                                         },
                                     })
 
-                                    // let imgFileName = ''
-                                    // try {
-                                    //     if (candidate.file_name.indexOf('/') !== -1) {
-                                    //         imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
-                                    //     } else {
-                                    //         imgFileName = candidate.file_name
-                                    //     }
-                                    // }catch (e) {}
-                                    // topicData.image = imgFileName
-
                                     topicData.image = candidate.image_logo
 
                                     topicData.name = candidate.name
@@ -446,9 +589,9 @@ class TopicsController {
 
 
                 const user = await User.findOne({where: {id: item.created_by_user_id}})
-                if(!user){
+                if (!user) {
                     newItem.created_by_user_name = '-'
-                }else {
+                } else {
                     newItem.created_by_user_name = user.name
                 }
 
@@ -515,7 +658,7 @@ class TopicsController {
             try {
                 if (currUser) {
                     userAdmin = await User.findOne({where: {id: currUser.id}})
-                    if(!userAdmin.is_admin){
+                    if (!userAdmin.is_admin) {
                         return next(ApiError.forbidden("Не админимтратор"))
                     }
                 }
@@ -575,9 +718,9 @@ class TopicsController {
 
                 const user = await User.findOne({where: {id: item.created_by_user_id}})
 
-                if(user) {
+                if (user) {
                     newItem.created_by_user_name = user.name
-                }else{
+                } else {
                     newItem.created_by_user_name = '-'
                 }
 
@@ -682,42 +825,52 @@ class TopicsController {
                 if (candidate) {
 
                     try {
-                        // let imgFileName = candidate.file_name.split('\\')[1]
-                        // imgFileName = candidate.file_name.substring(0, candidate.file_name.lastIndexOf("/") + 1);
+                        /** Remove image_logo of topic from derive **/
                         const imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
-
                         const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
                         fs.unlinkSync(imgFilePath)
                     } catch (e) {
                     }
 
-                    const result = removeFile(candidate.file_name)
-                    if (result.hasOwnProperty('status')) {
-                        if (result.status === 'ok') {
+                    /** Remove topic data file **/
+                    removeFile("data/" + candidate.file_name)
 
-                            const tagsArr = JSON.parse(candidate.tag)
-                            await removeTopicsCountFromCategories(tagsArr)
-                            // await tagsArr.map(topicCatId => {
-                            //     const topicCategoryItem = TopicsCategory.findOne({where: {id: topicCatId}})
-                            //     if (topicCategoryItem) {
-                            //         const topicsCount = topicCategoryItem.topics_count - 1 || 0
-                            //         TopicsCategory.update({
-                            //             topics_count: topicsCount,
-                            //         }, {where: {id: topicCatId}})
-                            //         if(topicCategoryItem.topics_count > 0) {
-                            //             topicCategoryItem.topics_count = topicsCount;
-                            //             topicCategoryItem.save();
-                            //         }
-                            //     }
-                            //
-                            // })
-
-
-                            await Files.destroy({where: {table_name: 'Topics', file_name: candidate.file_name}})
-                            const count = await Topics.destroy({where: {id: id}})
-                            return res.json({status: "ok", message: `Удалено записей: ${count}`})
+                    /** Remove all topic comments **/
+                    await TopicComments.destroy({
+                        where: {
+                            topic_id: candidate.id
                         }
-                    }
+                    })
+
+                    /** Remove data of topic count from categories **/
+                    const tagsArr = JSON.parse(candidate.tag)
+                    await removeTopicsCountFromCategories(tagsArr)
+
+                    /** Remove image_logo of topic from DB **/
+                    await Files.destroy({where: {table_name: 'Topics', file_name: candidate.file_name}})
+
+                    /** Collect all images of topic data (topic.data type="images") **/
+                    const topicDataImages = await Files.findAll({
+                        where: {
+                            table_name: 'Topic ' + id,
+                        }
+                    })
+                    /** Remove all images of topic data from drive **/
+                    topicDataImages.map(item => {
+                        removeFile(item.file_name)
+                    })
+
+                    /** Remove all images of topic data from DB **/
+                    await Files.destroy({
+                        where: {
+                            table_name: 'Topic ' + id,
+                        }
+                    })
+
+                    /** Remove topic from DB **/
+                    const count = await Topics.destroy({where: {id: id}})
+                    return res.json({status: "ok", message: `Удалено записей: ${count}`})
+
                 }
             }
         } catch (e) {

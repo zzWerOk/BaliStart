@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import SpinnerSM from "../../SpinnerSM";
 
 const TopicCommentComponent = (props) => {
     const {item, dataItemEditHandler} = props
 
-    const [isSaving, stIsSaving] = useState(false)
+    // const [isSaving, stIsSaving] = useState(false)
     const [commentName, setCommentName] = useState('')
     const [commentText, setCommentText] = useState('')
     const [loading, setLoading] = useState(true)
@@ -28,7 +27,7 @@ const TopicCommentComponent = (props) => {
     }
 
     if (loading) {
-        return <SpinnerSM/>
+        // return <SpinnerSM/>
     } else {
 
         return (
@@ -39,7 +38,7 @@ const TopicCommentComponent = (props) => {
                     className="form-control"
                     placeholder='Comment name'
                     value={commentName}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleName(e.target.value)}
                 />
                 <input
@@ -48,7 +47,7 @@ const TopicCommentComponent = (props) => {
                     className="form-control"
                     placeholder='Comment'
                     value={commentText}
-                    disabled={!!isSaving}
+                    // disabled={!!isSaving}
                     onChange={e => handleText(e.target.value)}
                 />
             </div>
