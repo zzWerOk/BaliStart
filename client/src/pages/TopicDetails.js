@@ -17,6 +17,7 @@ import TopicDetailEmailComponent from "../components/topics/components/TopicDeta
 import TopicDetailPhoneComponent from "../components/topics/components/TopicDetailPhoneComponent";
 import TopicDetailImagesComponent from "../components/topics/components/TopicDetailImagesComponent";
 import TopicDetailGoogleMapUrlComponent from "../components/topics/components/TopicDetailGoogleMapUrlComponent";
+import TopicDetailLineComponent from "../components/topics/components/TopicDetailLineComponent";
 
 
 const TopicDetails = () => {
@@ -110,6 +111,8 @@ const TopicDetails = () => {
                     return <TopicDetailImagesComponent key={index} element={element}/>
                 case 'googleMapUrl':
                     return <TopicDetailGoogleMapUrlComponent key={index} element={element}/>
+                case 'line':
+                    return <TopicDetailLineComponent key={index} element={element}/>
             }
         }
 

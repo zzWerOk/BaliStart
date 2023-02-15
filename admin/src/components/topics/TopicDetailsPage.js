@@ -25,6 +25,7 @@ import {MDBFile} from "mdb-react-ui-kit";
 
 import './TopicDetailsPage.css'
 import './FAB.css'
+import TopicLineComponent from "./components/TopicLineComponent";
 
 const dropDownItems = [
     {
@@ -66,6 +67,11 @@ const dropDownItems = [
         id: 7,
         name: 'Google Map Url card',
         type: 'googleMapUrl',
+    },
+    {
+        id: 8,
+        name: 'Line',
+        type: 'line',
     },
 ]
 let currTopic = null
@@ -219,6 +225,9 @@ const TopicDetailsPage = observer((props) => {
                 break
             case "googleMapUrl":
                 newItem = {"type": type, "name": "", "url": ""}
+                break
+            case "line":
+                newItem = {"type": type, "style": "solid"}
                 break
         }
         return newItem
@@ -816,8 +825,6 @@ const TopicDetailsPage = observer((props) => {
                                     case 'images': {
                                         // itemKey = itemKey + Date.now()
                                         itemKey = itemKey + " " + item.items
-                                        console.log(item)
-                                        console.log(itemKey)
                                         child = <TopicImagesComponent
                                             item={item}
                                             index={index}
@@ -831,6 +838,14 @@ const TopicDetailsPage = observer((props) => {
                                     }
                                     case 'googleMapUrl': {
                                         child = <TopicGoogleMapUrlComponent
+                                            item={item}
+                                            isSaving={isSaving}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                        />
+                                        break
+                                    }
+                                    case 'line': {
+                                        child = <TopicLineComponent
                                             item={item}
                                             isSaving={isSaving}
                                             dataItemEditHandler={dataItemEditHandler}

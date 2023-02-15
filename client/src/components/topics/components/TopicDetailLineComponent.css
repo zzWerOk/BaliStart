@@ -1,0 +1,26 @@
+
+hr.solid {
+    /*border-top: 10px solid var(--lineColor) !important;*/
+    border: 0;
+    height: 1px;
+    background: #fff;
+    background-image: linear-gradient(to right, #fff, #000, #fff);
+}
+
+hr.dashed {
+    background-color: #fff;
+    border-top: 2px dashed #20303c;
+    opacity: 65%;
+}
+
+hr.dotted {
+    background-color: #fff;
+    border-top: 2px dotted #20303c;
+    opacity: 65%;
+}
+
+hr.empty {
+    background-color: rgba(255, 255, 255, 0);
+    border-top: 0 solid rgba(255, 255, 255, 0);
+    opacity: 0;
+}
