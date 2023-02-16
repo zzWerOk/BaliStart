@@ -1,2 +1,26 @@
 .topic-detail-row {
   padding-bottom: 20px; }
+
+@keyframes append-animate-down {
+  from {
+    transform: scaleY(0);
+    opacity: 0; }
+  to {
+    transform: scaleY(1);
+    opacity: 1; } }
+
+@keyframes append-animate-up {
+  from {
+    transform: scaleY(1);
+    opacity: 1; }
+  to {
+    transform: scaleY(0);
+    opacity: 0; } }
+
+.moved-item-down {
+  transform-origin: 50% 0;
+  animation: append-animate-down .5s linear; }
+
+.moved-item-up {
+  transform-origin: 50% 0;
+  animation: append-animate-up .5s linear; }

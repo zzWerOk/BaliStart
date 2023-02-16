@@ -99,10 +99,12 @@ const TopicDetailsPage = observer((props) => {
     const [topicCategoriesItems, setTopicCategoriesItems] = useState([])
     const [topicCategoriesItems_load, setTopicCategoriesItems_load] = useState(true)
 
+    const [movedDownItemIndex, setMovedDownItemIndex] = useState(-1)
+
     const [showFab, setShowFab] = useState(false)
     const [redraw, setRedraw] = useState(false)
 
-    const redrawItemTrigger = useRef(null)
+    // const redrawItemTrigger = useRef(null)
 
     useEffect(
         () => {
@@ -553,6 +555,58 @@ const TopicDetailsPage = observer((props) => {
         }
     }
 
+    const moveItemUp = (index) => {
+        if (index !== null) {
+            if (index !== undefined) {
+                if (index > 0) {
+
+                    let newItemsArr = currTopic.dataJSON
+
+                    newItemsArr.splice(index - 1, 0, newItemsArr.splice(index, 1)[0])
+
+                    currTopic.data = JSON.stringify(newItemsArr)
+                    setItemData(newItemsArr)
+                    currTopic.isSaved = false
+                    onItemEditHandler(currTopic.getAsJson())
+
+                    // setRedraw(!redraw)
+
+                    setMovedDownItemIndex(index - 1)
+                    setTimeout(() => {
+                        setMovedDownItemIndex(-1)
+                    }, 800)
+
+                }
+            }
+        }
+    }
+
+    const moveItemDown = (index) => {
+        if (index !== null) {
+            if (index !== undefined) {
+                if (index < itemData.length - 1) {
+
+                    let newItemsArr = currTopic.dataJSON
+
+                    newItemsArr.splice(index, 0, newItemsArr.splice(index + 1, 1)[0])
+
+                    currTopic.data = JSON.stringify(newItemsArr)
+                    setItemData(newItemsArr)
+                    currTopic.isSaved = false
+                    onItemEditHandler(currTopic.getAsJson())
+
+                    // setRedraw(!redraw)
+
+                    setMovedDownItemIndex(index + 1)
+                    setTimeout(() => {
+                        setMovedDownItemIndex(-1)
+                    }, 800)
+                }
+            }
+        }
+
+    }
+
     /** Определение нижней позиции для показа FAB**/
     const listInnerRef = useRef();
     useEffect(() => {
@@ -759,126 +813,116 @@ const TopicDetailsPage = observer((props) => {
                 </div>
             </Row>
             <Row className={'topic-detail-row'}>
-                {/*<div>*/}
+                {
+                    itemData.map(function (item, index) {
+                        let itemKey = index
 
-                    {/*{itemData.map(function (item, index) {*/}
-                    {
-                        // currTopic
-                        //     ?
-                        // currTopic.dataJSON.map(function (item, index) {
-                        itemData.map(function (item, index) {
-                            let itemKey = index
-
-                            // console.log('currTopic.dataJSON ', item)
-                            if (item.hasOwnProperty('type')) {
-                                let child = null
-                                item.index = index
-                                switch (item.type) {
-                                    default : {
-                                        child = <TopicTextComponent
-                                            item={item}
-                                            isSaving={isSaving}
-                                            dataItemEditHandler={dataItemEditHandler}
-                                        />
-                                        break
-                                    }
-                                    case 'comment': {
-                                        child = <TopicCommentComponent
-                                            item={item}
-                                            isSaving={isSaving}
-                                            dataItemEditHandler={dataItemEditHandler}
-                                        />
-                                        break
-                                    }
-                                    case 'list': {
-                                        child = <TopicListComponent
-                                            item={item}
-                                            isSaving={isSaving}
-                                            dataItemEditHandler={dataItemEditHandler}
-                                        />
-                                        break
-                                    }
-                                    case 'link': {
-                                        child = <TopicLinkComponent
-                                            item={item}
-                                            isSaving={isSaving}
-                                            dataItemEditHandler={dataItemEditHandler}
-                                        />
-                                        break
-                                    }
-                                    case 'email': {
-                                        child = <TopicEmailComponent
-                                            item={item}
-                                            isSaving={isSaving}
-                                            dataItemEditHandler={dataItemEditHandler}
-                                        />
-                                        break
-                                    }
-                                    case 'phone': {
-                                        child = <TopicPhoneComponent
-                                            item={item}
-                                            isSaving={isSaving}
-                                            dataItemEditHandler={dataItemEditHandler}
-                                        />
-                                        break
-                                    }
-                                    case 'images': {
-                                        // itemKey = itemKey + Date.now()
-                                        itemKey = itemKey + " " + item.items
-                                        child = <TopicImagesComponent
-                                            item={item}
-                                            index={index}
-                                            isSaving={isSaving}
-                                            dataItemEditHandler={dataItemEditHandler}
-                                            onFilesAddHandler={onFilesAddHandler}
-                                            onFilesDeleteHandler={onFilesDeleteHandler}
-                                            redrawItemTrigger={redrawItemTrigger}
-                                        />
-                                        break
-                                    }
-                                    case 'googleMapUrl': {
-                                        child = <TopicGoogleMapUrlComponent
-                                            item={item}
-                                            isSaving={isSaving}
-                                            dataItemEditHandler={dataItemEditHandler}
-                                        />
-                                        break
-                                    }
-                                    case 'line': {
-                                        child = <TopicLineComponent
-                                            item={item}
-                                            isSaving={isSaving}
-                                            dataItemEditHandler={dataItemEditHandler}
-                                        />
-                                        break
-                                    }
+                        // console.log('currTopic.dataJSON ', item)
+                        if (item.hasOwnProperty('type')) {
+                            let child = null
+                            item.index = index
+                            switch (item.type) {
+                                default : {
+                                    child = <TopicTextComponent
+                                        item={item}
+                                        isSaving={isSaving}
+                                        dataItemEditHandler={dataItemEditHandler}
+                                    />
+                                    break
                                 }
-
-
-                                return <TopicItemCard
-                                    key={itemKey + redraw}
-                                    // key={index}
-                                    // key={Date.now()}
-                                    index={index}
-                                    child={child}
-                                    dropDownItems={dropDownItems}
-                                    changeItemType={changeItemType}
-                                    deleteDataItemByIndex={deleteDataItemByIndex}
-                                    title={getDropDownTitleByType(item.type)}
-                                >
-                                </TopicItemCard>
+                                case 'comment': {
+                                    child = <TopicCommentComponent
+                                        item={item}
+                                        isSaving={isSaving}
+                                        dataItemEditHandler={dataItemEditHandler}
+                                    />
+                                    break
+                                }
+                                case 'list': {
+                                    child = <TopicListComponent
+                                        item={item}
+                                        isSaving={isSaving}
+                                        dataItemEditHandler={dataItemEditHandler}
+                                    />
+                                    break
+                                }
+                                case 'link': {
+                                    child = <TopicLinkComponent
+                                        item={item}
+                                        isSaving={isSaving}
+                                        dataItemEditHandler={dataItemEditHandler}
+                                    />
+                                    break
+                                }
+                                case 'email': {
+                                    child = <TopicEmailComponent
+                                        item={item}
+                                        isSaving={isSaving}
+                                        dataItemEditHandler={dataItemEditHandler}
+                                    />
+                                    break
+                                }
+                                case 'phone': {
+                                    child = <TopicPhoneComponent
+                                        item={item}
+                                        isSaving={isSaving}
+                                        dataItemEditHandler={dataItemEditHandler}
+                                    />
+                                    break
+                                }
+                                case 'images': {
+                                    itemKey = item.items
+                                    child = <TopicImagesComponent
+                                        item={item}
+                                        index={index}
+                                        isSaving={isSaving}
+                                        dataItemEditHandler={dataItemEditHandler}
+                                        onFilesAddHandler={onFilesAddHandler}
+                                        onFilesDeleteHandler={onFilesDeleteHandler}
+                                    />
+                                    break
+                                }
+                                case 'googleMapUrl': {
+                                    child = <TopicGoogleMapUrlComponent
+                                        item={item}
+                                        isSaving={isSaving}
+                                        dataItemEditHandler={dataItemEditHandler}
+                                    />
+                                    break
+                                }
+                                case 'line': {
+                                    child = <TopicLineComponent
+                                        item={item}
+                                        isSaving={isSaving}
+                                        dataItemEditHandler={dataItemEditHandler}
+                                    />
+                                    break
+                                }
                             }
-                        })
-                        // :
-                        // null
-                    }
 
-                    <TopicAddNewBtn
-                        disabled={!!isSaving}
-                        addNewItemHandler={addNewItemHandler}
-                        dropDownItems={dropDownItems}
-                    />
-                {/*</div>*/}
+
+                            return <TopicItemCard
+                                key={itemKey + redraw}
+                                index={index}
+                                child={child}
+                                dropDownItems={dropDownItems}
+                                changeItemType={changeItemType}
+                                deleteDataItemByIndex={deleteDataItemByIndex}
+                                title={getDropDownTitleByType(item.type)}
+                                moveItemUp={index === 0 ? null : moveItemUp}
+                                moveItemDown={itemData[itemData.length - 1] === item ? null : moveItemDown}
+                                isMovedDownItem={movedDownItemIndex === index}
+                            >
+                            </TopicItemCard>
+                        }
+                    })
+                }
+
+                <TopicAddNewBtn
+                    disabled={!!isSaving}
+                    addNewItemHandler={addNewItemHandler}
+                    dropDownItems={dropDownItems}
+                />
             </Row>
             <Row className={'col-12 d-flex justify-content-center topic-detail-row'}
                  ref={listInnerRef}
