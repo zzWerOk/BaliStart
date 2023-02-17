@@ -79,7 +79,7 @@ const TopicPhoneComponent = (props) => {
     }, []);
 
     if (loading) {
-        // return <SpinnerSM/>
+
     } else {
 
         return (

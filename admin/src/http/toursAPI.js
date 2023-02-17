@@ -22,10 +22,10 @@ export const getAll = async () => {
     return data
 }
 
-// export const getTourData = async (id) => {
-//     const {data} = await $host.get(apiUrl+'/data/' + id)
-//     return data
-// }
+export const getTourData = async (id) => {
+    const {data} = await $host.get(apiUrl+'/data/' + id)
+    return data
+}
 
 export const deleteTourAPI = async (id) => {
     const {data} = await $authHost.delete(apiUrl+'/', {params: {id: id}})
@@ -46,6 +46,8 @@ export const saveTourAPI = async (
     languages,
     map_points,
     image_logo_file,
+    tourData,
+    imagesAdd,
 ) => {
 
     try {
@@ -64,6 +66,8 @@ export const saveTourAPI = async (
             languages,
             map_points,
             image_logo_file,
+            tourData,
+            imagesAdd,
         )
 
         if(!formData){
@@ -97,7 +101,8 @@ export const changeTourAPI = async (
     languages,
     map_points,
     image_logo_file,
-
+    tourData,
+    imagesAdd,
 ) => {
     try {
 
@@ -117,7 +122,9 @@ export const changeTourAPI = async (
             activity_level,
             languages,
             map_points,
-            image_logo_file
+            image_logo_file,
+            tourData,
+            imagesAdd,
         )
 
         if(!formData){
@@ -146,7 +153,9 @@ const addToFormData = (formData,
                        activity_level,
                        languages,
                        map_points,
-                       image_logo_file
+                       image_logo_file,
+                       tourData,
+                       imagesAdd,
 ) => {
     try {
         formData.append("name", name);
@@ -162,6 +171,7 @@ const addToFormData = (formData,
         formData.append("activity_level", activity_level);
         formData.append("languages", languages);
         formData.append("map_points", map_points);
+        formData.append("data", tourData);
 
         if (image_logo_file !== '') {
             if (image_logo_file !== undefined) {
@@ -171,6 +181,25 @@ const addToFormData = (formData,
                     console.log('File apply error: ', e.message)
                 }
             }
+        }
+
+        if(imagesAdd){
+            let imagesCount = 0
+
+            Object.keys(imagesAdd).map(function(key) {
+                let currFilesList = imagesAdd[key]
+                Object.keys(currFilesList).map(function(itemKey) {
+                    let currFile = currFilesList[itemKey]
+                    try {
+                        if (currFile.name && currFile.size) {
+                            // formData.append("img" + imagesCount, currFile, currFile.name + ' ' + key);
+                            formData.append("img" + imagesCount, currFile, currFile.name);
+                            imagesCount++
+                        }
+                    }catch (e) {}
+                });
+            });
+            formData.append("new_images_count", imagesCount);
         }
 
         return formData

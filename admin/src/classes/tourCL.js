@@ -18,6 +18,54 @@ export default class TourCL {
         this._activity_level = 1
         this._languages = '[]'
         this._map_points = '[]'
+        // this._includes = '[]'
+        this._data = '{}'
+    }
+
+
+    get data() {
+        return this._data;
+    }
+
+    set data(value) {
+        this._data = value;
+    }
+
+    get tourIncludes() {
+        return JSON.parse(this._data)['includes']
+    }
+
+    set tourIncludes(value) {
+        let dataJson = JSON.parse(this._data)
+        dataJson['includes'] = value
+        this._data = JSON.stringify(dataJson)
+    }
+
+    get tourImages() {
+        // const dataJSON = JSON.parse(this._data)
+        // if(dataJSON.hasOwnProperty('images')) {
+        //     return dataJSON['images']
+        // }else{
+        //     return '[]'
+        // }
+
+        return JSON.parse(this._data)['images'] || '[]'
+    }
+
+    set tourImages(value) {
+        let dataJson = JSON.parse(this._data)
+        dataJson['images'] = value
+        this._data = JSON.stringify(dataJson)
+    }
+
+    get tourNotIncludes() {
+        return JSON.parse(this._data)['notincludes']
+    }
+
+    set tourNotIncludes(value) {
+        let dataJson = JSON.parse(this._data)
+        dataJson['notincludes'] = value
+        this._data = JSON.stringify(dataJson)
     }
 
     get tour_categoryJSON() {
@@ -79,6 +127,9 @@ export default class TourCL {
         if (itemObj.hasOwnProperty('map_points')) {
             this._map_points = itemObj.map_points
         }
+        if (itemObj.hasOwnProperty('data')) {
+            this._data = itemObj.data
+        }
     }
 
     getAsJson() {
@@ -100,6 +151,7 @@ export default class TourCL {
                 "activity_level": this._activity_level,
                 "languages": this._languages,
                 "map_points": this._map_points,
+                "data": this._data,
             }
 
             if (this.hasOwnProperty('newId')) {

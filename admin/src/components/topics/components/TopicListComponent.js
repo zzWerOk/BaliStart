@@ -117,9 +117,7 @@ const TopicListComponent = (props) => {
                                                                 width={24}
                                                                 style={{padding: 5}}
                                                             />
-                                                            {/*<div key={index} style={{display: "flex"}}>*/}
 
-                                                            {/*<div style={{marginRight: '5px'}}>•</div>*/}
                                                             <input
                                                                 type="commentText"
                                                                 id="commentText"

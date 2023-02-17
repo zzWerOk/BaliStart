@@ -152,6 +152,7 @@ const TopicDetailsPage = observer((props) => {
 
     const getTopicDataHandler = (id) => {
         // delay(0).then(() => {
+        setIsSaving(true)
         let currTopicId = currTopic.id
         if (id) {
             currTopicId = id
@@ -174,9 +175,11 @@ const TopicDetailsPage = observer((props) => {
                 setRedraw(!redraw)
                 setImagesAdd({})
                 setTopicCategoriesItems_load(false)
+                setIsSaving(false)
             })
         } else {
             setTopicCategoriesItems_load(false)
+            setIsSaving(false)
         }
         // })
     }
@@ -189,10 +192,10 @@ const TopicDetailsPage = observer((props) => {
 
     }
 
-    const changeTopicId = (id) => {
-        currTopic.newId = id
-        onItemEditHandler(currTopic.getAsJson(), newImageLogo)
-    }
+    // const changeTopicId = (id) => {
+    //     currTopic.newId = id
+    //     onItemEditHandler(currTopic.getAsJson(), newImageLogo)
+    // }
 
     const onDescriptionHandler = (value) => {
         setCurrDescription(value)

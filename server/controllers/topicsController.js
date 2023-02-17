@@ -27,14 +27,11 @@ const removeTopicsCountFromCategories = (removeArr) => {
 const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
     let dataText_json = JSON.parse(dataText)
 
-    // dataText_json.map(function (item) {
     for(let i = 0;i < dataText_json.length;i++) {
         let item = dataText_json[i]
         if (item.hasOwnProperty('type')) {
             if (item.type === 'images') {
 
-                // if (item.hasOwnProperty('type')) {
-                //     if (item.type === 'images') {
                 let imagesArr = JSON.parse(item.items)
                 const arrIndex = item.index
 
@@ -45,7 +42,7 @@ const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
                     imagesArr = imagesArr.filter(function (value) {
                         return value !== imageArrName;
                     })
-                    console.log('image.name ',image.name)
+
                     if (("" + imageArrIndex) === (arrIndex + "")) {
 
                         const md5 = image.md5
@@ -64,12 +61,9 @@ const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
                     }
                 })
                 item.items = JSON.stringify(imagesArr)
-                // }
-                // }
             }
         }
         dataText_json[i] = item
-    // })
     }
 
     return JSON.stringify(dataText_json)
@@ -172,7 +166,7 @@ class TopicsController {
                         try {
                             if (new_images_count > 0) {
                                 const newDataText = saveTopicImageFile(dataText, newImagesArr, newTopic.id)// create
-                                await await reWrightFile(newDataText, 'Topics', newTopic.file_name, null)
+                                await reWrightFile(newDataText, 'Topics', newTopic.file_name, null)
                             }
                         } catch (e) {
                             console.log(e)

@@ -13,9 +13,6 @@ const TourMapPointCardFloatRight = (props) => {
     useEffect(() => {
 
         cardData.map(function (item) {
-
-            console.log(item)
-
             if (item.type === 'googleMapUrl') {
                 setLinkComponentsItems([...linkComponentsItems, item])
             } else if (item.type === 'topic') {

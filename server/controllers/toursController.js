@@ -3,7 +3,41 @@ const {Op} = require("sequelize");
 const ApiError = require("../error/ApiError");
 const path = require("path");
 const fs = require("fs");
-const {removeFile, createNewFile} = require("../utils/consts");
+const {removeFile, createNewFile, reWrightFile, readFile, getDirName, getFreeFileName} = require("../utils/consts");
+
+const saveTourImageFile = (dataText, newImagesArr, tourId) => {
+    let dataText_json = JSON.parse(dataText)
+
+            if (dataText_json.hasOwnProperty('images')) {
+                let item = dataText_json['images']
+                let imagesArr = JSON.parse(item)
+
+                newImagesArr.map(function (image) {
+                    let imageArrName = image.name
+
+                    imagesArr = imagesArr.filter(function (value) {
+                        return value !== imageArrName;
+                    })
+
+                        const md5 = image.md5
+                        let dirName = getDirName('img')
+                        const fileName = getFreeFileName(dirName)
+                        const imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
+                        image.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
+
+                        imagesArr.push(imgFileName)
+
+                        Files.create({
+                            table_name: 'Tour ' + tourId,
+                            file_name: fileName,
+                            md5
+                        }).then()
+                })
+                item = JSON.stringify(imagesArr)
+                dataText_json['images'] = item
+            }
+    return JSON.stringify(dataText_json)
+}
 
 class ToursController {
 
@@ -22,6 +56,8 @@ class ToursController {
                 activity_level,
                 languages,
                 map_points,
+                data,
+                new_images_count,
             } = req.body
 
             let created_by_user_admin_id = created_by_user_id
@@ -38,13 +74,23 @@ class ToursController {
             }
 
             let img
+            let newImagesArr = []
             if (req.files) {
                 img = req.files.img
+
+                if (new_images_count) {
+                    if (new_images_count > 0) {
+                        for (let i = 0; i < new_images_count; i++) {
+                            const newImg = req.files['img' + i]
+                            newImagesArr.push(newImg)
+                        }
+                    }
+                }
+
             }
 
             if (name && created_by_user_admin_id) {
-                const result = await createNewFile('', 'Tours', img)
-
+                const result = await createNewFile(data, 'Tours', img)
 
                 if (result.hasOwnProperty('status')) {
                     if (result.status === 'ok') {
@@ -69,6 +115,15 @@ class ToursController {
                             map_points,
                             file_name: fileName,
                         })
+
+                        try {
+                            if (new_images_count > 0) {
+                                const newDataText = saveTourImageFile(data, newImagesArr, newTour.id)// create
+                                await reWrightFile(newDataText, 'Tours', newTour.file_name, null)
+                            }
+                        } catch (e) {
+                            console.log(e)
+                        }
 
                         /**
                          Обновление таблиц
@@ -119,11 +174,25 @@ class ToursController {
                 activity_level,
                 languages,
                 map_points,
+                data,
+                new_images_count,
             } = req.body
 
+
+
             let img
+            let newImagesArr = []
             if (req.files) {
                 img = req.files.img
+
+                if (new_images_count) {
+                    if (new_images_count > 0) {
+                        for (let i = 0; i < new_images_count; i++) {
+                            const newImg = req.files['img' + i]
+                            newImagesArr.push(newImg)
+                        }
+                    }
+                }
             }
 
             if (id && name && created_by_user_id) {
@@ -131,64 +200,123 @@ class ToursController {
                 const candidate = await Tours.findOne({where: {id}})
 
                 if (candidate) {
-                    // const result = reWrightFile('', 'Tours', candidate.file_name, null)
-                    //
-                    // if (result.hasOwnProperty('status')) {
-                    //     if (result.status === 'ok') {
 
-                    let imgFileName = ''
-                    try {
-                        if (img) {
-                            // imgFileName = candidate.file_name.split('\\')[1]
-                            imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
-                            await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                    let newDataText = data
+
+                    const readFileResult = readFile(candidate.file_name)
+
+                    if (readFileResult.hasOwnProperty('status')) {
+                        if (readFileResult.status === 'ok') {
+                            let tourFileData = JSON.parse(readFileResult.data)
+                            let newTourFileData = JSON.parse(data)
+
+                            let topicDataImages = []
+                            let newTopicDataImages = []
+
+                            if (tourFileData.hasOwnProperty('images')) {
+                                // topicDataImages = [...topicDataImages, ...JSON.parse(tourFileData['images'])]
+                                topicDataImages = JSON.parse(tourFileData['images'])
+                            }
+
+                            if (newTourFileData.hasOwnProperty('images')) {
+                                // newTopicDataImages = [...newTopicDataImages, ...JSON.parse(newTourFileData['images'])]
+                                newTopicDataImages = JSON.parse(newTourFileData['images'])
+                            }
+
+                            const res = topicDataImages.filter(item => !newTopicDataImages.includes(item));
+
+                            res.map(async currImageForDelete => {
+                                /** Grab image of tour data **/
+                                const topicDataImage_db = await Files.findAll({
+                                    where: {
+                                        table_name: 'Tour ' + id,
+                                        file_name: 'static/' + currImageForDelete,
+                                    }
+                                })
+                                /** Remove images of tour data from drive **/
+                                topicDataImage_db.map(item => {
+                                    removeFile(item.file_name)
+                                })
+                                /** Remove images of tour data from DB **/
+                                await Files.destroy({
+                                    where: {
+                                        table_name: 'Tour ' + id,
+                                        file_name: 'static/' + currImageForDelete,
+                                    }
+                                })
+                            })
+
                         }
-                    } catch (e) {
-                        return res.json({status: 'error', message: 'save image error', e: e.message})
                     }
 
-                    await Tours.update({
-                        name,
-                        description,
-                        image_logo,
-                        created_by_user_id,
-                        created_date,
-                        active,
-                        tour_category,
-                        tour_type,
-                        duration,
-                        activity_level,
-                        languages,
-                        map_points,
-                    }, {where: {id: id}})
-
                     try {
-                        if (img) {
+                        if (new_images_count > 0) {
+                            newDataText = saveTourImageFile(data, newImagesArr, candidate.id)// change
+                        }
+                    } catch (e) {
+                        console.log(e)
+                    }
+
+                    const result = await reWrightFile(newDataText, 'Topics', candidate.file_name, null)
+
+                    // const result = await reWrightFile(data, 'Tours', candidate.file_name)
+
+                    if (result.hasOwnProperty('status')) {
+                        if (result.status === 'ok') {
+
+                            let imgFileName = ''
+                            try {
+                                if (img) {
+                                    // imgFileName = candidate.file_name.split('\\')[1]
+                                    imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+                                    await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                                }
+                            } catch (e) {
+                                return res.json({status: 'error', message: 'save image error', e: e.message})
+                            }
+
                             await Tours.update({
-                                image_logo: imgFileName,
+                                name,
+                                description,
+                                image_logo,
+                                created_by_user_id,
+                                created_date,
+                                active,
+                                tour_category,
+                                tour_type,
+                                duration,
+                                activity_level,
+                                languages,
+                                map_points,
                             }, {where: {id: id}})
+
+                            try {
+                                if (img) {
+                                    await Tours.update({
+                                        image_logo: imgFileName,
+                                    }, {where: {id: id}})
+                                }
+                            } catch (e) {
+                            }
+
+                            /**
+                             Обновление таблиц
+                             **/
+                            try {
+                                await TableUpdates.upsert({table_name: 'Tours', date: Date.now()})
+                            } catch (e) {
+                            }
+
+                            try {
+                                if (img) {
+                                    return res.json({status: 'ok', 'image_logo': imgFileName})
+                                }
+                            } catch (e) {
+                            }
+
+                            return res.json({status: 'ok'})
                         }
-                    } catch (e) {
                     }
-
-                    /**
-                     Обновление таблиц
-                     **/
-                    try {
-                        await TableUpdates.upsert({table_name: 'Tours', date: Date.now()})
-                    } catch (e) {
-                    }
-
-                    try {
-                        if (img) {
-                            return res.json({status: 'ok', 'image_logo': imgFileName})
-                        }
-                    } catch (e) {
-                    }
-
-                    return res.json({status: 'ok'})
-                    // }
-                    // }
 
                 }
             } else {
@@ -275,6 +403,21 @@ class ToursController {
     }
 
     async getById(req, res) {
+
+    }
+
+    async getData(req, res, next) {
+        const {id} = req.params
+        if (!id) {
+            return next(ApiError.badRequest("Ошибка параметра"))
+        } else {
+            const candidate = await Tours.findOne({where: {id}})
+
+            if (candidate) {
+                return res.json(readFile(candidate.file_name))
+            }
+        }
+        return next(ApiError.internal("Ошибка чтения данных файла"))
 
     }
 

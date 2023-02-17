@@ -21,6 +21,8 @@ const TopicImagesComponent = (props) => {
         setImagesName(item.name)
         setImages(item.items)
 
+        console.log(item.items)
+
         setLoading(false)
     }, [])
 
@@ -30,28 +32,28 @@ const TopicImagesComponent = (props) => {
         dataItemEditHandler(item)
     }
 
-    const itemImagesEdit = (text, index) => {
-        let newArr = JSON.parse(images)
-        let currItem
-        currItem = text
-        newArr[index] = currItem
-        setImages(JSON.stringify(newArr))
+    // const itemImagesEdit = (text, index) => {
+    //     let newArr = JSON.parse(images)
+    //     let currItem
+    //     currItem = text
+    //     newArr[index] = currItem
+    //     setImages(JSON.stringify(newArr))
+    //
+    //     item.items = JSON.stringify(newArr)
+    //     dataItemEditHandler(item)
+    // }
 
-        item.items = JSON.stringify(newArr)
-        dataItemEditHandler(item)
-    }
-
-    const newItemAddHandler = () => {
-        let itemsArr = JSON.parse(images)
-        itemsArr.push("")
-        setImages(JSON.stringify(itemsArr))
-
-        item.items = JSON.stringify(itemsArr)
-
-        onFilesAddHandler('empty', index, itemsArr.length - 1)
-
-        dataItemEditHandler(item)
-    }
+    // const newItemAddHandler = () => {
+    //     let itemsArr = JSON.parse(images)
+    //     itemsArr.push("")
+    //     setImages(JSON.stringify(itemsArr))
+    //
+    //     item.items = JSON.stringify(itemsArr)
+    //
+    //     onFilesAddHandler('empty', index, itemsArr.length - 1)
+    //
+    //     dataItemEditHandler(item)
+    // }
 
 
     const itemDeleteHandler = (imageIndex) => {

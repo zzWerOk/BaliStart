@@ -10,7 +10,7 @@ import {ReactComponent as CloseIco} from "../../img/svg/close.svg"
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
 import {MDBContainer, MDBFile} from "mdb-react-ui-kit";
-import {changeTourAPI, deleteTourAPI, saveTourAPI} from "../../http/toursAPI";
+import {changeTourAPI, deleteTourAPI, getTourData, saveTourAPI} from "../../http/toursAPI";
 import TourCL from "../../classes/tourCL";
 import ModalPopUp from "../modal/ModalPopUp";
 import MapPointsDetailsPage from "../mappoints/MapPointsDetailsPage";
@@ -18,12 +18,15 @@ import MapPointsDetailsPage from "../mappoints/MapPointsDetailsPage";
 import './TourDetailsPage.css';
 import TourTimeLineCollapse from "./components/TourTimeLineCollapse";
 import {getMapPointData} from "../../http/mapPointsAPI";
+import TourIncludeComponent from "./components/TourIncludeComponent";
+import TopicImagesComponent from "../topics/components/TopicImagesComponent";
 
 let durationItems = []
 
 let currTour = null
 
 const TourDetailsPage = observer((props) => {
+
     const {mapPointsStore} = useContext(Context)
     const {item, onItemEditHandler, deleteTopic} = props
 
@@ -39,7 +42,6 @@ const TourDetailsPage = observer((props) => {
     const [itemImageLogo, setItemImageLogo] = useState('')
     const [newImageLogo, setNewImageLogo] = useState(false)
     const [tourCategoriesItems, setTourCategoriesItems] = useState([])
-    const [tourCategoriesItems_load, setTourCategoriesItems_load] = useState(true)
     const [tourTypesItems, setTourTypesItems] = useState([])
     const [tourTags, setTourTags] = useState([])
     const [tourTypes, setTourTypes] = useState([])
@@ -48,109 +50,143 @@ const TourDetailsPage = observer((props) => {
     const [activityType, setActivityType] = useState(1)
     const [tourLanguage, setTourLanguage] = useState('[]')
     const [tourMapPoints, setTourMapPoints] = useState('[]')
+    const [tourIncludes, setTourIncludes] = useState('[]')
+    const [tourNotIncludes, setTourNotIncludes] = useState('[]')
     const [mapPointsArr, setMapPointsArr] = useState([])
     const [mapPointsArr_Loading, setMapPointsArr_Loading] = useState(false)
 
     const [showModal, setShowModal] = useState(false)
+    const [tourCategoriesItems_load, setTourCategoriesItems_load] = useState(true)
+
+    const [imagesAdd, setImagesAdd] = useState({})
+    const [imagesItem, setImagesItem] = useState({name: '', items: '[]'})
+
+    const getTourDataF = async () => {
+
+        if(item.id > -1) {
+            await getTourData(item.id).then(data => {
+                if (data.hasOwnProperty('status')) {
+                    if (data.status === 'ok') {
+                        // currTour.data = data.data
+                        item.data = data.data
+                    }
+                }
+            }).catch(() => {
+                currTour.data = '{}'
+            })
+        }
+    }
 
     useEffect(() => {
-
-            durationItems = []
-            for (let i = 1; i <= 21; i++) {
-                durationItems.push({id: i})
-            }
-
             currTour = new TourCL()
 
-            setTourCategoriesItems_load(true)
-            currTour.setFromJson(item)
+            getTourDataF().finally(() => {//start
 
-            setDurationTime(parseInt(currTour.duration.split(' ')[0]) || 1)
-            setDurationTimeType(currTour.duration.split(' ')[1] || 'h')
-            setActivityType(parseInt(currTour.activity_level) || 1)
-
-            setTourLanguage(currTour.languages)
-
-            setCurrName(currTour.name)
-            setCurrDescription(currTour.description)
-            setIsActive(currTour.active)
-            setTourCategoriesItems(toursCategoryStore.getSavedCategoriesList())
-            setTourTypesItems(toursTypeStore.getSavedCategoriesList())
-            setTourTags(currTour.tour_categoryJSON)
-            setTourTypes(currTour.tour_typeJSON)
-
-
-            mapPointsStore.loadMapPointsList()
-            let storeMapointsItems = mapPointsStore.getMapPointList
-            setMapPointsArr(mapPointsStore.getMapPointList)
-
-            let newMapPointArr = []
-            let lostMapPointsArr = []
-            let currTourMapPointArr = JSON.parse(currTour.map_points)
-            // console.log(currTour)
-
-            for (let i = 0; i < currTourMapPointArr.length; i++) {
-                mapPointsStore.getMapPointList.map(currMapPoint => {
-                    if (currTourMapPointArr[i] === currMapPoint.id) {
-                        if (!currMapPoint.data) {
-                            // lostMapPointsArr.push(currMapPoint.id)
-                            lostMapPointsArr.push(i)
-                        }
-
-                        newMapPointArr.push(currTourMapPointArr[i])
-                    }
-                })
-            }
-
-            setTourMapPoints(JSON.stringify(newMapPointArr))
-            currTour.map_points = JSON.stringify(newMapPointArr)
-
-
-            if (item.image_logo) {
-                if (item.id >= 0) {
-                    setItemImageLogo(currTour.image_logo + '?' + Date.now())
+                durationItems = []
+                for (let i = 1; i <= 21; i++) {
+                    durationItems.push({id: i})
                 }
-            }
-            setTourCategoriesItems_load(false)
 
-            setMapPointsArr_Loading(true)
-            if (lostMapPointsArr.length > 0) {
-                lostMapPointsArr.map(async function (lostItem, index) {
 
-                    getMapPointData(currTourMapPointArr[lostItem]).then(data => {
-                        if (data.hasOwnProperty('status')) {
-                            if (data.status === 'ok') {
+                // setTourCategoriesItems_load(true)
+                currTour.setFromJson(item)
 
-                                for (let j = 0; j < storeMapointsItems.length; j++) {
-                                    let currStoreMapPointItem = storeMapointsItems[j]
-                                    if (currStoreMapPointItem.id === currTourMapPointArr[lostItem]) {
-                                        // storeMapointsItems[currTourMapPointArr[lostItem]].data = data.data
-                                        currStoreMapPointItem.data = data.data
+                setDurationTime(parseInt(currTour.duration.split(' ')[0]) || 1)
+                setDurationTimeType(currTour.duration.split(' ')[1] || 'h')
+                setActivityType(parseInt(currTour.activity_level) || 1)
 
-                                        mapPointsStore.addDataToMapPoint_byId(currStoreMapPointItem.id, data.data)
+                setTourLanguage(currTour.languages)
 
+                setCurrName(currTour.name)
+                setCurrDescription(currTour.description)
+                setIsActive(currTour.active)
+                setTourCategoriesItems(toursCategoryStore.getSavedCategoriesList())
+                setTourTypesItems(toursTypeStore.getSavedCategoriesList())
+                setTourTags(currTour.tour_categoryJSON)
+                setTourTypes(currTour.tour_typeJSON)
+
+
+                mapPointsStore.loadMapPointsList()
+                let storeMapointsItems = mapPointsStore.getMapPointList
+                setMapPointsArr(mapPointsStore.getMapPointList)
+
+                let newMapPointArr = []
+                let lostMapPointsArr = []
+                let currTourMapPointArr = JSON.parse(currTour.map_points)
+                // console.log(currTour)
+
+                for (let i = 0; i < currTourMapPointArr.length; i++) {
+                    mapPointsStore.getMapPointList.map(currMapPoint => {
+                        if (currTourMapPointArr[i] === currMapPoint.id) {
+                            if (!currMapPoint.data) {
+                                // lostMapPointsArr.push(currMapPoint.id)
+                                lostMapPointsArr.push(i)
+                            }
+
+                            newMapPointArr.push(currTourMapPointArr[i])
+                        }
+                    })
+                }
+
+                setTourMapPoints(JSON.stringify(newMapPointArr))
+                currTour.map_points = JSON.stringify(newMapPointArr)
+
+
+                if (item.image_logo) {
+                    if (item.id >= 0) {
+                        setItemImageLogo(currTour.image_logo + '?' + Date.now())
+                    }
+                }
+
+                setMapPointsArr_Loading(true)
+                if (lostMapPointsArr.length > 0) {
+                    lostMapPointsArr.map(async function (lostItem, index) {
+
+                        getMapPointData(currTourMapPointArr[lostItem]).then(data => {
+                            if (data.hasOwnProperty('status')) {
+                                if (data.status === 'ok') {
+
+                                    for (let j = 0; j < storeMapointsItems.length; j++) {
+                                        let currStoreMapPointItem = storeMapointsItems[j]
+                                        if (currStoreMapPointItem.id === currTourMapPointArr[lostItem]) {
+                                            // storeMapointsItems[currTourMapPointArr[lostItem]].data = data.data
+                                            currStoreMapPointItem.data = data.data
+
+                                            mapPointsStore.addDataToMapPoint_byId(currStoreMapPointItem.id, data.data)
+
+                                        }
                                     }
+
                                 }
+                            }
+                        }).finally(() => {
+
+                            if (lostMapPointsArr.length - 1 === index) {
+                                setMapPointsArr_Loading(false)
+                                setMapPointsArr(storeMapointsItems)
+
+                                // mapPointsStore.setMapPointsListFromArr(storeMapointsItems)
 
                             }
-                        }
-                    }).finally(() => {
 
-                        if (lostMapPointsArr.length - 1 === index) {
-                            setMapPointsArr_Loading(false)
-                            setMapPointsArr(storeMapointsItems)
-
-                            // mapPointsStore.setMapPointsListFromArr(storeMapointsItems)
-
-                        }
-
+                        })
                     })
-                })
-            } else {
-                setMapPointsArr(storeMapointsItems)
-                setMapPointsArr_Loading(false)
+                } else {
+                    setMapPointsArr(storeMapointsItems)
+                    setMapPointsArr_Loading(false)
 
-            }
+                }
+
+                setTourIncludes(currTour.tourIncludes || '[]')
+                setTourNotIncludes(currTour.tourNotIncludes || '[]')
+
+                setImagesAdd({0: JSON.parse(currTour.tourImages)} || {})
+                // imagesItem.items = currTour.tourImages
+
+                setImagesItem({name: '', items: currTour.tourImages})
+
+                setTourCategoriesItems_load(false)
+            })
 
 
         }, []
@@ -448,6 +484,8 @@ const TourDetailsPage = observer((props) => {
                     currTour.languages,
                     currTour.map_points,
                     currTour.image_logo_file,
+                    currTour.data,
+                    imagesAdd,
                 ).then(data => {
                     if (data.hasOwnProperty('status')) {
                         if (data.status === 'ok') {
@@ -459,13 +497,18 @@ const TourDetailsPage = observer((props) => {
                                 setItemImageLogo(data.image_logo + '?' + Date.now())
                             }
 
-                            changeTopicId(data.id)
+                            getTourDataF().finally(() => {//save
+                                changeTopicId(data.id)
+                            }).finally(() => {
+                                setIsSaving(false)
+                            })
+
                         }
                     }
                 }).catch(() => {
                     setSaveError(true)
                 }).finally(() => {
-                    setIsSaving(false)
+                    // setIsSaving(false)
                 })
             } else {
                 changeTourAPI(
@@ -484,6 +527,8 @@ const TourDetailsPage = observer((props) => {
                     currTour.languages,
                     currTour.map_points,
                     currTour.image_logo_file,
+                    currTour.data,
+                    imagesAdd,
                 ).then(data => {
 
                     if (data.hasOwnProperty('status')) {
@@ -495,13 +540,27 @@ const TourDetailsPage = observer((props) => {
                                 setItemImageLogo(data.image_logo + '?' + Date.now())
                             }
 
-                            onItemEditHandler(currTour.getAsJson(), newImageLogo)
+                            getTourDataF().finally(() => {//change
+                                currTour.data = item.data
+
+                                setTourIncludes(currTour.tourIncludes || '[]')
+                                setTourNotIncludes(currTour.tourNotIncludes || '[]')
+
+                                setImagesAdd({0: JSON.parse(currTour.tourImages)} || {})
+                                // imagesItem.items = currTour.tourImages
+                                setImagesItem({name: '', items: currTour.tourImages})
+
+                                onItemEditHandler(currTour.getAsJson(), newImageLogo)
+                            }).finally(() => {
+                                setIsSaving(false)
+                            })
                         }
                     }
                 }).catch(() => {
                     currTour.isSaved = false
                     setSaveError(true)
                 }).finally(() => {
+
                     setIsSaving(false)
                 })
             }
@@ -687,6 +746,87 @@ const TourDetailsPage = observer((props) => {
         />
     }
 
+    const tourIncludesEditHandler = (newTourIncludes) => {
+        currTour.tourIncludes = JSON.stringify(newTourIncludes)
+        currTour.isSaved = false
+        setTourIncludes(JSON.stringify(newTourIncludes))
+        onItemEditHandler(currTour.getAsJson())
+    }
+
+    const tourNotIncludesEditHandler = (newTourIncludes) => {
+        currTour.tourNotIncludes = JSON.stringify(newTourIncludes)
+        currTour.isSaved = false
+        setTourIncludes(JSON.stringify(newTourIncludes))
+        onItemEditHandler(currTour.getAsJson())
+    }
+
+    const tourImagesEditHandler = () => {
+        // currTour.tourImages = newTourImages.items
+        // currTour.isSaved = false
+        // onItemEditHandler(currTour.getAsJson())
+        //
+        // console.log(newTourImages)
+
+    }
+
+    const onImagesFilesDeleteHandler = (imageListIndex, imageIndex) => {
+        let currImagesList = imagesAdd
+        if (!currImagesList.hasOwnProperty(imageListIndex)) {
+            currImagesList[imageListIndex] = {}
+        }
+        let currList = currImagesList[imageListIndex]
+        delete currList[imageIndex]
+
+        let newCurrList = {}
+        let newDataImagesArr = []
+        Object.keys(currList).forEach(function (key) {
+            newCurrList[Object.keys(newCurrList).length] = currList[key]
+            newDataImagesArr.push(currList[key])
+        });
+
+        currImagesList[imageListIndex] = newCurrList
+        setImagesAdd(currImagesList)
+
+        currTour.tourImages = JSON.stringify(newDataImagesArr)
+
+        currTour.isSaved = false
+        onItemEditHandler(currTour.getAsJson())
+
+    }
+    const onImagesFilesAddHandler = (fileName, imageListIndex) => {
+        if (fileName) {
+            let currImagesList = imagesAdd
+            if (!currImagesList.hasOwnProperty(imageListIndex)) {
+                currImagesList[imageListIndex] = {}
+            }
+            let currList = currImagesList[imageListIndex]
+
+            let isThere = false
+            Object.keys(currList).forEach(function (key) {
+                let currFile = currList[key]
+                if (currFile.name === fileName.name &&
+                    currFile.lastModified === fileName.lastModified &&
+                    currFile.size === fileName.size &&
+                    currFile.type === fileName.type) {
+                    isThere = true
+                }
+            });
+
+            if (!isThere) {
+                currList[Object.keys(currList).length] = fileName
+                currImagesList[imageListIndex] = currList
+                setImagesAdd(currImagesList)
+
+                currTour.tourImages = JSON.stringify([...JSON.parse(currTour.tourImages),fileName.name])
+
+            }
+
+            currTour.isSaved = false
+            onItemEditHandler(currTour.getAsJson())
+
+            return !isThere
+        }
+    }
     const getMapPointsTimeLine = () => {
 
 
@@ -1196,6 +1336,42 @@ const TourDetailsPage = observer((props) => {
                         <br/>
 
                     </div>
+                </Row>
+                {/***
+                 WHAT INCLUDE
+                 ***/}
+                <Row style={{backgroundColor: 'rgba(0,255,0,0.17)', paddingBottom: '30px', paddingTop: '15px'}}>
+                    <span>Includes</span>
+                    <TourIncludeComponent
+                        includes={tourIncludes}
+                        isSaving={isSaving}
+                        tourIncludesEditHandler={tourIncludesEditHandler}
+                    />
+                </Row>
+                {/***
+                 WHAT NOT INCLUDE
+                 ***/}
+                <Row style={{backgroundColor: 'rgba(255,0,0,0.17)', paddingBottom: '30px', paddingTop: '15px'}}>
+                    <span>Not includes</span>
+                    <TourIncludeComponent
+                        includes={tourNotIncludes}
+                        isSaving={isSaving}
+                        tourIncludesEditHandler={tourNotIncludesEditHandler}
+                    />
+                </Row>
+                {/***
+                 IMAGES
+                 ***/}
+                <Row>
+                    <span>Images</span>
+                    <TopicImagesComponent
+                        index={0}
+                        item={imagesItem}
+                        isSaving={isSaving}
+                        dataItemEditHandler={tourImagesEditHandler}
+                        onFilesAddHandler={onImagesFilesAddHandler}
+                        onFilesDeleteHandler={onImagesFilesDeleteHandler}
+                    />
                 </Row>
                 {/***
                  SAVE
