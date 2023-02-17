@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Button, Dropdown, DropdownButton, Image, Row, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
+import {Button, Dropdown, Image, Row, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import noImageLogo from '../../img/nophoto.jpg'
 import {Context} from "../../index";
 import {observer} from "mobx-react-lite";
@@ -9,7 +9,7 @@ import {ReactComponent as CircleOkIco} from "../../img/svg/circle_ok.svg"
 import {ReactComponent as CloseIco} from "../../img/svg/close.svg"
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
-import {MDBContainer, MDBFile, MDBIcon} from "mdb-react-ui-kit";
+import {MDBContainer, MDBFile} from "mdb-react-ui-kit";
 import {changeTourAPI, deleteTourAPI, saveTourAPI} from "../../http/toursAPI";
 import TourCL from "../../classes/tourCL";
 import ModalPopUp from "../modal/ModalPopUp";
@@ -24,7 +24,7 @@ let durationItems = []
 let currTour = null
 
 const TourDetailsPage = observer((props) => {
-    const {mapPointsStore, user} = useContext(Context)
+    const {mapPointsStore} = useContext(Context)
     const {item, onItemEditHandler, deleteTopic} = props
 
     const {toursCategoryStore, toursTypeStore} = useContext(Context)
@@ -41,7 +41,6 @@ const TourDetailsPage = observer((props) => {
     const [tourCategoriesItems, setTourCategoriesItems] = useState([])
     const [tourCategoriesItems_load, setTourCategoriesItems_load] = useState(true)
     const [tourTypesItems, setTourTypesItems] = useState([])
-    const [tourTypeItems_load, setTourTypeItems_load] = useState(true)
     const [tourTags, setTourTags] = useState([])
     const [tourTypes, setTourTypes] = useState([])
     const [durationTime, setDurationTime] = useState(0)
@@ -88,7 +87,7 @@ const TourDetailsPage = observer((props) => {
             let newMapPointArr = []
             let lostMapPointsArr = []
             let currTourMapPointArr = JSON.parse(currTour.map_points)
-        // console.log(currTour)
+            // console.log(currTour)
 
             for (let i = 0; i < currTourMapPointArr.length; i++) {
                 mapPointsStore.getMapPointList.map(currMapPoint => {
@@ -114,7 +113,7 @@ const TourDetailsPage = observer((props) => {
             }
             setTourCategoriesItems_load(false)
 
-        setMapPointsArr_Loading(true)
+            setMapPointsArr_Loading(true)
             if (lostMapPointsArr.length > 0) {
                 lostMapPointsArr.map(async function (lostItem, index) {
 
@@ -122,9 +121,9 @@ const TourDetailsPage = observer((props) => {
                         if (data.hasOwnProperty('status')) {
                             if (data.status === 'ok') {
 
-                                for(let j = 0;j < storeMapointsItems.length;j ++){
+                                for (let j = 0; j < storeMapointsItems.length; j++) {
                                     let currStoreMapPointItem = storeMapointsItems[j]
-                                    if(currStoreMapPointItem.id === currTourMapPointArr[lostItem]){
+                                    if (currStoreMapPointItem.id === currTourMapPointArr[lostItem]) {
                                         // storeMapointsItems[currTourMapPointArr[lostItem]].data = data.data
                                         currStoreMapPointItem.data = data.data
 
@@ -137,7 +136,7 @@ const TourDetailsPage = observer((props) => {
                         }
                     }).finally(() => {
 
-                        if(lostMapPointsArr.length-1 === index){
+                        if (lostMapPointsArr.length - 1 === index) {
                             setMapPointsArr_Loading(false)
                             setMapPointsArr(storeMapointsItems)
 
@@ -147,7 +146,7 @@ const TourDetailsPage = observer((props) => {
 
                     })
                 })
-            }else{
+            } else {
                 setMapPointsArr(storeMapointsItems)
                 setMapPointsArr_Loading(false)
 
@@ -290,7 +289,7 @@ const TourDetailsPage = observer((props) => {
         if (newCategory) {
             const found = tourTags.find(element => element === newCategory.id)
             if (found) {
-                const filtered = tourTags.filter(function (value, index, arr) {
+                const filtered = tourTags.filter(function (value) {
                     return value !== found;
                 })
                 setTourTags(filtered)
@@ -313,25 +312,25 @@ const TourDetailsPage = observer((props) => {
         if (newCategory) {
             const found = tourTypes.find(element => element === newCategory.id)
             if (found) {
-                const filtered = tourTypes.filter(function (value, index, arr) {
-                    return value !== found;
+                const filtered = tourTypes.filter(function (typeId) {
+                    return typeId !== found;
                 })
                 setTourTypes(filtered)
                 currTour.tour_type = JSON.stringify(filtered)
                 currTour.isSaved = false
                 onItemEditHandler(currTour.getAsJson())
             }
+        } else {
+            const filtered = tourTypes.filter(function (typeId) {
+                return value !== typeId;
+            })
+
+            setTourTypes(filtered)
+            currTour.tour_type = JSON.stringify(filtered)
+            currTour.isSaved = false
+            onItemEditHandler(currTour.getAsJson())
         }
     }
-
-    // const getDropDownTitleByType = (type) => {
-    //     for (let i = 0; i < dropDownItems.length; i++) {
-    //         if (dropDownItems[i].type === type) {
-    //             return dropDownItems[i].name
-    //         }
-    //
-    //     }
-    // }
 
     const getTagNameById = (id) => {
         for (let i = 0; i < tourCategoriesItems.length; i++) {
@@ -398,7 +397,7 @@ const TourDetailsPage = observer((props) => {
         setIsSaving(true)
         setDeleteError(false)
 
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             if (currTour.id > 0) {
                 deleteTourAPI(
@@ -431,7 +430,7 @@ const TourDetailsPage = observer((props) => {
 
         setIsSaving(true)
         setSaveError(false)
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             if (currTour.id < 0) {
                 saveTourAPI(
@@ -514,7 +513,7 @@ const TourDetailsPage = observer((props) => {
             const currLangArr = JSON.parse(tourLanguage)
             const found = currLangArr.find(element => element === value)
             if (found) {
-                const filtered = currLangArr.filter(function (value, index, arr) {
+                const filtered = currLangArr.filter(function (value) {
                     return value !== found;
                 })
                 currTour.languages = JSON.stringify(filtered)
@@ -569,16 +568,16 @@ const TourDetailsPage = observer((props) => {
         onItemEditHandler(currTour.getAsJson())
     }
 
-    const getMapPointName_byId = (id) => {
-        for (let i = 0; i < mapPointsArr.length; i++) {
-            if (parseInt(mapPointsArr[i].id) === parseInt(id)) {
-                return mapPointsArr[i].name
-            }
-        }
-    }
+    // const getMapPointName_byId = (id) => {
+    //     for (let i = 0; i < mapPointsArr.length; i++) {
+    //         if (parseInt(mapPointsArr[i].id) === parseInt(id)) {
+    //             return mapPointsArr[i].name
+    //         }
+    //     }
+    // }
 
     const getMapPointDataItems = (selectedMapPoint) => {
-        if(selectedMapPoint.hasOwnProperty('data')) {
+        if (selectedMapPoint.hasOwnProperty('data')) {
             let newDataItems = []
             const mapPointData = JSON.parse(selectedMapPoint.data)
             for (let i = 0; i < mapPointData.length; i++) {
@@ -594,7 +593,7 @@ const TourDetailsPage = observer((props) => {
 
     const getMapPointDataDescription = (selectedMapPoint) => {
         try {
-            if(selectedMapPoint.hasOwnProperty('data')) {
+            if (selectedMapPoint.hasOwnProperty('data')) {
                 const mapPointData = JSON.parse(selectedMapPoint.data)
 
                 for (let i = 0; i < mapPointData.length; i++) {
@@ -605,7 +604,7 @@ const TourDetailsPage = observer((props) => {
 
                 return selectedMapPoint.description
             }
-        }catch (e) {
+        } catch (e) {
             console.log(selectedMapPoint)
             console.log(e)
 
@@ -628,7 +627,7 @@ const TourDetailsPage = observer((props) => {
 
             const found = currMapPointsArr.find(element => element === id)
             if (found) {
-                const filtered = currMapPointsArr.filter(function (value, index, arr) {
+                const filtered = currMapPointsArr.filter(function (value) {
                     return value !== found;
                 })
 
@@ -743,11 +742,10 @@ const TourDetailsPage = observer((props) => {
                         0 favs
                     </div>
                 </Row>
-
+                {/***
+                 ACTIVE BTN
+                 ***/}
                 <Row>
-                    {/***
-                     ACTIVE BTN
-                     ***/}
                     <div
                         className={'col-sm-5 justify-content-start '}
                         style={{display: 'flex'}}
@@ -798,10 +796,10 @@ const TourDetailsPage = observer((props) => {
                         </ToggleButton>
                     </div>
                 </Row>
+                {/***
+                 DESCRIPTION
+                 ***/}
                 <Row>
-                    {/***
-                     DESCRIPTION
-                     ***/}
 
                     <div className={'col-lg-10 justify-content-center '}>
                     <textarea
@@ -814,10 +812,10 @@ const TourDetailsPage = observer((props) => {
                     />
                     </div>
                 </Row>
+                {/***
+                 CATEGORIES
+                 ***/}
                 <Row>
-                    {/***
-                     CATEGORIES
-                     ***/}
 
                     {tourCategoriesItems_load
                         ?
@@ -882,10 +880,10 @@ const TourDetailsPage = observer((props) => {
                     }
 
                 </Row>
+                {/***
+                 IMAGE
+                 ***/}
                 <Row>
-                    {/***
-                     IMAGE
-                     ***/}
 
                     <div
                         className={'d-flex align-items-center justify-content-center'}
@@ -929,10 +927,10 @@ const TourDetailsPage = observer((props) => {
                         />
                     </div>
                 </Row>
+                {/***
+                 TYPES
+                 ***/}
                 <Row>
-                    {/***
-                     TYPES
-                     ***/}
 
                     {tourCategoriesItems_load
                         ?
@@ -997,10 +995,10 @@ const TourDetailsPage = observer((props) => {
                     }
 
                 </Row>
+                {/***
+                 DURATION
+                 ***/}
                 <Row>
-                    {/***
-                     DURATION
-                     ***/}
                     <span>Tour duration</span>
                     <div>
                         <ToggleButtonGroup type="radio" name="hourday" defaultValue={durationTimeType === 'h' ? 1 : 2}>
@@ -1049,10 +1047,10 @@ const TourDetailsPage = observer((props) => {
                         </div>
                     </div>
                 </Row>
+                {/***
+                 ACTIVITY LEVEL
+                 ***/}
                 <Row>
-                    {/***
-                     ACTIVITY LEVEL
-                     ***/}
                     <span>Tour activity level</span>
                     <div>
                         <ToggleButtonGroup type="radio" name="activity" defaultValue={activityType}>
@@ -1110,10 +1108,10 @@ const TourDetailsPage = observer((props) => {
 
                     </div>
                 </Row>
+                {/***
+                 LANGUAGE
+                 ***/}
                 <Row>
-                    {/***
-                     LANGUAGE
-                     ***/}
                     <span>Tour languages</span>
                     <div>
                         <ToggleButtonGroup type="checkbox" name="activity" defaultValue={JSON.parse(tourLanguage)}>
@@ -1153,11 +1151,10 @@ const TourDetailsPage = observer((props) => {
                     </div>
                 </Row>
                 <br/>
-
+                {/***
+                 MAP POINT
+                 ***/}
                 <Row>
-                    {/***
-                     MAP POINT
-                     ***/}
                     <span>Itinerary</span>
 
                     {getMapPointsTimeLine()}
@@ -1200,21 +1197,20 @@ const TourDetailsPage = observer((props) => {
 
                     </div>
                 </Row>
+                {/***
+                 SAVE
+                 ***/}
                 <Row>
-                    {/***
-                     SAVE
-                     ***/}
-
                     <Button
                         className={`btn ${saveError ? 'btn-danger' : 'btn-primary'}  btn-lg w-75 btn-block`}
                         disabled={!!isSaving}
                         onClick={saveHandler}
                     >Save</Button>
                 </Row>
+                {/***
+                 DELETE
+                 ***/}
                 <Row>
-                    {/***
-                     DELETE
-                     ***/}
 
                     <div style={{display: "flex"}}>
                         <button
@@ -1239,10 +1235,8 @@ const TourDetailsPage = observer((props) => {
                             >
                                 Yes
                             </button>
-
                         </div>
                     </div>
-
                 </Row>
 
                 <ModalPopUp

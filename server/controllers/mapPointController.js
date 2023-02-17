@@ -30,7 +30,7 @@ class MapPointController {
 
             if(name) {
 
-                const result = createNewFile(data_text, 'MapPoint', img)
+                const result = await createNewFile(data_text, 'MapPoint', img)
 
                 if (result.hasOwnProperty('status')) {
                     if (result.status === 'ok') {
@@ -105,7 +105,7 @@ class MapPointController {
                 const candidate = await MapPoint.findOne({where: {id}})
 
                 if (candidate) {
-                    const result = reWrightFile(data_text, 'MapPoint', candidate.file_name, null)
+                    const result = await reWrightFile(data_text, 'MapPoint', candidate.file_name, null)
 
                     if (result.hasOwnProperty('status')) {
                         if (result.status === 'ok') {

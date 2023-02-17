@@ -1,7 +1,6 @@
-import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
-import {Button, ListGroup} from "react-bootstrap";
+import React, {useContext, useEffect, useState} from 'react';
+import {ListGroup} from "react-bootstrap";
 import {delay} from "../../utils/consts";
-import {getTableUpdateByName} from "../../http/tableUpdatesAPI";
 import {Context} from "../../index";
 import SpinnerSm from "../SpinnerSM";
 import {observer} from "mobx-react-lite";
@@ -16,6 +15,8 @@ const ToursCategoryPage = observer((props) => {
     const {toursCategoryStore, toursTypeStore} = useContext(Context)
     const [loading, setLoading] = useState(true)
 
+    const [saveItemError, setSaveItemError] = useState(false)
+
     const [loadingAddItem, setLoadingAddItem] = useState(false)
     const [new_items_arr, setNew_items_arr] = useState([])
     const [items_arr, setItems_arr] = useState([])
@@ -25,25 +26,25 @@ const ToursCategoryPage = observer((props) => {
     useEffect(() => {
         setLoading(true)
 
-        delay(0).then(r => {
+        delay(0).then(() => {
 
-            getTableUpdateByName(tagType === 'categories' ? 'ToursCategory' : 'ToursType').then(tuData => {
-                let lastDateTable
-
-                if(tagType === 'categories') {
-                    lastDateTable = toursCategoryStore.getSavedLastDateTableToursCategory()
-                }else {
-                    lastDateTable = toursTypeStore.getSavedLastDateTableToursCategory()
-                }
-
-                let currTagList = []
-                if(tagType === 'categories'){
-                    currTagList = toursCategoryStore.getSavedCategoriesList()
-                }else{
-                    currTagList = toursTypeStore.getSavedCategoriesList()
-                }
-
-                if (tuData.date.toString() !== lastDateTable.toString() || currTagList.length === 0) {
+            // getTableUpdateByName(tagType === 'categories' ? 'ToursCategory' : 'ToursType').then(tuData => {
+            //     let lastDateTable
+            //
+                // if(tagType === 'categories') {
+                //     lastDateTable = toursCategoryStore.getSavedLastDateTableToursCategory()
+                // }else {
+                //     lastDateTable = toursTypeStore.getSavedLastDateTableToursCategory()
+                // }
+                //
+                // let currTagList = []
+                // if(tagType === 'categories'){
+                //     currTagList = toursCategoryStore.getSavedCategoriesList()
+                // }else{
+                //     currTagList = toursTypeStore.getSavedCategoriesList()
+                // }
+                //
+                // if (tuData.date.toString() !== lastDateTable.toString() || currTagList.length === 0) {
 
                     if(tagType === 'categories'){
                         getAll_Cat().then(data => {
@@ -53,10 +54,11 @@ const ToursCategoryPage = observer((props) => {
                             toursCategoryStore.saveCategoriesList(data.rows)
                             setItems_arr(data.rows)
                         }).finally(() => {
-                            /**
-                             Сохраняем дату последнего изменения таблицы
-                             **/
-                            toursCategoryStore.saveLastDateTableToursCategory(tuData.date)
+                            // /**
+                            //  Сохраняем дату последнего изменения таблицы
+                            //  **/
+                            // toursCategoryStore.saveLastDateTableToursCategory(tuData.date)
+                            setLoading(false)
                         })
                     }else{
                         getAll_Type().then(data => {
@@ -66,51 +68,54 @@ const ToursCategoryPage = observer((props) => {
                             toursTypeStore.saveCategoriesList(data.rows)
                             setItems_arr(data.rows)
                         }).finally(() => {
-                            /**
-                             Сохраняем дату последнего изменения таблицы
-                             **/
-                            toursTypeStore.saveLastDateTableToursCategory(tuData.date)
+                            // /**
+                            //  Сохраняем дату последнего изменения таблицы
+                            //  **/
+                            // toursTypeStore.saveLastDateTableToursCategory(tuData.date)
+                            setLoading(false)
                         })
                     }
 
-                } else {
-                    if(tagType === 'categories'){
-                        setItems_arr(toursCategoryStore.getSavedCategoriesList())
-                    }else{
-                        setItems_arr(toursTypeStore.getSavedCategoriesList())
-                    }
-                }
-
-            }).finally(() => {
-                setLoading(false)
-            })
+            //     } else {
+            //         if(tagType === 'categories'){
+            //             setItems_arr(toursCategoryStore.getSavedCategoriesList())
+            //         }else{
+            //             setItems_arr(toursTypeStore.getSavedCategoriesList())
+            //         }
+            //     }
+            //
+            // }).finally(() => {
+            //     setLoading(false)
+            // })
 
         })
     }, [])
 
     const addNewNewItem = (newItemData) => {
 
-        if (newItemData.hasOwnProperty('name')) {
+        setSaveItemError(false)
 
+        if (newItemData.hasOwnProperty('name')) {
 
             if (!toursCategoryStore.checkIfNewItemExists(newItemData.name)) {
 
                 setLoadingAddItem(true)
 
-                delay(0).then(r => {
+                delay(0).then(() => {
                     if(tagType === 'categories'){
                         createAPI_Cat(newItemData.name, newItemData.description).then(data => {
                             if (data.hasOwnProperty('status')) {
-
                                 if (data.status === 'ok') {
                                     if (toursCategoryStore.addNewItem(newItemData.name, newItemData.description, false, data.id)) {
                                         setNew_items_arr(toursCategoryStore.newItemsArr)
                                         toursCategoryStore.saveCategoriesList()
                                         addItemTrigger.added()
-
+                                        setSaveItemError(false)
                                     }
-                                }
-                            }
+                                }else{setSaveItemError(true)}
+                            }else{setSaveItemError(true)}
+                        }).catch(() => {
+                            setSaveItemError(true)
                         }).finally(() => {
                             setLoadingAddItem(false)
                         })
@@ -123,9 +128,12 @@ const ToursCategoryPage = observer((props) => {
                                         setNew_items_arr(toursTypeStore.newItemsArr)
                                         toursTypeStore.saveCategoriesList()
                                         addItemTrigger.added()
+                                        setSaveItemError(false)
                                     }
-                                }
-                            }
+                                }else{setSaveItemError(true)}
+                            }else{setSaveItemError(true)}
+                        }).catch(() => {
+                            setSaveItemError(true)
                         }).finally(() => {
                             setLoadingAddItem(false)
                         })
@@ -177,6 +185,7 @@ const ToursCategoryPage = observer((props) => {
                     addNewItemFunc={addNewNewItem}
                     loadingAddItem={loadingAddItem}
                     addItemTrigger={addItemTrigger}
+                    saveItemError={saveItemError}
                 />
             </ListGroup>
             <div style={{marginBottom: '10px'}}>

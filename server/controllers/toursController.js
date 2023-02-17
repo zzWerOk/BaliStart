@@ -1,9 +1,9 @@
 const {TableUpdates, User, Tours, Files} = require("../models/models");
 const {Op} = require("sequelize");
 const ApiError = require("../error/ApiError");
-const {removeFile, createNewFile} = require("../utils/consts");
 const path = require("path");
 const fs = require("fs");
+const {removeFile, createNewFile} = require("../utils/consts");
 
 class ToursController {
 
@@ -24,13 +24,27 @@ class ToursController {
                 map_points,
             } = req.body
 
+            let created_by_user_admin_id = created_by_user_id
+            const currUser = req.user
+            let userAdmin = null
+            try {
+                if (currUser) {
+                    userAdmin = await User.findOne({where: {id: currUser.id}})
+                    created_by_user_admin_id = userAdmin.id
+                } else {
+                    return next(ApiError.forbidden("Не авторизован"))
+                }
+            } catch (e) {
+            }
+
             let img
             if (req.files) {
                 img = req.files.img
             }
 
-            if (name && created_by_user_id) {
-                const result = createNewFile('', 'Tours', img)
+            if (name && created_by_user_admin_id) {
+                const result = await createNewFile('', 'Tours', img)
+
 
                 if (result.hasOwnProperty('status')) {
                     if (result.status === 'ok') {
@@ -44,7 +58,7 @@ class ToursController {
                             name,
                             description,
                             image_logo,
-                            created_by_user_id,
+                            created_by_user_id: created_by_user_admin_id,
                             created_date,
                             active,
                             tour_category,

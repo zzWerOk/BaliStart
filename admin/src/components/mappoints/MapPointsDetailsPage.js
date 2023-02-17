@@ -78,7 +78,7 @@ const MapPointsDetailsPage = observer((props) => {
             }
 
             if (Object.keys(currMapPoint.dataJSON).length === 0) {
-                delay(0).then(r => {
+                delay(0).then(() => {
                     if (currMapPoint.id > -1) {
                         getMapPointData(currMapPoint.id).then(data => {
                             if (data.hasOwnProperty('status')) {
@@ -136,7 +136,7 @@ const MapPointsDetailsPage = observer((props) => {
                 newItem = {"type": type, "name": "", "url": ""}
                 break
             case "topic":
-                newItem = {"type": type, "name": "", "url": ""}
+                newItem = {"type": type, "topicId": "", "topicName": ""}
                 break
         }
         return newItem
@@ -176,7 +176,7 @@ const MapPointsDetailsPage = observer((props) => {
     const deleteDataItemByIndex = (index) => {
         const currItem = itemData[index]
 
-        const filtered = itemData.filter(function (value, index, arr) {
+        const filtered = itemData.filter(function (value) {
             return value !== currItem;
         })
 
@@ -230,7 +230,7 @@ const MapPointsDetailsPage = observer((props) => {
         setIsSaving(true)
         setDeleteError(false)
 
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             if (currMapPoint.id > 0) {
                 deleteMapPointAPI(
@@ -260,7 +260,7 @@ const MapPointsDetailsPage = observer((props) => {
 
         setIsSaving(true)
         setSaveError(false)
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             /***
              * Удаляем поле 'index' с каждого элемента

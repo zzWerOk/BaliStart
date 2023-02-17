@@ -1,10 +1,8 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import './TourTimeLineCollapse.css';
 import {MDBCollapse} from "mdb-react-ui-kit";
 import noImageLogo from "../../../img/nophoto.jpg";
-import {Image} from "react-bootstrap";
-import TourMapPointText from "./TourMapPointText";
-import TourMapPointGoogleMap from "./TourMapPointGoogleMap";
+import TourMapPointCardFloatRight from "./TourMapPointCardFloarRight";
 
 const TourTimeLineCollapse = (props) => {
 
@@ -24,14 +22,6 @@ const TourTimeLineCollapse = (props) => {
     }, [])
 
 
-    // useEffect(
-    //     () => {
-    //         if (image_logo) {
-    //             setItemImageLogo(image_logo + '?' + Date.now())
-    //         }
-    //     }
-    // )
-
     const toggleShow = () => setShowShow(!showShow);
 
 
@@ -43,65 +33,19 @@ const TourTimeLineCollapse = (props) => {
             </span>
             <h5 className="fw-bold">{name}</h5>
 
-            <MDBCollapse show={showShow}>
-                <div>
-                    <Image
+            <MDBCollapse
+                show={showShow}
+            >
 
-                        style={{
-                            float: 'left',
-                            margin: '5px',
-                            objectFit: 'cover',
-                            width: '150px',
-                            maxHeight: '95px',
-                        }}
-                        src={itemImageLogo
-                            ?
-                            `${process.env.REACT_APP_API_URL}/static/${itemImageLogo}`
-                            :
-                            noImageLogo
-                        }
-                    />
-                </div>
+                <TourMapPointCardFloatRight
+                    cardImageUrl={itemImageLogo ? `${process.env.REACT_APP_API_URL}/static/${itemImageLogo}` : noImageLogo}
+                    cardName={name}
+                    cardDescription={description}
+                    cardData={dataItems}
+                />
 
-                <p
-                    className="text-muted"
-                    style={{
-                        textAlign: 'justify',
-                    }}
-                >
-                    {description}
-                </p>
-
-                {dataItems
-                    ?
-                    dataItems.map(function (item, index) {
-
-                        if (item.hasOwnProperty('type')) {
-                            switch (item.type) {
-                                case 'text':
-                                    return <TourMapPointText
-                                        key={index}
-                                        name={item.name}
-                                        text={item.text}
-                                    />
-                                case 'googleMapUrl':
-                                    return <TourMapPointGoogleMap
-                                        key={index}
-                                        name={item.name}
-                                        url={item.url}
-                                    />
-                            }
-                        }
-                    })
-                    :
-                    null
-                }
-
-                {/**/}
 
             </MDBCollapse>
-
-
         </li>
     );
 };

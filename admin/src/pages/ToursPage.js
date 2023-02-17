@@ -3,7 +3,6 @@ import {Context} from "../index";
 import SpinnerSM from "../components/SpinnerSM";
 import {getAll} from "../http/toursAPI";
 import {delay} from "../utils/consts";
-import {getTableUpdateByName} from "../http/tableUpdatesAPI";
 import TopicsList from "../components/topics/TopicsList";
 import ToursCategories from "../components/ToursCategories";
 import TourListsCell from "../components/tours/TourListsCell";
@@ -27,9 +26,6 @@ const ToursPage = () => {
 
                 toursStore.saveToursListRows(data.rows)
 
-                /**
-                 Сохраняем список пользователей преобразовав его в строку
-                 **/
             }
         }).finally(() => {
             toursStore.loadToursList()
@@ -38,23 +34,23 @@ const ToursPage = () => {
     }
 
     useEffect(() => {
-        delay(0).then(r => {
+        delay(0).then(() => {
 
-            getTableUpdateByName('Tours').then(tuData => {
-                const lastDateTable = toursStore.getSavedLastDateTableTours()
-
-                if (tuData.date !== lastDateTable) {
+            // getTableUpdateByName('Tours').then(tuData => {
+            //     const lastDateTable = toursStore.getSavedLastDateTableTours()
+            //
+            //     if (tuData.date !== lastDateTable) {
                     getAllData()
-                    /**
-                     Сохраняем дату последнего изменения таблицы
-                     **/
-                    toursStore.saveLastDateTableTours(tuData.date)
-                } else {
-                    toursStore.loadToursList()
-                    setLoading(false)
-                }
-
-            })
+            //         /**
+            //          Сохраняем дату последнего изменения таблицы
+            //          **/
+            //         toursStore.saveLastDateTableTours(tuData.date)
+            //     } else {
+            //         toursStore.loadToursList()
+            //         setLoading(false)
+            //     }
+            //
+            // })
 
         })
     }, [])

@@ -3,8 +3,7 @@ const ApiError = require("../error/ApiError");
 const fs = require("fs");
 const path = require("path");
 const {Op} = require("sequelize");
-const {createNewFile} = require("../utils/consts.js");
-const {reWrightFile, readFile, removeFile, getFreeFileName, getDirName} = require("../utils/consts");
+const {createNewFile, reWrightFile, readFile, removeFile, getFreeFileName, getDirName} = require("../utils/consts");
 
 const removeTopicsCountFromCategories = (removeArr) => {
     if (removeArr) {
@@ -27,11 +26,6 @@ const removeTopicsCountFromCategories = (removeArr) => {
 
 const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
     let dataText_json = JSON.parse(dataText)
-    console.log('')
-    console.log('')
-    console.log('')
-    console.log(dataText_json)
-    console.log('')
 
     // dataText_json.map(function (item) {
     for(let i = 0;i < dataText_json.length;i++) {
@@ -77,10 +71,6 @@ const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
         dataText_json[i] = item
     // })
     }
-
-    console.log('')
-    console.log(dataText_json)
-    console.log('')
 
     return JSON.stringify(dataText_json)
 }
@@ -182,7 +172,7 @@ class TopicsController {
                         try {
                             if (new_images_count > 0) {
                                 const newDataText = saveTopicImageFile(dataText, newImagesArr, newTopic.id)// create
-                                await reWrightFile(newDataText, 'Topics', newTopic.file_name, null)
+                                await await reWrightFile(newDataText, 'Topics', newTopic.file_name, null)
                             }
                         } catch (e) {
                             console.log(e)

@@ -70,6 +70,7 @@ reWrightFile = async function (textData, tableName, fileName) {
 }
 
 createNewFile = async function (textData, tableName, img) {
+
     try {
         let dirName = getDirName(tableName)
 

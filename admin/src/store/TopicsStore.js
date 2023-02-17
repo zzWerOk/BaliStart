@@ -61,7 +61,7 @@ export default class TopicsStore {
 
     filterTopicsByTag(tagId) {
 
-        const newArr = JSON.parse(this._topicsList).filter(function (value, index, arr) {
+        const newArr = JSON.parse(this._topicsList).filter(function (value) {
             return value.id !== tagId
         })
 
@@ -83,7 +83,7 @@ export default class TopicsStore {
     }
 
     saveTopicsListRows(rows) {
-        let textForSave = ''
+        let textForSave
         rows.map(item => {
             item.isSaved = true
         })
@@ -111,7 +111,7 @@ export default class TopicsStore {
             return rows
         } catch (e) {
         }
-        return '[]'
+        return []
     }
 
     get getSavedTopics_List() {
@@ -147,7 +147,7 @@ export default class TopicsStore {
             let topicsArr = JSON.parse(this._topicsList)
             const found = topicsArr.find(element => element.id === id)
             if (found) {
-                const filtered = topicsArr.filter(function (value, index, arr) {
+                const filtered = topicsArr.filter(function (value) {
                     return value !== found;
                 })
                 this._topicsList = JSON.stringify(filtered)

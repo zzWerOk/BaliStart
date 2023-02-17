@@ -1,4 +1,4 @@
-import React, {useContext, useMemo, useState} from 'react';
+import React, {useContext} from 'react';
 import TopicsCategoryItem from "./TopicsCategoryItem";
 import {Button} from "react-bootstrap";
 import {Context} from "../../index";
@@ -11,7 +11,7 @@ const TopicsCategoryItemNew = (props) => {
     // const [newItemName, setNewItemName] = useState('')
     // const [newItemDescription, setNewItemDescription] = useState('')
 
-    const {addItemTrigger, addNewItemFunc, loadingAddItem} = props
+    const {addItemTrigger, addNewItemFunc, loadingAddItem, saveItemError} = props
 
     React.useEffect(() => {
         if(addItemTrigger) {
@@ -69,6 +69,7 @@ const TopicsCategoryItemNew = (props) => {
             changeDescription={changeDescription}
             isNameEdit={true}
             addItemTrigger={addItemTrigger2}
+            saveError={saveItemError}
         />
     );
 };
