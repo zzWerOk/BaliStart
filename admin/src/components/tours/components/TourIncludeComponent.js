@@ -162,7 +162,7 @@ const TourIncludeComponent = (props) => {
                         rows="2"
                         id="includeText"
                         className="form-control"
-                        placeholder='What include'
+                        placeholder='Paste list of items here'
                         value={newIncludesField}
                         disabled={!!isSaving}
                         onChange={(e) => {

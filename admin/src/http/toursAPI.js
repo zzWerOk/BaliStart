@@ -27,6 +27,11 @@ export const getTourData = async (id) => {
     return data
 }
 
+export const setTourGuideCanAdd = async (id) => {
+    const {data} = await $authHost.post(apiUrl+'/guidecanadd/', {tour_id: id})
+    return data
+}
+
 export const deleteTourAPI = async (id) => {
     const {data} = await $authHost.delete(apiUrl+'/', {params: {id: id}})
     return data
@@ -46,8 +51,11 @@ export const saveTourAPI = async (
     languages,
     map_points,
     image_logo_file,
+    selected_guides,
+    guide_can_add,
     tourData,
     imagesAdd,
+    price_usd,
 ) => {
 
     try {
@@ -66,8 +74,11 @@ export const saveTourAPI = async (
             languages,
             map_points,
             image_logo_file,
+            selected_guides,
+            guide_can_add,
             tourData,
             imagesAdd,
+            price_usd,
         )
 
         if(!formData){
@@ -101,8 +112,11 @@ export const changeTourAPI = async (
     languages,
     map_points,
     image_logo_file,
+    selected_guides,
+    guide_can_add,
     tourData,
     imagesAdd,
+    price_usd,
 ) => {
     try {
 
@@ -123,8 +137,11 @@ export const changeTourAPI = async (
             languages,
             map_points,
             image_logo_file,
+            selected_guides,
+            guide_can_add,
             tourData,
             imagesAdd,
+            price_usd,
         )
 
         if(!formData){
@@ -154,8 +171,11 @@ const addToFormData = (formData,
                        languages,
                        map_points,
                        image_logo_file,
+                       selected_guides,
+                       guide_can_add,
                        tourData,
                        imagesAdd,
+                       price_usd,
 ) => {
     try {
         formData.append("name", name);
@@ -171,7 +191,9 @@ const addToFormData = (formData,
         formData.append("activity_level", activity_level);
         formData.append("languages", languages);
         formData.append("map_points", map_points);
+        formData.append("selected_guides", selected_guides);
         formData.append("data", tourData);
+        formData.append("price_usd", price_usd);
 
         if (image_logo_file !== '') {
             if (image_logo_file !== undefined) {

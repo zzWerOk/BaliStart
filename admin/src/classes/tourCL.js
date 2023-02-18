@@ -20,8 +20,35 @@ export default class TourCL {
         this._map_points = '[]'
         // this._includes = '[]'
         this._data = '{}'
+        this._guide_can_add = '{}'
+        this._selected_guides = '[]'
+        this._price_usd = 0
     }
 
+
+    get price_usd() {
+        return this._price_usd;
+    }
+
+    set price_usd(value) {
+        this._price_usd = value;
+    }
+
+    get selected_guides() {
+        return this._selected_guides;
+    }
+
+    set selected_guides(value) {
+        this._selected_guides = value;
+    }
+
+    get guide_can_add() {
+        return this._guide_can_add;
+    }
+
+    set guide_can_add(value) {
+        this._guide_can_add = value;
+    }
 
     get data() {
         return this._data;
@@ -130,6 +157,15 @@ export default class TourCL {
         if (itemObj.hasOwnProperty('data')) {
             this._data = itemObj.data
         }
+        if (itemObj.hasOwnProperty('guide_can_add')) {
+            this._guide_can_add = itemObj.guide_can_add
+        }
+        if (itemObj.hasOwnProperty('selected_guides')) {
+            this._selected_guides = itemObj.selected_guides
+        }
+        if (itemObj.hasOwnProperty('price_usd')) {
+            this._price_usd = itemObj.price_usd
+        }
     }
 
     getAsJson() {
@@ -152,6 +188,8 @@ export default class TourCL {
                 "languages": this._languages,
                 "map_points": this._map_points,
                 "data": this._data,
+                "guide_can_add": this._guide_can_add,
+                "price_usd": this._price_usd,
             }
 
             if (this.hasOwnProperty('newId')) {

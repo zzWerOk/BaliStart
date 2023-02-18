@@ -56,8 +56,11 @@ class ToursController {
                 activity_level,
                 languages,
                 map_points,
+                selected_guides,
+                guide_can_add,
                 data,
                 new_images_count,
+                price_usd,
             } = req.body
 
             let created_by_user_admin_id = created_by_user_id
@@ -114,6 +117,9 @@ class ToursController {
                             languages,
                             map_points,
                             file_name: fileName,
+                            selected_guides,
+                            guide_can_add,
+                            price_usd,
                         })
 
                         try {
@@ -176,6 +182,9 @@ class ToursController {
                 map_points,
                 data,
                 new_images_count,
+                selected_guides,
+                guide_can_add,
+                price_usd,
             } = req.body
 
 
@@ -288,6 +297,9 @@ class ToursController {
                                 activity_level,
                                 languages,
                                 map_points,
+                                selected_guides,
+                                guide_can_add,
+                                price_usd,
                             }, {where: {id: id}})
 
                             try {
@@ -330,6 +342,27 @@ class ToursController {
 
     }
 
+    async guidecanadd(req, res) {
+        // const {tour_id} = req.query
+        const {tour_id} = req.body
+
+        try{
+
+            if(tour_id) {
+                const candidate = await Tours.findOne({where: {id: tour_id}})
+                if (candidate) {
+                    await Tours.update({
+                        guide_can_add: !candidate.guide_can_add,
+                    }, {where: {id: candidate.id}})
+                    return res.json({status: 'ok'})
+                }
+            }
+        }catch (e) {
+            return res.json({status: 'error', message: e.message})
+        }
+        return res.json({status: 'error', message: 'Parameter error'})
+
+    }
     async getAll(req, res, next) {
         try {
             const {tag_search, sort_code} = req.query

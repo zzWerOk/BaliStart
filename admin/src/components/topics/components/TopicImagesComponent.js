@@ -21,8 +21,6 @@ const TopicImagesComponent = (props) => {
         setImagesName(item.name)
         setImages(item.items)
 
-        console.log(item.items)
-
         setLoading(false)
     }, [])
 

@@ -10,7 +10,7 @@ import {ReactComponent as CloseIco} from "../../img/svg/close.svg"
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
 import {MDBContainer, MDBFile} from "mdb-react-ui-kit";
-import {changeTourAPI, deleteTourAPI, getTourData, saveTourAPI} from "../../http/toursAPI";
+import {changeTourAPI, deleteTourAPI, getTourData, saveTourAPI, setTourGuideCanAdd} from "../../http/toursAPI";
 import TourCL from "../../classes/tourCL";
 import ModalPopUp from "../modal/ModalPopUp";
 import MapPointsDetailsPage from "../mappoints/MapPointsDetailsPage";
@@ -20,6 +20,7 @@ import TourTimeLineCollapse from "./components/TourTimeLineCollapse";
 import {getMapPointData} from "../../http/mapPointsAPI";
 import TourIncludeComponent from "./components/TourIncludeComponent";
 import TopicImagesComponent from "../topics/components/TopicImagesComponent";
+import {getAll} from "../../http/userAPI";
 
 let durationItems = []
 
@@ -27,7 +28,7 @@ let currTour = null
 
 const TourDetailsPage = observer((props) => {
 
-    const {mapPointsStore} = useContext(Context)
+    const {mapPointsStore, user} = useContext(Context)
     const {item, onItemEditHandler, deleteTopic} = props
 
     const {toursCategoryStore, toursTypeStore} = useContext(Context)
@@ -61,9 +62,18 @@ const TourDetailsPage = observer((props) => {
     const [imagesAdd, setImagesAdd] = useState({})
     const [imagesItem, setImagesItem] = useState({name: '', items: '[]'})
 
+    const [isGuideCanAdd, setIsGuideCanAdd] = useState(true)
+
+    const [userList, setUserList] = useState([])
+    const [userListFiltered, setUserListFiltered] = useState([])
+    const [userListLoading, setUserListLoading] = useState(false)
+    const [selectedUserList, setSelectedUserList] = useState([])
+
+    const [tourPriceUsd, setTourPriceUsd] = useState(0)
+
     const getTourDataF = async () => {
 
-        if(item.id > -1) {
+        if (item.id > -1) {
             await getTourData(item.id).then(data => {
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
@@ -77,120 +87,151 @@ const TourDetailsPage = observer((props) => {
         }
     }
 
-    useEffect(() => {
-            currTour = new TourCL()
+    const getUserListHandler = () => {
+        if (!userListLoading) {
+            setUserListLoading(true)
+            getAll().then(data => {
+                if (data.hasOwnProperty('count') && data.hasOwnProperty('rows')) {
+                    let usersList = []
+                    let usersListFiltered = []
 
-            getTourDataF().finally(() => {//start
-
-                durationItems = []
-                for (let i = 1; i <= 21; i++) {
-                    durationItems.push({id: i})
-                }
-
-
-                // setTourCategoriesItems_load(true)
-                currTour.setFromJson(item)
-
-                setDurationTime(parseInt(currTour.duration.split(' ')[0]) || 1)
-                setDurationTimeType(currTour.duration.split(' ')[1] || 'h')
-                setActivityType(parseInt(currTour.activity_level) || 1)
-
-                setTourLanguage(currTour.languages)
-
-                setCurrName(currTour.name)
-                setCurrDescription(currTour.description)
-                setIsActive(currTour.active)
-                setTourCategoriesItems(toursCategoryStore.getSavedCategoriesList())
-                setTourTypesItems(toursTypeStore.getSavedCategoriesList())
-                setTourTags(currTour.tour_categoryJSON)
-                setTourTypes(currTour.tour_typeJSON)
-
-
-                mapPointsStore.loadMapPointsList()
-                let storeMapointsItems = mapPointsStore.getMapPointList
-                setMapPointsArr(mapPointsStore.getMapPointList)
-
-                let newMapPointArr = []
-                let lostMapPointsArr = []
-                let currTourMapPointArr = JSON.parse(currTour.map_points)
-                // console.log(currTour)
-
-                for (let i = 0; i < currTourMapPointArr.length; i++) {
-                    mapPointsStore.getMapPointList.map(currMapPoint => {
-                        if (currTourMapPointArr[i] === currMapPoint.id) {
-                            if (!currMapPoint.data) {
-                                // lostMapPointsArr.push(currMapPoint.id)
-                                lostMapPointsArr.push(i)
-                            }
-
-                            newMapPointArr.push(currTourMapPointArr[i])
+                    data.rows.map(function (currUser) {
+                        if (currUser.is_guide) {
+                            usersList.push(currUser)
+                            usersListFiltered.push(currUser.id)
                         }
                     })
+
+
+                    setUserList(usersList)
+                    setUserListFiltered(usersListFiltered)
                 }
+            }).catch(() => {
 
-                setTourMapPoints(JSON.stringify(newMapPointArr))
-                currTour.map_points = JSON.stringify(newMapPointArr)
-
-
-                if (item.image_logo) {
-                    if (item.id >= 0) {
-                        setItemImageLogo(currTour.image_logo + '?' + Date.now())
-                    }
-                }
-
-                setMapPointsArr_Loading(true)
-                if (lostMapPointsArr.length > 0) {
-                    lostMapPointsArr.map(async function (lostItem, index) {
-
-                        getMapPointData(currTourMapPointArr[lostItem]).then(data => {
-                            if (data.hasOwnProperty('status')) {
-                                if (data.status === 'ok') {
-
-                                    for (let j = 0; j < storeMapointsItems.length; j++) {
-                                        let currStoreMapPointItem = storeMapointsItems[j]
-                                        if (currStoreMapPointItem.id === currTourMapPointArr[lostItem]) {
-                                            // storeMapointsItems[currTourMapPointArr[lostItem]].data = data.data
-                                            currStoreMapPointItem.data = data.data
-
-                                            mapPointsStore.addDataToMapPoint_byId(currStoreMapPointItem.id, data.data)
-
-                                        }
-                                    }
-
-                                }
-                            }
-                        }).finally(() => {
-
-                            if (lostMapPointsArr.length - 1 === index) {
-                                setMapPointsArr_Loading(false)
-                                setMapPointsArr(storeMapointsItems)
-
-                                // mapPointsStore.setMapPointsListFromArr(storeMapointsItems)
-
-                            }
-
-                        })
-                    })
-                } else {
-                    setMapPointsArr(storeMapointsItems)
-                    setMapPointsArr_Loading(false)
-
-                }
-
-                setTourIncludes(currTour.tourIncludes || '[]')
-                setTourNotIncludes(currTour.tourNotIncludes || '[]')
-
-                setImagesAdd({0: JSON.parse(currTour.tourImages)} || {})
-                // imagesItem.items = currTour.tourImages
-
-                setImagesItem({name: '', items: currTour.tourImages})
-
-                setTourCategoriesItems_load(false)
+            }).finally(() => {
+                setUserListLoading(false)
             })
+        }
+    }
+
+    useEffect(() => {
+        currTour = new TourCL()
+
+        getTourDataF().finally(() => {//start
+
+            durationItems = []
+            for (let i = 1; i <= 21; i++) {
+                durationItems.push({id: i})
+            }
 
 
-        }, []
-    )
+            // setTourCategoriesItems_load(true)
+            currTour.setFromJson(item)
+
+            setDurationTime(parseInt(currTour.duration.split(' ')[0]) || 1)
+            setDurationTimeType(currTour.duration.split(' ')[1] || 'h')
+            setActivityType(parseInt(currTour.activity_level) || 1)
+
+            setTourLanguage(currTour.languages)
+
+            setCurrName(currTour.name)
+            setCurrDescription(currTour.description)
+            setIsActive(currTour.active)
+            setTourCategoriesItems(toursCategoryStore.getSavedCategoriesList())
+            setTourTypesItems(toursTypeStore.getSavedCategoriesList())
+            setTourTags(currTour.tour_categoryJSON)
+            setTourTypes(currTour.tour_typeJSON)
+
+            setIsGuideCanAdd(currTour.guide_can_add)
+            setSelectedUserList(JSON.parse(currTour.selected_guides))
+
+            mapPointsStore.loadMapPointsList()
+            let storeMapointsItems = mapPointsStore.getMapPointList
+            setMapPointsArr(mapPointsStore.getMapPointList)
+
+            setTourPriceUsd(currTour.price_usd)
+
+            let newMapPointArr = []
+            let lostMapPointsArr = []
+            let currTourMapPointArr = JSON.parse(currTour.map_points)
+
+            for (let i = 0; i < currTourMapPointArr.length; i++) {
+                mapPointsStore.getMapPointList.map(currMapPoint => {
+                    if (currTourMapPointArr[i] === currMapPoint.id) {
+                        if (!currMapPoint.data) {
+                            lostMapPointsArr.push(i)
+                        }
+
+                        newMapPointArr.push(currTourMapPointArr[i])
+                    }
+                })
+            }
+
+            setTourMapPoints(JSON.stringify(newMapPointArr))
+            currTour.map_points = JSON.stringify(newMapPointArr)
+
+
+            if (item.image_logo) {
+                if (item.id >= 0) {
+                    setItemImageLogo(currTour.image_logo + '?' + Date.now())
+                }
+            }
+
+            setMapPointsArr_Loading(true)
+            if (lostMapPointsArr.length > 0) {
+                lostMapPointsArr.map(async function (lostItem, index) {
+
+                    getMapPointData(currTourMapPointArr[lostItem]).then(data => {
+                        if (data.hasOwnProperty('status')) {
+                            if (data.status === 'ok') {
+
+                                for (let j = 0; j < storeMapointsItems.length; j++) {
+                                    let currStoreMapPointItem = storeMapointsItems[j]
+                                    if (currStoreMapPointItem.id === currTourMapPointArr[lostItem]) {
+                                        // storeMapointsItems[currTourMapPointArr[lostItem]].data = data.data
+                                        currStoreMapPointItem.data = data.data
+
+                                        mapPointsStore.addDataToMapPoint_byId(currStoreMapPointItem.id, data.data)
+
+                                    }
+                                }
+
+                            }
+                        }
+                    }).finally(() => {
+
+                        if (lostMapPointsArr.length - 1 === index) {
+                            setMapPointsArr_Loading(false)
+                            setMapPointsArr(storeMapointsItems)
+
+                            // mapPointsStore.setMapPointsListFromArr(storeMapointsItems)
+
+                        }
+
+                    })
+                })
+            } else {
+                setMapPointsArr(storeMapointsItems)
+                setMapPointsArr_Loading(false)
+
+            }
+
+            setTourIncludes(currTour.tourIncludes || '[]')
+            setTourNotIncludes(currTour.tourNotIncludes || '[]')
+
+            setImagesAdd({0: JSON.parse(currTour.tourImages)} || {})
+            // imagesItem.items = currTour.tourImages
+
+            setImagesItem({name: '', items: currTour.tourImages})
+
+            setTourCategoriesItems_load(false)
+
+            getUserListHandler()
+
+        })
+
+
+    }, [])
 
     const onNameHandler = (value) => {
         setCurrName(value)
@@ -429,6 +470,22 @@ const TourDetailsPage = observer((props) => {
         onItemEditHandler(currTour.getAsJson())
     }
 
+    const setGuideCanAddHandler = (value) => {
+
+        setTourGuideCanAdd(currTour.id).then(() => {
+
+            setIsSaving(true)
+            setIsGuideCanAdd(value)
+            currTour.guide_can_add = value
+            // currTour.isSaved = false
+            onItemEditHandler(currTour.getAsJson())
+
+        }).finally(() => {
+            setIsSaving(false)
+        })
+
+    }
+
     const deleteHandler = () => {
         setIsSaving(true)
         setDeleteError(false)
@@ -484,8 +541,11 @@ const TourDetailsPage = observer((props) => {
                     currTour.languages,
                     currTour.map_points,
                     currTour.image_logo_file,
+                    currTour.selected_guides,
+                    currTour.guide_can_add,
                     currTour.data,
                     imagesAdd,
+                    currTour.price_usd,
                 ).then(data => {
                     if (data.hasOwnProperty('status')) {
                         if (data.status === 'ok') {
@@ -527,8 +587,11 @@ const TourDetailsPage = observer((props) => {
                     currTour.languages,
                     currTour.map_points,
                     currTour.image_logo_file,
+                    currTour.selected_guides,
+                    currTour.guide_can_add,
                     currTour.data,
                     imagesAdd,
+                    currTour.price_usd,
                 ).then(data => {
 
                     if (data.hasOwnProperty('status')) {
@@ -761,11 +824,6 @@ const TourDetailsPage = observer((props) => {
     }
 
     const tourImagesEditHandler = () => {
-        // currTour.tourImages = newTourImages.items
-        // currTour.isSaved = false
-        // onItemEditHandler(currTour.getAsJson())
-        //
-        // console.log(newTourImages)
 
     }
 
@@ -817,7 +875,7 @@ const TourDetailsPage = observer((props) => {
                 currImagesList[imageListIndex] = currList
                 setImagesAdd(currImagesList)
 
-                currTour.tourImages = JSON.stringify([...JSON.parse(currTour.tourImages),fileName.name])
+                currTour.tourImages = JSON.stringify([...JSON.parse(currTour.tourImages), fileName.name])
 
             }
 
@@ -858,6 +916,45 @@ const TourDetailsPage = observer((props) => {
                     </ul>
                 </MDBContainer>
         );
+    }
+
+    const getUserNameById = (userId) => {
+        const selectedUser = userList.find(element => element.id === userId)
+        return selectedUser.name
+    }
+
+    const addGuideToTourHandler = (userId) => {
+
+        const selectedGuidesIds = JSON.parse(currTour.selected_guides)
+        let filtered
+        const userIdFinded = selectedGuidesIds.find(element => element === userId)
+        if (userIdFinded) {
+            filtered = selectedGuidesIds.filter(function (value) {
+                return value !== userId;
+            })
+            currTour.selected_guides = JSON.stringify(filtered)
+            setSelectedUserList(filtered)
+        } else {
+            selectedGuidesIds.push(userId)
+            currTour.selected_guides = JSON.stringify(selectedGuidesIds)
+            setSelectedUserList(selectedGuidesIds)
+            // filtered = userListFiltered.filter(item => !selectedGuidesIds.includes(item));
+        }
+        // setUserListFiltered(filtered)
+        currTour.isSaved = false
+        onItemEditHandler(currTour.getAsJson())
+
+    }
+
+    const priceEditHandler = (value) => {
+        if (value > -1) {
+            setTourPriceUsd(value)
+            currTour.price_usd = value
+            currTour.isSaved = false
+            onItemEditHandler(currTour.getAsJson())
+
+        }
+
     }
 
     if (tourCategoriesItems_load) {
@@ -1372,6 +1469,159 @@ const TourDetailsPage = observer((props) => {
                         onFilesAddHandler={onImagesFilesAddHandler}
                         onFilesDeleteHandler={onImagesFilesDeleteHandler}
                     />
+                </Row>
+                {/***
+                 GUIDES
+                 ***/}
+                <Row>
+                    <span>Guides</span>
+                    <div className={'d-flex'}>
+                        {
+                            user.isAdmin
+                                ?
+                                <div className={'d-flex'}>
+                                    <Dropdown>
+                                        <Dropdown.Toggle
+                                            variant="outline-secondary"
+                                            size="sm"
+                                            id="dropdown-tag"
+                                            disabled={!!isSaving}
+                                        >
+                                            Add Guide
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu>
+
+                                            {
+                                                // userListFiltered.length > 0
+                                                !userListLoading === true
+                                                    ?
+                                                    userListFiltered.map(item => {
+                                                        return <Dropdown.Item
+                                                            key={item}
+                                                            id={item}
+                                                            onClick={() => {
+                                                                addGuideToTourHandler(item)
+                                                            }}
+                                                        >{getUserNameById(item)}</Dropdown.Item>
+                                                    })
+                                                    :
+                                                    <Dropdown.Item disabled={true}>
+                                                        <span>
+                                                            Loading...
+                                                        </span>
+                                                    </Dropdown.Item>
+                                            }
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+
+                                    {
+                                        !userListLoading
+                                            ?
+                                            selectedUserList.map(item => {
+                                                return <Button
+                                                    key={item}
+                                                    className="badge btn-secondary"
+                                                    disabled={!!isSaving}
+                                                    style={{
+                                                        margin: '0 3px'
+                                                    }}
+                                                >
+                                                    {getUserNameById(item)}
+                                                    <CloseIco
+                                                        onClick={() => {
+                                                            addGuideToTourHandler(item)
+                                                        }}
+                                                        fill='white'
+                                                        style={{
+                                                            width: '36px',
+                                                            height: '16px',
+                                                            marginBottom: '2px',
+                                                            marginTop: '2px',
+                                                            marginLeft: '-5px',
+                                                            marginRight: '-15px',
+                                                        }}
+                                                    />
+                                                </Button>
+                                            })
+                                            :
+                                            null
+
+                                    }
+
+                                </div>
+                                :
+                                null
+                        }
+                    </div>
+                    <div className={'d-flex'}>
+                        {
+                            user.isGuide
+                                ?
+                                null
+                                :
+                                null
+                        }
+                    </div>
+                    <div className={'d-flex'}>
+                        <ToggleButton
+                            id="toggle-guide-can_add"
+                            type="checkbox"
+                            variant={"outline-primary"}
+                            checked={isGuideCanAdd}
+                            value={'2'}
+                            disabled={!!isSaving}
+                            onChange={(e) => setGuideCanAddHandler(e.currentTarget.checked)}
+                            style={{display: 'flex'}}
+                        >
+                            {isGuideCanAdd
+                                ?
+                                <CircleOkIco
+                                    fill='white'
+                                    style={{
+                                        width: '16px',
+                                        height: '16px',
+                                        marginBottom: '3px',
+                                        marginRight: '5px',
+                                    }}
+
+                                />
+                                :
+                                <CircleIco
+                                    fill='blue'
+                                    style={{
+                                        width: '16px',
+                                        height: '16px',
+                                        marginBottom: '3px',
+                                        marginRight: '5px',
+                                    }}
+                                />
+                            }
+                            Is guide can add
+                        </ToggleButton>
+                    </div>
+                    <small>
+                        This option allows guides to be added to this tour
+                    </small>
+                </Row>
+                {/***
+                 PRICE
+                 ***/}
+                <Row>
+                    <span>Tour price USD (per person)</span>
+                    <div className={'d-flex col-3'}>
+                        <input
+                            type="tourPrice"
+                            id="tourPrice"
+                            className="form-control "
+                            placeholder='Items'
+                            value={tourPriceUsd}
+                            disabled={!!isSaving}
+                            onChange={(e) => {
+                                priceEditHandler(e.target.value)
+                            }}
+                        />
+                    </div>
                 </Row>
                 {/***
                  SAVE

@@ -44,6 +44,9 @@ const Tours = sequelize.define('tours', {
     languages: {type: DataTypes.STRING},
     map_points: {type: DataTypes.STRING},
     file_name: {type: DataTypes.STRING},
+    guide_can_add: {type: DataTypes.BOOLEAN, defaultValue: true},
+    selected_guides: {type: DataTypes.STRING},
+    price_usd: {type: DataTypes.INTEGER, defaultValue: 0},
 
 })
 
