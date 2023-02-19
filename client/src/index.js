@@ -6,6 +6,8 @@ import {BrowserRouter} from "react-router-dom";
 import UserStore from "./store/UserStore";
 import TopicsCategoryStore from "./store/TopicsCategoryStore";
 import TopicCommentsStore from "./store/TopicCommentsStore";
+import ToursCategoryStore from "./store/ToursCategoryStore";
+import ToursTypeStore from "./store/ToursTypeStore";
 
 export const Context = createContext(null)
 
@@ -15,6 +17,8 @@ root.render(
         user: new UserStore(),
         topicsCategoryStore: new TopicsCategoryStore(),
         topicCommentsStore: new TopicCommentsStore(),
+        toursCategoryStore: new ToursCategoryStore(),
+        toursTypeStore: new ToursTypeStore(),
     }}>
         <BrowserRouter>
             <App/>

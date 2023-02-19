@@ -2,7 +2,7 @@ import {$authHost, $authHostUpload, $host} from "./index";
 
 const apiUrl = 'api/tours'
 
-export const getAll = async () => {
+export const getAllTours = async () => {
 
     let tag_search = localStorage.getItem("tag_search_Tours")
     let sort_code = localStorage.getItem("sort_code_Tours")
@@ -18,7 +18,7 @@ export const getAll = async () => {
         params: params
     }
 
-    const {data} = await $authHost.get(apiUrl+'/getAllAdmin', request)
+    const {data} = await $host.get(apiUrl+'/getAll', request)
     return data
 }
 

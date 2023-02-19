@@ -3,6 +3,8 @@ import {makeAutoObservable} from "mobx";
 export default class TopicsCategoryStore {
 
     constructor() {
+        this._loaded = false
+
         this._newItemsName = ''
         this._newItemsDescription = ''
         this._newItemsIsEdited = false
@@ -11,6 +13,11 @@ export default class TopicsCategoryStore {
         this._lastDateTableTopicsCategory = -1
 
         makeAutoObservable(this)
+    }
+
+
+    get loaded() {
+        return this._loaded;
     }
 
     set setName(name) {
@@ -124,9 +131,7 @@ export default class TopicsCategoryStore {
             return []
         }
 
-        const itm = JSON.parse(this._newItemsArr)
-
-        return itm
+        return JSON.parse(this._newItemsArr)
     }
 
     checkIfNewItemExists(name) {
@@ -217,6 +222,7 @@ export default class TopicsCategoryStore {
             newList = data
             this._newItemsArr = ''
             this._itemsArr = JSON.stringify(newList)
+            this._loaded = true
         }else{
             newList.push.apply(newList, this.itemsArr)
         }
@@ -227,9 +233,7 @@ export default class TopicsCategoryStore {
         }
 
 
-        let textForSave = ''
-
-        textForSave = JSON.stringify(newList)
+        let textForSave = JSON.stringify(newList)
 
         localStorage.setItem('topicsCategoryPage_listItems', textForSave)
     }

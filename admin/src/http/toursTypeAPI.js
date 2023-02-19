@@ -1,4 +1,4 @@
-import {$authHost, $host} from "./index";
+import {$authHost} from "./index";
 
 const apiUrl = 'api/tourstype'
 
@@ -18,7 +18,7 @@ export const setIsActiveAPI = async (id, active) => {
 }
 
 export const getAll_Type = async () => {
-    const {data} = await $authHost.get(apiUrl+'/all')
+    const {data} = await $authHost.get(apiUrl+'/allAdmin')
 
     if(data.hasOwnProperty('rows')) {
         let newRows = []

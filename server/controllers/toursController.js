@@ -8,34 +8,34 @@ const {removeFile, createNewFile, reWrightFile, readFile, getDirName, getFreeFil
 const saveTourImageFile = (dataText, newImagesArr, tourId) => {
     let dataText_json = JSON.parse(dataText)
 
-            if (dataText_json.hasOwnProperty('images')) {
-                let item = dataText_json['images']
-                let imagesArr = JSON.parse(item)
+    if (dataText_json.hasOwnProperty('images')) {
+        let item = dataText_json['images']
+        let imagesArr = JSON.parse(item)
 
-                newImagesArr.map(function (image) {
-                    let imageArrName = image.name
+        newImagesArr.map(function (image) {
+            let imageArrName = image.name
 
-                    imagesArr = imagesArr.filter(function (value) {
-                        return value !== imageArrName;
-                    })
+            imagesArr = imagesArr.filter(function (value) {
+                return value !== imageArrName;
+            })
 
-                        const md5 = image.md5
-                        let dirName = getDirName('img')
-                        const fileName = getFreeFileName(dirName)
-                        const imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
-                        image.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
+            const md5 = image.md5
+            let dirName = getDirName('img')
+            const fileName = getFreeFileName(dirName)
+            const imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
+            image.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
 
-                        imagesArr.push(imgFileName)
+            imagesArr.push(imgFileName)
 
-                        Files.create({
-                            table_name: 'Tour ' + tourId,
-                            file_name: fileName,
-                            md5
-                        }).then()
-                })
-                item = JSON.stringify(imagesArr)
-                dataText_json['images'] = item
-            }
+            Files.create({
+                table_name: 'Tour ' + tourId,
+                file_name: fileName,
+                md5
+            }).then()
+        })
+        item = JSON.stringify(imagesArr)
+        dataText_json['images'] = item
+    }
     return JSON.stringify(dataText_json)
 }
 
@@ -186,7 +186,6 @@ class ToursController {
                 guide_can_add,
                 price_usd,
             } = req.body
-
 
 
             let img
@@ -346,9 +345,9 @@ class ToursController {
         // const {tour_id} = req.query
         const {tour_id} = req.body
 
-        try{
+        try {
 
-            if(tour_id) {
+            if (tour_id) {
                 const candidate = await Tours.findOne({where: {id: tour_id}})
                 if (candidate) {
                     await Tours.update({
@@ -357,13 +356,96 @@ class ToursController {
                     return res.json({status: 'ok'})
                 }
             }
-        }catch (e) {
+        } catch (e) {
             return res.json({status: 'error', message: e.message})
         }
         return res.json({status: 'error', message: 'Parameter error'})
 
     }
+
+
     async getAll(req, res, next) {
+        try {
+            const {tag_search, sort_code} = req.query
+            let sortOrder = ['id', 'ASC']
+
+            let tagSearch = tag_search
+            if (!tagSearch) {
+                tagSearch = ''
+            }
+
+            switch (sort_code) {
+                case 'user':
+                    sortOrder = ['created_by_user_id', 'ASC']
+                    break
+                case 'reuser':
+                    sortOrder = ['created_by_user_id', 'DESC']
+                    break
+                case 'date':
+                    sortOrder = ['created_date', 'ASC']
+                    break
+                case 'redate':
+                    sortOrder = ['created_date', 'DESC']
+                    break
+                case 'id':
+                    sortOrder = ['id', 'ASC']
+                    break
+                case 'reid':
+                    sortOrder = ['id', 'DESC']
+                    break
+            }
+
+            const toursList = await Tours.findAndCountAll({
+                    order: [sortOrder
+                    ],
+                    where: {
+                        active: true,
+                        tour_category: {
+                            [Op.like]: '%' + tagSearch + '%'
+                        }
+                    }
+                }
+            )
+
+            let newRows = []
+
+            // const usersArr = await User.findAll()
+
+            toursList.rows.map(item => {
+                let newItem = JSON.parse(JSON.stringify(item))
+
+                newItem.updatedAt = newItem.createdAt
+                newItem.image = newItem.image_logo
+
+                const currUser = User.findOne({where: {id: item.created_by_user_id}})
+                newItem.created_by_user_name = currUser.name
+                newRows.push(newItem)
+
+                delete newItem.active
+                delete newItem.created_by_user_id
+                delete newItem.guide_can_add
+                delete newItem.file_name
+                delete newItem.created_date
+                // delete newItem.updatedAt
+                delete newItem.image_logo
+
+
+                // usersArr.map(currUser => {
+                //     if (currUser.id === item.created_by_user_id) {
+                //     }
+                // })
+            })
+
+            return res.json({
+                count: newRows.length,
+                'rows': newRows
+            })
+        } catch (e) {
+            return next(ApiError.internal("Ошибка параметра"))
+        }
+    }
+
+    async getAllAdmin(req, res, next) {
         try {
             const {tag_search, sort_code} = req.query
             let sortOrder = ['id', 'ASC']
@@ -447,7 +529,48 @@ class ToursController {
             const candidate = await Tours.findOne({where: {id}})
 
             if (candidate) {
-                return res.json(readFile(candidate.file_name))
+                // let newRows = []
+
+                let newItem = JSON.parse(JSON.stringify(candidate))
+
+                // newItem.created_date = newItem.createdAt
+                newItem.image = newItem.image_logo
+
+                const currUser = await User.findOne({where: {id: candidate.created_by_user_id}})
+                newItem.userName = currUser.name
+                // newItem.created_by_user_name = currUser.name
+
+                const result = await readFile(candidate.file_name)
+                if (result.hasOwnProperty('status')) {
+                    if (result.status === 'ok') {
+                        newItem.data = result.data
+                    }
+                }
+
+                delete newItem.active
+                delete newItem.created_by_user_id
+                delete newItem.guide_can_add
+                delete newItem.file_name
+                // delete newItem.created_date
+                delete newItem.updatedAt
+                delete newItem.createdAt
+                delete newItem.image_logo
+
+                // newRows.push(newItem)
+
+                return res.json({
+                    status: 'ok',
+                    'data': newItem
+                })
+
+                // usersArr.map(currUser => {
+                //     if (currUser.id === item.created_by_user_id) {
+                //         newItem.created_by_user_name = currUser.name
+                //         newRows.push(newItem)
+                //     }
+                // })
+
+                // return res.json(readFile(candidate.file_name))
             }
         }
         return next(ApiError.internal("Ошибка чтения данных файла"))

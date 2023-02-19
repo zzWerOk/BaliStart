@@ -78,7 +78,8 @@ const TourDetailsPage = observer((props) => {
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
                         // currTour.data = data.data
-                        item.data = data.data
+                        console.log(data.data)
+                        item.data = data.data.data
                     }
                 }
             }).catch(() => {
@@ -203,11 +204,7 @@ const TourDetailsPage = observer((props) => {
                         if (lostMapPointsArr.length - 1 === index) {
                             setMapPointsArr_Loading(false)
                             setMapPointsArr(storeMapointsItems)
-
-                            // mapPointsStore.setMapPointsListFromArr(storeMapointsItems)
-
                         }
-
                     })
                 })
             } else {
@@ -363,17 +360,39 @@ const TourDetailsPage = observer((props) => {
             }
         }
 
+        // if (newCategory) {
+        //     const found = tourTags.find(element => element === newCategory.id)
+        //     if (found) {
+        //         const filtered = tourTags.filter(function (value) {
+        //             return value !== found;
+        //         })
+        //         setTourTags(filtered)
+        //         currTour.tour_category = JSON.stringify(filtered)
+        //         currTour.isSaved = false
+        //         onItemEditHandler(currTour.getAsJson())
+        //     }
+        // }
+
         if (newCategory) {
             const found = tourTags.find(element => element === newCategory.id)
             if (found) {
-                const filtered = tourTags.filter(function (value) {
-                    return value !== found;
+                const filtered = tourTags.filter(function (typeId) {
+                    return typeId !== found;
                 })
                 setTourTags(filtered)
                 currTour.tour_category = JSON.stringify(filtered)
                 currTour.isSaved = false
                 onItemEditHandler(currTour.getAsJson())
             }
+        } else {
+            const filtered = tourTags.filter(function (typeId) {
+                return value !== typeId;
+            })
+
+            setTourTags(filtered)
+            currTour.tour_category = JSON.stringify(filtered)
+            currTour.isSaved = false
+            onItemEditHandler(currTour.getAsJson())
         }
     }
 

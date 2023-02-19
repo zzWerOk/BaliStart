@@ -9,8 +9,6 @@ const FeedTopic = (props) => {
 
     const {item} = props
 
-    // console.log(item)
-
     return (
 
         <li

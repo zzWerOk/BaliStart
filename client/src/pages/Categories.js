@@ -1,11 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
-import MainPageFeed from "../components/mainpage/MainPageFeed";
 import {Context} from "../index";
 import {delay} from "../utils/consts";
 import {getAll} from "../http/topicsCategoryAPI";
 import SpinnerSm from "../components/SpinnerSM";
+import MainPageFeed from "../components/mainpage/MainPageFeed";
 
-const Main = () => {
+const Categories = () => {
     const {topicsCategoryStore} = useContext(Context)
 
     const [loading, setLoading] = useState(true)
@@ -16,6 +16,7 @@ const Main = () => {
         delay(0).then(() => {
 
             if (!topicsCategoryStore.loaded) {
+
                 getAll(true).then(data => {
                     /**
                      Сохраняем список
@@ -45,4 +46,4 @@ const Main = () => {
     }
 };
 
-export default Main;
+export default Categories;

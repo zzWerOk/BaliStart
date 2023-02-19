@@ -1,43 +1,36 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {useHistory, useParams} from "react-router-dom";
-import {delay, epochToDateWithTime, NOPAGE_ROUTE} from "../utils/consts";
-import {getTopicData} from "../http/topicsAPI";
-import {Context} from "../index";
-import {Col, Row} from "react-bootstrap";
-import classes from './TopicDetails.module.css'
-import './TopicDetails.css'
-import CommentsFeed from "../components/comments/CommentsFeed";
+import {useParams} from "react-router-dom";
+import {delay} from "../utils/consts";
 import FeedTopBar from "../components/mainpage/FeedTopBar";
+import classes from "./TopicDetails.module.css";
+import {Col, Row} from "react-bootstrap";
+import CommentsFeed from "../components/comments/CommentsFeed";
+import {getTourData} from "../http/toursAPI";
+import {Context} from "../index";
+import {getAllTours_Type} from "../http/toursTypeAPI";
+import {getAll_ToursCat} from "../http/toursCategoryAPI";
 
-import TopicDetailTextComponent from "../components/topics/components/TopicDetailTextComponent";
-import TopicDetailCommentComponent from "../components/topics/components/TopicDetailCommentComponent";
-import TopicDetailListComponent from "../components/topics/components/TopicDetailListComponent";
-import TopicDetailLinkComponent from "../components/topics/components/TopicDetailLinkComponent";
-import TopicDetailEmailComponent from "../components/topics/components/TopicDetailEmailComponent";
-import TopicDetailPhoneComponent from "../components/topics/components/TopicDetailPhoneComponent";
-import TopicDetailImagesComponent from "../components/topics/components/TopicDetailImagesComponent";
-import TopicDetailGoogleMapUrlComponent from "../components/topics/components/TopicDetailGoogleMapUrlComponent";
-import TopicDetailLineComponent from "../components/topics/components/TopicDetailLineComponent";
-
-const TopicDetails = () => {
+const TourDetails = () => {
     let {id} = useParams();
-    const history = useHistory()
 
-    const {user, topicsCategoryStore} = useContext(Context)
+    const {toursCategoryStore, toursTypeStore} = useContext(Context)
 
     const [loading, setLoading] = useState(true)
-    const [topic, setTopic] = useState({})
-    const [topicData, setTopicData] = useState([])
-    const [topicCategories, setTopicCategories] = useState([])
+    const [loadingType, setLoadingType] = useState(true)
+    const [loadingCat, setLoadingCat] = useState(true)
+
+    const [currTour, setCurrTour] = useState({})
+    // const [tourData, setTourData] = useState([])
+    const [tourCategories, setTourCategories] = useState([])
     const [itemImage, setItemImage] = useState('')
 
     useEffect(() => {
-        setLoading(true)
 
+        setLoading(true)
 
         delay(0).then(() => {
 
-            getTopicData(id, user.id).then(data => {
+            getTourData(id).then(data => {
                 let dataJson
 
                 try {
@@ -47,77 +40,91 @@ const TopicDetails = () => {
                 }
 
                 if (dataJson.hasOwnProperty('status')) {
-                    if (dataJson.status === 'error') {
-                        if (dataJson.message === 'topic not found') {
-                            history.push(NOPAGE_ROUTE)
+                    if (dataJson.status === 'ok') {
+                        if (dataJson.data.hasOwnProperty('data')) {
+                            // setTourData(JSON.parse(dataJson.data.data))
+                            delete dataJson.data.data
                         }
+                        setCurrTour(dataJson.data)
+
+                        console.log(dataJson.data)
+
+                        setTourCategories(JSON.parse(dataJson.data.tour_category))
+
+                        if (dataJson.data.image) {
+                            setItemImage(process.env.REACT_APP_API_URL + '/static/' + dataJson.data.image + '?' + Date.now())
+                        }
+
                     }
                 } else if (dataJson.hasOwnProperty('name')) {
-                    setTopicData(dataJson.data)
-                    delete dataJson.data
-                    setTopic(dataJson)
 
-                    if (dataJson.image) {
-                        setItemImage(process.env.REACT_APP_API_URL + '/static/' + dataJson.image + '?' + Date.now())
-                    }
-
-                    try {
-                        const currCategories = topicsCategoryStore.getSavedCategoriesList()
-                        const currTopicCategories = JSON.parse(dataJson.categories)
-                        let fullCategories = []
-
-                        currTopicCategories.map(category => {
-                            for (let i = 0; i < currCategories.length; i++) {
-                                if (category === currCategories[i].id) {
-                                    fullCategories.push(currCategories[i])
-                                    break
-                                }
-                            }
-                        })
-                        setTopicCategories(fullCategories)
-                    } catch (e) {
-                    }
                 }
 
             }).catch((e) => {
                 console.log(e)
             }).finally(() => {
                 setLoading(false)
+                if (!toursCategoryStore.loaded) {
+                    getAll_ToursCat().then(data => {
+
+                        if (data.hasOwnProperty('count')) {
+                            if (data.hasOwnProperty('rows')) {
+                                if (data.count > 0) {
+                                    toursCategoryStore.itemsArr = data.rows
+                                }
+                            }
+                        }
+
+                    }).finally(() => {
+                        setLoadingCat(false)
+                    })
+                } else {
+                    setLoadingCat(false)
+                }
+
+                if (!toursTypeStore.loaded) {
+                    getAllTours_Type().then(data => {
+
+                        if (data.hasOwnProperty('count')) {
+                            if (data.hasOwnProperty('rows')) {
+                                if (data.count > 0) {
+                                    toursTypeStore.itemsArr = data.rows
+                                }
+                            }
+                        }
+
+                    }).finally(() => {
+                        setLoadingType(false)
+                    })
+
+                } else {
+                    setLoadingType(false)
+                }
+
             })
 
         })
 
     }, [])
 
-    const getTopicDetailsElement = (element, index) => {
-
-        if (element.hasOwnProperty('type')) {
-            switch (element.type) {
-                case 'text':
-                    return <TopicDetailTextComponent key={index} element={element}/>
-                case 'comment':
-                    return <TopicDetailCommentComponent key={index} element={element}/>
-                case 'list':
-                    return <TopicDetailListComponent key={index} element={element}/>
-                case 'link':
-                    return <TopicDetailLinkComponent key={index} element={element}/>
-                case 'email':
-                    return <TopicDetailEmailComponent key={index} element={element}/>
-                case 'phone':
-                    return <TopicDetailPhoneComponent key={index} element={element}/>
-                case 'images':
-                    return <TopicDetailImagesComponent key={index} element={element}/>
-                case 'googleMapUrl':
-                    return <TopicDetailGoogleMapUrlComponent key={index} element={element}/>
-                case 'line':
-                    return <TopicDetailLineComponent key={index} element={element}/>
-            }
+    const getToutCatNameById = (catId) => {
+        console.log(toursCategoryStore.itemsArr)
+        const selectedCat = toursCategoryStore.itemsArr.find(element => element.id === catId)
+        if(selectedCat){
+            return selectedCat.name
         }
-
-
+        return ""
     }
 
-    if (loading) {
+    const getToutCatDescriptionById = (catId) => {
+        const selectedCat = toursCategoryStore.itemsArr.find(element => element.id === catId)
+        if(selectedCat){
+            return selectedCat.description
+        }
+        return ""
+    }
+
+    if (loading || loadingCat || loadingType) {
 
     } else {
         return (
@@ -129,8 +136,6 @@ const TopicDetails = () => {
                     <FeedTopBar
                         isBackBtn={true}
                         backBtnTitle={'Back'}
-                        // prevLocation={usePrevLocation()}
-                        // prevLocation={prevLocation}
                         rightSideBarElements={
                             <div className={'d-flex'}>
                                 <div className={'d-flex justify-content-between align-items-center'}>
@@ -149,7 +154,7 @@ const TopicDetails = () => {
                                                     d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
                                             </svg>
                                             <small style={{marginLeft: '5px',}}>
-                                                {topic.commentsCount}
+                                                {currTour.commentsCount}
                                             </small>
                                         </div>
 
@@ -212,26 +217,27 @@ const TopicDetails = () => {
                             <Row className={classes.topic_row_top}>
                                 <div className={'d-flex justify-content-between'}>
                                     <small>
-                                        {topic.userName}
+                                        {/*{currTour.userName}*/}
                                     </small>
                                     <small>
-                                        {epochToDateWithTime(topic.created_date)}
+                                        {/*{epochToDateWithTime(currTour.created_date)}*/}
                                     </small>
                                 </div>
                             </Row>
                             <Row className={classes.topic_row}>
                                 <div>
                                     {
-                                        topicCategories.map(function (item, index) {
+                                        tourCategories.map(function (item, index) {
+                                            console.log(item)
                                             return <a
                                                 key={index}
                                                 className="badge badge-secondary"
                                                 type="button"
                                                 data-toggle="tooltip"
                                                 data-placement="top"
-                                                title={item.description}>
+                                                title={getToutCatDescriptionById(item)}>
                                                 <small>
-                                                    {item.category_name}
+                                                    {getToutCatNameById(item)}
                                                 </small>
                                             < /a>
 
@@ -247,21 +253,21 @@ const TopicDetails = () => {
                                 }}
                             >
                                 <Row className={`${classes.topic_row} text-muted`} style={{paddingTop: '20px'}}>
-                                    <h1 className={'display-4 font-italic'}  style={{color: `white`,}}>
-                                        {topic.name}
+                                    <h1 className={'display-4 font-italic'} style={{color: `white`,}}>
+                                        {currTour.name}
                                     </h1>
                                 </Row>
-                                <Row className={`${classes.topic_row} text-muted`}  style={{paddingBottom: '20px'}}>
+                                <Row className={`${classes.topic_row} text-muted`} style={{paddingBottom: '20px'}}>
                                     <p className={'lead my-3'} style={{color: `white`,}}>
-                                        {topic.description}
+                                        {currTour.description}
                                     </p>
                                 </Row>
                             </div>
                             <Row className={`${classes.topic_row} ${classes.topic_data}`}>
                                 {
-                                    topicData.map(function (item, index) {
-                                        return getTopicDetailsElement(item, index)
-                                    })
+                                    // tourData.map(function (item, index) {
+                                    //     return getTopicDetailsElement(item, index)
+                                    // })
                                 }
                             </Row>
                             <Row className={classes.topic_row}>
@@ -285,4 +291,4 @@ const TopicDetails = () => {
     }
 };
 
-export default TopicDetails;
+export default TourDetails;

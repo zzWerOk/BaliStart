@@ -31,7 +31,7 @@ const SideBar = observer(() => {
                     style={{cursor: 'pointer'}}
                 >
                     <Link
-                        to={'topics'}
+                        to={'/topics'}
                         className={classes.linkitem}
                         style={{display: 'block'}}
                     >
@@ -43,7 +43,31 @@ const SideBar = observer(() => {
                     style={{cursor: 'pointer'}}
                 >
                     <Link
-                        to={'mappoints'}
+                        to={'/categories'}
+                        className={classes.linkitem}
+                        style={{display: 'block'}}
+                    >
+                        Categories page
+                    </Link>
+                </ListGroupItem>
+
+                <ListGroupItem
+                    style={{cursor: 'pointer'}}
+                >
+                    <Link
+                        to={'/tours'}
+                        className={classes.linkitem}
+                        style={{display: 'block'}}
+                    >
+                        Tours
+                    </Link>
+                </ListGroupItem>
+
+                <ListGroupItem
+                    style={{cursor: 'pointer'}}
+                >
+                    <Link
+                        to={'/mappoints'}
                         className={classes.linkitem}
                         style={{display: 'block'}}
                     >

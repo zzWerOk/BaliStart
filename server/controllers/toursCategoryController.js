@@ -65,6 +65,35 @@ class ToursCategoryController {
 
     async getAll(req, res) {
         const topicsCategoriesList = await ToursCategory.findAndCountAll({
+                is_active: true,
+                order: [
+                    ['id', 'DESC'],
+                ]
+            }
+        )
+
+        let newRows = []
+        topicsCategoriesList.rows.map(item => {
+            let newItem = JSON.parse(JSON.stringify(item))
+
+            newItem.name = newItem.category_name
+
+            delete newItem.is_active
+            delete newItem.createdAt
+            delete newItem.updatedAt
+            delete newItem.category_name
+
+            newRows.push(newItem)
+        })
+        return res.json({
+            count: newRows.length,
+            'rows': newRows
+        })
+        // return res.json(topicsCategoriesList)
+    }
+
+    async getAllAdmin(req, res) {
+        const topicsCategoriesList = await ToursCategory.findAndCountAll({
                 // limit: 10,
                 order: [
                     ['id', 'DESC'],
@@ -133,7 +162,7 @@ class ToursCategoryController {
             }
 
             const count = await ToursCategory.destroy({where: {id: id}})
-            if(count > 0) {
+            if (count > 0) {
                 // return res.json(`Удалено записей: ${count}`)
                 return res.json({status: 'ok'})
             }

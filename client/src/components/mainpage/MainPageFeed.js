@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import FeedTopBar from "./FeedTopBar";
-import FeedAddNewPostBtn from "./FeedAddNewPostBtn";
 import FeedItemsList from "./FeedItemsList";
 
 const MainPageFeed = () => {
@@ -18,7 +17,7 @@ const MainPageFeed = () => {
                 itemsType={itemsType}
                 isSearch={true}
             />
-            <FeedAddNewPostBtn/>
+            {/*<FeedAddNewPostBtn/>*/}
             <FeedItemsList
                 itemsType={itemsType}
             />

@@ -59,7 +59,11 @@ export default class TourCL {
     }
 
     get tourIncludes() {
-        return JSON.parse(this._data)['includes']
+        const dataJson = JSON.parse(this._data)
+        if(dataJson.hasOwnProperty('includes')){
+            return dataJson.includes
+        }
+        return '[]'
     }
 
     set tourIncludes(value) {

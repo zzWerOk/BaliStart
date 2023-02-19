@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {Row} from "react-bootstrap";
 import './TopicDetailLineComponent.css'
 const TopicDetailLineComponent = (props) => {
     const {element} = props
@@ -13,7 +12,6 @@ const TopicDetailLineComponent = (props) => {
         if (element.hasOwnProperty('style')) {
             if (element.style !== '') {
                 setElementStyle(element.style)
-                console.log(element.style)
             }
         }
 

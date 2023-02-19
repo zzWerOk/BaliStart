@@ -15,10 +15,6 @@ const NavBar = observer(() => {
 
     const [showModal, setShowModal] = useState(false)
 
-    // useEffect(() => {
-    //     console.log(user.name)
-    // }, [])
-
     const logOut = () => {
         user.logout()
     }
@@ -96,7 +92,6 @@ const NavBar = observer(() => {
                 onHide={() => {
                     setShowModal(false)
                 }}
-                // title={'Login'}
                 child={mapPointsPageCardComponent}
             />
 

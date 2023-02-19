@@ -1,4 +1,4 @@
-import {$authHost, $host} from "./index";
+import {$authHost} from "./index";
 
 const apiUrl = 'api/tourscategory'
 
@@ -18,7 +18,7 @@ export const setIsActiveAPI = async (id, active) => {
 }
 
 export const getAll_Cat = async () => {
-    const {data} = await $authHost.get(apiUrl+'/all')
+    const {data} = await $authHost.get(apiUrl+'/allAdmin')
     return data
 }
 
