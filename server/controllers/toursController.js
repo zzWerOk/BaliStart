@@ -540,6 +540,29 @@ class ToursController {
                 newItem.userName = currUser.name
                 // newItem.created_by_user_name = currUser.name
 
+                const selectedGuides = []
+                const guidesIdsArr = JSON.parse(newItem.selected_guides)
+                for (let i = 0; i < guidesIdsArr.length; i++) {
+                    const currGuideId = guidesIdsArr[i]
+                    const currGuide = await User.findOne({
+                        where: {id: currGuideId, is_guide: true},
+                        attributes: {
+                            exclude: ['password', 'updatedAt', 'is_admin', 'is_guide', 'is_active', 'date_last_login', 'createdAt'],
+                        },
+                    })
+
+                    selectedGuides.push(currGuide)
+                }
+
+                // await JSON.parse(newItem.selected_guides).map(async function (currGuideId) {
+                //     const currGuide = await User.findOne({where: {id: currGuideId}})
+                //     // if(currGuide.is_guide){
+                //         selectedGuides.push(currGuide)
+                //     // }
+                // })
+
+                newItem.selected_guides = selectedGuides
+
                 const result = await readFile(candidate.file_name)
                 if (result.hasOwnProperty('status')) {
                     if (result.status === 'ok') {

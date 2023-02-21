@@ -17,7 +17,6 @@ const TourMpCard = (props) => {
             const itemData = JSON.parse(item.data)
             const itemTextDataArr = []
             const itemMapUrlsDataArr = []
-            console.log(item)
 
             setNameMP(item.name)
 

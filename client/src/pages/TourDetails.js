@@ -13,6 +13,7 @@ import TopicDetailListComponent from "../components/topics/components/TopicDetai
 import {getMapPointById} from "../http/mapPointsAPI";
 import ElementName from "../components/topics/components/ElementName";
 import TourMpCard from "../components/tours/TourMPCard";
+import TourGuidesCard from "../components/tours/TourGuidesCard";
 
 const TourDetails = () => {
     let {id} = useParams();
@@ -29,6 +30,14 @@ const TourDetails = () => {
     const [tourCategories, setTourCategories] = useState([])
     const [itemImage, setItemImage] = useState('')
     const [tourMP, setTourMP] = useState([])
+    const [tourGuides, setTourGuides] = useState([])
+
+    const [tourGuideClicked, setTourGuideClicked] = useState(-1)
+
+    const clickTourGuide = (guideId) => {
+        setTourGuideClicked(guideId)
+        console.log('guideId ',guideId)
+    }
 
     useEffect(() => {
 
@@ -53,7 +62,44 @@ const TourDetails = () => {
                         }
                         setCurrTour(dataJson.data)
 
-                        console.log(dataJson)
+                        // setTourGuides(dataJson.data.selected_guides)
+
+                        const guidesArr = []
+                        let newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
+                        newGuide.id = guidesArr.length
+                        guidesArr.push(newGuide)
+
+                        setTourGuides(guidesArr)
 
                         setTourCategories(JSON.parse(dataJson.data.tour_category))
 
@@ -71,8 +117,6 @@ const TourDetails = () => {
                                         if (dataMP.status === 'ok') {
                                             newMPArr.push(dataMP.data)
                                             setTourMP(newMPArr)
-                                            console.log(dataMP.data)
-
                                         }
                                     }
                                 })
@@ -409,7 +453,12 @@ const TourDetails = () => {
 
                             </Row>
                             <Row className={classes.topic_row}>
-
+                                <ElementName name={'Guides'}/>
+                                <TourGuidesCard
+                                    items={tourGuides}
+                                    tourGuideClicked={tourGuideClicked}
+                                    clickTourGuide={clickTourGuide}
+                                />
                             </Row>
                             {/*<Row className={classes.topic_row}>*/}
                             {/*    <CommentsFeed*/}

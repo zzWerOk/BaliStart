@@ -1,0 +1,19 @@
+.rounded {
+
+    background-color: rgba(204, 204, 204, 0.0);
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out;
+
+}
+
+.rounded.clicked {
+
+    background-color: rgba(204, 204, 204, 0.4);
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out;
+
+}
