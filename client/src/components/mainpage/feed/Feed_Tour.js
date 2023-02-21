@@ -17,7 +17,6 @@ const FeedTour = (props) => {
             setItemImage(process.env.REACT_APP_API_URL + '/static/' + item.image + '?' + Date.now())
         }
 
-        console.log(item)
 //image
     }, [])
 

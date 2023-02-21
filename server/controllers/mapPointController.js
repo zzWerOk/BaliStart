@@ -13,7 +13,7 @@ class MapPointController {
                 name,
                 description,
                 google_map_url,
-                topics='[]',
+                topics = '[]',
                 active,
                 created_by_user_id,
                 data_text = '',
@@ -28,7 +28,7 @@ class MapPointController {
                 img = req.files.img
             }
 
-            if(name) {
+            if (name) {
 
                 const result = await createNewFile(data_text, 'MapPoint', img)
 
@@ -36,7 +36,7 @@ class MapPointController {
                     if (result.status === 'ok') {
                         const fileName = result.fileName
                         let imgFileName = ''
-                        if(result.imgFileName){
+                        if (result.imgFileName) {
                             imgFileName = result.imgFileName
                         }
 
@@ -69,7 +69,7 @@ class MapPointController {
                         }
 
                         return res.json({status: 'ok', id: newMapPoint.id})
-                    }else{
+                    } else {
                         return res.json({status: 'error', message: result.message})
                     }
 
@@ -77,7 +77,7 @@ class MapPointController {
                 return res.json({status: 'error', message: 'Create file error'})
 
             }
-        }catch (e) {
+        } catch (e) {
             return next(ApiError.forbidden("Ошибка добавления точки интереса"))
         }
     }
@@ -89,7 +89,7 @@ class MapPointController {
                 name,
                 description,
                 google_map_url,
-                topics='[]',
+                topics = '[]',
                 active,
                 created_by_user_id,
                 data_text = '',
@@ -231,7 +231,64 @@ class MapPointController {
         }
     }
 
-    async getById(req, res) {
+    async getByIdAdmin(req, res, next) {
+        const {id} = req.params
+        if (!id) {
+            return next(ApiError.badRequest("Ошибка параметра"))
+        } else {
+            const candidate = await MapPoint.findOne({where: {id}})
+
+            if (candidate) {
+                const result = readFile(candidate.file_name)
+                if (result.hasOwnProperty('status')) {
+                    if (result.status === 'ok') {
+                        candidate.data = result.data
+                    }
+                }
+                return res.json({status: 'ok', data: candidate})
+            }
+        }
+        return next(ApiError.internal("Ошибка чтения данных файла"))
+
+    }
+
+    async getById(req, res, next) {
+        const {id} = req.params
+        if (!id) {
+            return next(ApiError.badRequest("Ошибка параметра"))
+        } else {
+            const candidate = await MapPoint.findOne({where: {id}})
+            let resultItem = JSON.parse(JSON.stringify(candidate))
+            if (candidate) {
+                if (candidate.active) {
+                    const result = await readFile(candidate.file_name)
+                    if (result.hasOwnProperty('status')) {
+                        if (result.status === 'ok') {
+                            resultItem.data = result.data
+                        }
+                    }
+                    resultItem.image = resultItem.image_logo
+
+
+                    delete resultItem.active
+                    delete resultItem.createdAt
+                    delete resultItem.created_by_user_id
+                    delete resultItem.created_date
+                    // data
+                    // description
+                    delete resultItem.file_name
+                    delete resultItem.google_map_url
+                    delete resultItem.image_logo
+                    // id
+                    // name
+                    delete resultItem.topics
+                    delete resultItem.updatedAt
+
+                    return res.json({status: 'ok', data: resultItem})
+                }
+            }
+        }
+        return next(ApiError.internal("Ошибка чтения данных файла"))
 
     }
 
@@ -278,6 +335,21 @@ class MapPointController {
             return res.json({status: "error", message: e.message})
         }
         return next(ApiError.internal("Ошибка удаления"))
+    }
+
+    async getDataAdmin(req, res, next) {
+        const {id} = req.params
+        if (!id) {
+            return next(ApiError.badRequest("Ошибка параметра"))
+        } else {
+            const candidate = await MapPoint.findOne({where: {id}})
+
+            if (candidate) {
+                return res.json(readFile(candidate.file_name))
+            }
+        }
+        return next(ApiError.internal("Ошибка чтения данных файла"))
+
     }
 
     async getData(req, res, next) {

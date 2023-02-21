@@ -4,11 +4,15 @@ import {delay} from "../utils/consts";
 import FeedTopBar from "../components/mainpage/FeedTopBar";
 import classes from "./TopicDetails.module.css";
 import {Col, Row} from "react-bootstrap";
-import CommentsFeed from "../components/comments/CommentsFeed";
 import {getTourData} from "../http/toursAPI";
 import {Context} from "../index";
 import {getAllTours_Type} from "../http/toursTypeAPI";
 import {getAll_ToursCat} from "../http/toursCategoryAPI";
+import TopicDetailImagesComponent from "../components/topics/components/TopicDetailImagesComponent";
+import TopicDetailListComponent from "../components/topics/components/TopicDetailListComponent";
+import {getMapPointById} from "../http/mapPointsAPI";
+import ElementName from "../components/topics/components/ElementName";
+import TourMpCard from "../components/tours/TourMPCard";
 
 const TourDetails = () => {
     let {id} = useParams();
@@ -18,11 +22,13 @@ const TourDetails = () => {
     const [loading, setLoading] = useState(true)
     const [loadingType, setLoadingType] = useState(true)
     const [loadingCat, setLoadingCat] = useState(true)
+    const [loadingMP, setLoadingMP] = useState(true)
 
     const [currTour, setCurrTour] = useState({})
-    // const [tourData, setTourData] = useState([])
+    const [tourData, setTourData] = useState([])
     const [tourCategories, setTourCategories] = useState([])
     const [itemImage, setItemImage] = useState('')
+    const [tourMP, setTourMP] = useState([])
 
     useEffect(() => {
 
@@ -30,7 +36,7 @@ const TourDetails = () => {
 
         delay(0).then(() => {
 
-            getTourData(id).then(data => {
+            getTourData(id).then(async data => {
                 let dataJson
 
                 try {
@@ -42,12 +48,12 @@ const TourDetails = () => {
                 if (dataJson.hasOwnProperty('status')) {
                     if (dataJson.status === 'ok') {
                         if (dataJson.data.hasOwnProperty('data')) {
-                            // setTourData(JSON.parse(dataJson.data.data))
+                            setTourData(dataJson.data.data)
                             delete dataJson.data.data
                         }
                         setCurrTour(dataJson.data)
 
-                        console.log(dataJson.data)
+                        console.log(dataJson)
 
                         setTourCategories(JSON.parse(dataJson.data.tour_category))
 
@@ -55,6 +61,61 @@ const TourDetails = () => {
                             setItemImage(process.env.REACT_APP_API_URL + '/static/' + dataJson.data.image + '?' + Date.now())
                         }
 
+                        if (dataJson.data.hasOwnProperty('map_points')) {
+                            const mapPointsArr = JSON.parse(dataJson.data.map_points)
+                            let newMPArr = []
+                            for (let i = 0; i < mapPointsArr.length; i++) {
+                                const item = mapPointsArr[i]
+                                await getMapPointById(item).then(dataMP => {
+                                    if (dataMP.hasOwnProperty('status')) {
+                                        if (dataMP.status === 'ok') {
+                                            newMPArr.push(dataMP.data)
+                                            setTourMP(newMPArr)
+                                            console.log(dataMP.data)
+
+                                        }
+                                    }
+                                })
+                            }
+                            setLoadingMP(false)
+                        }
+
+                        if (!toursCategoryStore.loaded) {
+                            getAll_ToursCat().then(data => {
+
+                                if (data.hasOwnProperty('count')) {
+                                    if (data.hasOwnProperty('rows')) {
+                                        if (data.count > 0) {
+                                            toursCategoryStore.itemsArr = data.rows
+                                        }
+                                    }
+                                }
+
+                            }).finally(() => {
+                                setLoadingCat(false)
+                            })
+                        } else {
+                            setLoadingCat(false)
+                        }
+
+                        if (!toursTypeStore.loaded) {
+                            getAllTours_Type().then(data => {
+
+                                if (data.hasOwnProperty('count')) {
+                                    if (data.hasOwnProperty('rows')) {
+                                        if (data.count > 0) {
+                                            toursTypeStore.itemsArr = data.rows
+                                        }
+                                    }
+                                }
+
+                            }).finally(() => {
+                                setLoadingType(false)
+                            })
+
+                        } else {
+                            setLoadingType(false)
+                        }
                     }
                 } else if (dataJson.hasOwnProperty('name')) {
 
@@ -64,43 +125,6 @@ const TourDetails = () => {
                 console.log(e)
             }).finally(() => {
                 setLoading(false)
-                if (!toursCategoryStore.loaded) {
-                    getAll_ToursCat().then(data => {
-
-                        if (data.hasOwnProperty('count')) {
-                            if (data.hasOwnProperty('rows')) {
-                                if (data.count > 0) {
-                                    toursCategoryStore.itemsArr = data.rows
-                                }
-                            }
-                        }
-
-                    }).finally(() => {
-                        setLoadingCat(false)
-                    })
-                } else {
-                    setLoadingCat(false)
-                }
-
-                if (!toursTypeStore.loaded) {
-                    getAllTours_Type().then(data => {
-
-                        if (data.hasOwnProperty('count')) {
-                            if (data.hasOwnProperty('rows')) {
-                                if (data.count > 0) {
-                                    toursTypeStore.itemsArr = data.rows
-                                }
-                            }
-                        }
-
-                    }).finally(() => {
-                        setLoadingType(false)
-                    })
-
-                } else {
-                    setLoadingType(false)
-                }
-
             })
 
         })
@@ -108,9 +132,8 @@ const TourDetails = () => {
     }, [])
 
     const getToutCatNameById = (catId) => {
-        console.log(toursCategoryStore.itemsArr)
         const selectedCat = toursCategoryStore.itemsArr.find(element => element.id === catId)
-        if(selectedCat){
+        if (selectedCat) {
             return selectedCat.name
         }
         return ""
@@ -118,13 +141,121 @@ const TourDetails = () => {
 
     const getToutCatDescriptionById = (catId) => {
         const selectedCat = toursCategoryStore.itemsArr.find(element => element.id === catId)
-        if(selectedCat){
+        if (selectedCat) {
             return selectedCat.description
         }
         return ""
     }
 
-    if (loading || loadingCat || loadingType) {
+    const getTourDataElements = (tourData) => {
+        const tourDataJson = JSON.parse(tourData)
+        let imagesElement = {name: '', items: '[]'}
+        if (tourDataJson.hasOwnProperty('images')) {
+            imagesElement.items = tourDataJson.images
+        }
+
+        let includesElement = {name: '', items: '[]'}
+        if (tourDataJson.hasOwnProperty('includes')) {
+            includesElement.name = 'What Includes'
+            includesElement.items = tourDataJson.includes
+        }
+
+        let notIncludesElement = {name: '', items: '[]'}
+        if (tourDataJson.hasOwnProperty('notincludes')) {
+            notIncludesElement.name = 'What not includes'
+            notIncludesElement.items = tourDataJson.notincludes
+        }
+
+        return <div>
+            {
+                JSON.parse(imagesElement.items).length > 0
+                    ?
+                    <TopicDetailImagesComponent element={imagesElement}/>
+                    :
+                    null
+            }
+
+            {
+                tourMP.length > 0
+                    ?
+                    <div>
+
+                        <ElementName name={'Itinerary'}/>
+
+                        <div className="accordion accordion-borderless"
+                             id="accordionFlushExample"
+                             style={{marginTop: '-10px'}}
+                        >
+                            <ul className="timeline-with-icons">
+
+                                {
+                                    tourMP.map(function (item, index) {
+                                        return getMapPointsTimeLineItem(item, index)
+                                    })
+                                }
+
+                            </ul>
+                        </div>
+                    </div>
+
+                    :
+                    null
+            }
+
+            {
+                JSON.parse(includesElement.items).length > 0
+                    ?
+                    <TopicDetailListComponent isIncludes={true} element={includesElement}/>
+                    :
+                    null
+            }
+            {
+                JSON.parse(notIncludesElement.items).length > 0
+                    ?
+                    <TopicDetailListComponent isNotIncludes={true} element={notIncludesElement}/>
+                    :
+                    null
+            }
+        </div>
+    }
+
+    const getMapPointsTimeLineItem = (item, index) => {
+
+        return <li key={item.id + ' ' + index} className={'timeline-item'}>
+            <span className="timeline-icon">
+                {index + 1}
+            </span>
+
+            <div className="accordion-item">
+                <h2 className="accordion-header" id={"flush-heading" + item.id}>
+                    <button
+                        // className="accordion-button collapsed"
+                        className="btn-outline-secondary accordion-button collapsed"
+                        type="button"
+                        data-mdb-toggle="collapse"
+                        data-mdb-target={"#flush-collapse" + item.id}
+                        aria-expanded="false"
+                        aria-controls={"flush-collapse" + item.id}
+                    >
+                        {item.name}
+                    </button>
+                </h2>
+                <div
+                    id={"flush-collapse" + item.id}
+                    className="accordion-collapse collapse"
+                    aria-labelledby={"flush-heading" + item.id}
+                    data-mdb-parent="#accordionFlush"
+                >
+                    <div className="accordion-body">
+                        <TourMpCard item={item}/>
+                        {/*{item.description}*/}
+                    </div>
+                </div>
+            </div>
+        </li>
+    }
+
+    if (loading || loadingCat || loadingType || loadingMP) {
 
     } else {
         return (
@@ -217,18 +348,25 @@ const TourDetails = () => {
                             <Row className={classes.topic_row_top}>
                                 <div className={'d-flex justify-content-between'}>
                                     <small>
-                                        {/*{currTour.userName}*/}
-                                    </small>
-                                    <small>
                                         {/*{epochToDateWithTime(currTour.created_date)}*/}
                                     </small>
+                                    <div className={'price'}>
+                                        {/*{currTour.userName}*/}
+                                        {currTour.price_usd}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor"
+                                             className="bi bi-currency-dollar" viewBox="0 0 16 16">
+                                            <path
+                                                d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718H4zm3.391-3.836c-1.043-.263-1.6-.825-1.6-1.616 0-.944.704-1.641 1.8-1.828v3.495l-.2-.05zm1.591 1.872c1.287.323 1.852.859 1.852 1.769 0 1.097-.826 1.828-2.2 1.939V8.73l.348.086z"/>
+                                        </svg>
+
+                                    </div>
                                 </div>
                             </Row>
                             <Row className={classes.topic_row}>
                                 <div>
                                     {
                                         tourCategories.map(function (item, index) {
-                                            console.log(item)
                                             return <a
                                                 key={index}
                                                 className="badge badge-secondary"
@@ -264,25 +402,20 @@ const TourDetails = () => {
                                 </Row>
                             </div>
                             <Row className={`${classes.topic_row} ${classes.topic_data}`}>
+
                                 {
-                                    // tourData.map(function (item, index) {
-                                    //     return getTopicDetailsElement(item, index)
-                                    // })
+                                    getTourDataElements(tourData)
                                 }
+
                             </Row>
                             <Row className={classes.topic_row}>
-                                <hr/>
-                                <h5>
-                                    <small>
-                                        Comments
-                                    </small>
-                                </h5>
+
                             </Row>
-                            <Row className={classes.topic_row}>
-                                <CommentsFeed
-                                    topicId={id}
-                                />
-                            </Row>
+                            {/*<Row className={classes.topic_row}>*/}
+                            {/*    <CommentsFeed*/}
+                            {/*        topicId={id}*/}
+                            {/*    />*/}
+                            {/*</Row>*/}
                         </Col>
                     </div>
                 </div>

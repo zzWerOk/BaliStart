@@ -18,7 +18,12 @@ export const getAll = async () => {
 }
 
 export const getMapPointData = async (id) => {
-    const {data} = await $authHost.get(apiUrl+'/dataAdmin/' + id)
+    const {data} = await $host.get(apiUrl+'/data/' + id)
+    return data
+}
+
+export const getMapPointById = async (id) => {
+    const {data} = await $host.get(apiUrl+'/getById/' + id)
     return data
 }
 
