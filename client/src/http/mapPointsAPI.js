@@ -2,7 +2,7 @@ import {$authHost, $authHostUpload, $host} from "./index";
 
 const apiUrl = 'api/mappoint'
 
-export const getAll = async () => {
+export const getAllMP = async () => {
     let sort_code = localStorage.getItem("sort_code_MapPoints")
     const params = new URLSearchParams();
 

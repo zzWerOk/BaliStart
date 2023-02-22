@@ -126,22 +126,6 @@ const TopicDetailsPage = observer((props) => {
 
             if (Object.keys(currTopic.dataJSON).length === 0) {
                 getTopicDataHandler()//start
-                // delay(0).then(() => {
-                //     if (currTopic.id > -1) {
-                //         getTopicData(currTopic.id).then(data => {
-                //             if (data.hasOwnProperty('status')) {
-                //                 if (data.status === 'ok') {
-                //                     currTopic.data = data.data
-                //                 }
-                //             }
-                //         }).finally(() => {
-                //             setItemData(currTopic.dataJSON)
-                //             setTopicCategoriesItems_load(false)
-                //         })
-                //     } else {
-                //         setTopicCategoriesItems_load(false)
-                //     }
-                // })
             } else {
                 setItemData(currTopic.dataJSON)
                 setTopicCategoriesItems_load(false)
@@ -151,7 +135,6 @@ const TopicDetailsPage = observer((props) => {
     )
 
     const getTopicDataHandler = (id) => {
-        // delay(0).then(() => {
         setIsSaving(true)
         let currTopicId = currTopic.id
         if (id) {
@@ -159,10 +142,8 @@ const TopicDetailsPage = observer((props) => {
             currTopic.newId = id
 
         }
-        // console.log('----getTopicDataHandler----- id ',currTopicId)
         if (currTopicId > -1) {
             getTopicData(currTopicId).then(data => {
-                // console.log('----getTopicDataHandler----- ',data)
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
                         currTopic.data = data.data
@@ -181,7 +162,6 @@ const TopicDetailsPage = observer((props) => {
             setTopicCategoriesItems_load(false)
             setIsSaving(false)
         }
-        // })
     }
 
     const onNameHandler = (value) => {
@@ -191,11 +171,6 @@ const TopicDetailsPage = observer((props) => {
         onItemEditHandler(currTopic.getAsJson())
 
     }
-
-    // const changeTopicId = (id) => {
-    //     currTopic.newId = id
-    //     onItemEditHandler(currTopic.getAsJson(), newImageLogo)
-    // }
 
     const onDescriptionHandler = (value) => {
         setCurrDescription(value)
@@ -597,8 +572,6 @@ const TopicDetailsPage = observer((props) => {
                     setItemData(newItemsArr)
                     currTopic.isSaved = false
                     onItemEditHandler(currTopic.getAsJson())
-
-                    // setRedraw(!redraw)
 
                     setMovedDownItemIndex(index + 1)
                     setTimeout(() => {

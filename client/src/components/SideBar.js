@@ -67,11 +67,11 @@ const SideBar = observer(() => {
                     style={{cursor: 'pointer'}}
                 >
                     <Link
-                        to={'/mappoints'}
+                        to={'/poi'}
                         className={classes.linkitem}
                         style={{display: 'block'}}
                     >
-                        Map points page
+                        Points of interests
                     </Link>
                 </ListGroupItem>
 

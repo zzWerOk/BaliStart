@@ -208,10 +208,120 @@ class MapPointController {
 
             let newRows = []
 
+            // const usersArr = await User.findAll()
+
+            mapPointsList.rows.map(item => {
+                let newItem = JSON.parse(JSON.stringify(item))
+
+                const result = readFile(newItem.file_name)
+                if (result.hasOwnProperty('status')) {
+                    if (result.status === 'ok') {
+                        newItem.data = result.data
+                    }
+                }
+                newItem.image = newItem.image_logo
+
+
+                delete newItem.active
+                delete newItem.createdAt
+                delete newItem.created_by_user_id
+                delete newItem.created_date
+                // data
+                // description
+                delete newItem.file_name
+                delete newItem.google_map_url
+                delete newItem.image_logo
+                // id
+                // name
+                delete newItem.topics
+                delete newItem.updatedAt
+
+                // usersArr.map(currUser => {
+                //     if (currUser.id === item.created_by_user_id) {
+                //         newItem.created_by_user_name = currUser.name
+                //         newRows.push(newItem)
+                //     }
+                // })
+
+                newRows.push(newItem)
+            })
+
+            return res.json({
+                count: newRows.length,
+                'rows': newRows
+            })
+        } catch (e) {
+            // return res.json({'status': 'error', 'message': e.message})
+            return next(ApiError.internal("Ошибка параметра"))
+        }
+    }
+
+    async getAllAdmin(req, res, next) {
+        try {
+            const {sort_code} = req.query
+            let sortOrder = ['id', 'ASC']
+
+            switch (sort_code) {
+                case 'user':
+                    sortOrder = ['created_by_user_id', 'ASC']
+                    break
+                case 'reuser':
+                    sortOrder = ['created_by_user_id', 'DESC']
+                    break
+                case 'date':
+                    sortOrder = ['created_date', 'ASC']
+                    break
+                case 'redate':
+                    sortOrder = ['created_date', 'DESC']
+                    break
+                case 'id':
+                    sortOrder = ['id', 'ASC']
+                    break
+                case 'reid':
+                    sortOrder = ['id', 'DESC']
+                    break
+            }
+
+            const mapPointsList = await MapPoint.findAndCountAll({
+                    // limit: 10,
+                    // attributes: ['tag', tagSearch],
+                    order: [sortOrder,
+                        // ['name', 'DESC'],
+                        // ['name', 'ASC'],
+                    ],
+                }
+            )
+
+            let newRows = []
+
             const usersArr = await User.findAll()
 
             mapPointsList.rows.map(item => {
                 let newItem = JSON.parse(JSON.stringify(item))
+
+                // const result = readFile(candidate.file_name)
+                // if (result.hasOwnProperty('status')) {
+                //     if (result.status === 'ok') {
+                //         resultItem.data = result.data
+                //     }
+                // }
+                // resultItem.image = resultItem.image_logo
+                //
+                //
+                // delete resultItem.active
+                // delete resultItem.createdAt
+                // delete resultItem.created_by_user_id
+                // delete resultItem.created_date
+                // // data
+                // // description
+                // delete resultItem.file_name
+                // delete resultItem.google_map_url
+                // delete resultItem.image_logo
+                // // id
+                // // name
+                // delete resultItem.topics
+                // delete resultItem.updatedAt
+                //
 
                 usersArr.map(currUser => {
                     if (currUser.id === item.created_by_user_id) {

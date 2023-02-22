@@ -152,7 +152,7 @@ class UserController {
 
         const currUser = req.user
 
-        if(currUser){
+        if (currUser) {
             const candidate = await User.findOne({where: {email: req.user.email}})
 
             return res.json({status: "ok", message: candidate.name})
@@ -160,6 +160,7 @@ class UserController {
 
         return res.json({status: "error"})
     }
+
     async auth(req, res, next) {
         const candidate = await User.findOne({where: {email: req.user.email}})
         if (!candidate) {
@@ -248,6 +249,20 @@ class UserController {
                     ['id', 'ASC'],
                     // ['name', 'DESC'],
                 ]
+            }
+        )
+        return res.json(usersList)
+    }
+
+    async getAllGuides(req, res) {
+        const usersList = await User.findAndCountAll({
+                attributes: {exclude: ['password']},
+                where: {is_guide: true},
+                order: [
+                    ['id', 'ASC'],
+                    // ['name', 'DESC'],
+                ]
+                // limit: 10,
             }
         )
         return res.json(usersList)

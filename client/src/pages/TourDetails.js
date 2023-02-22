@@ -35,8 +35,12 @@ const TourDetails = () => {
     const [tourGuideClicked, setTourGuideClicked] = useState(-1)
 
     const clickTourGuide = (guideId) => {
-        setTourGuideClicked(guideId)
-        console.log('guideId ',guideId)
+
+        if(guideId === tourGuideClicked){
+            setTourGuideClicked(-1)
+        }else {
+            setTourGuideClicked(guideId)
+        }
     }
 
     useEffect(() => {
@@ -62,44 +66,7 @@ const TourDetails = () => {
                         }
                         setCurrTour(dataJson.data)
 
-                        // setTourGuides(dataJson.data.selected_guides)
-
-                        const guidesArr = []
-                        let newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-                        newGuide = JSON.parse(JSON.stringify(dataJson.data.selected_guides[0]))
-                        newGuide.id = guidesArr.length
-                        guidesArr.push(newGuide)
-
-                        setTourGuides(guidesArr)
+                        setTourGuides(dataJson.data.selected_guides)
 
                         setTourCategories(JSON.parse(dataJson.data.tour_category))
 
@@ -292,7 +259,6 @@ const TourDetails = () => {
                 >
                     <div className="accordion-body">
                         <TourMpCard item={item}/>
-                        {/*{item.description}*/}
                     </div>
                 </div>
             </div>
@@ -460,11 +426,6 @@ const TourDetails = () => {
                                     clickTourGuide={clickTourGuide}
                                 />
                             </Row>
-                            {/*<Row className={classes.topic_row}>*/}
-                            {/*    <CommentsFeed*/}
-                            {/*        topicId={id}*/}
-                            {/*    />*/}
-                            {/*</Row>*/}
                         </Col>
                     </div>
                 </div>

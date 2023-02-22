@@ -1,12 +1,14 @@
-// import Admin from "./pages/Admin";
 import {
     CATEGORIES_ROUTE,
     CATEGORY_ROUTE,
-    MAIN_ROUTE, NOPAGE_ROUTE, TOPIC_ROUTE, TOPICS_ROUTE, TOUR_ROUTE, TOURS_ROUTE,
+    MAIN_ROUTE,
+    NOPAGE_ROUTE,
+    TOPIC_ROUTE,
+    TOPICS_ROUTE,
+    TOUR_ROUTE,
+    TOURS_ROUTE,
+    MAPPOINT_ROUTE,
 } from "./utils/consts";
-// import Auth from "./pages/Auth";
-// import GuidePage from "./pages/GuidePage";
-// import Login from "./pages/Login";
 import Main from "./pages/Main";
 import Category from "./pages/Category";
 import NoPage from "./pages/NoPage";
@@ -15,11 +17,7 @@ import TopicsPage from "./pages/TopicsPage";
 import Categories from "./pages/Categories";
 import ToursPage from "./pages/ToursPage";
 import TourDetails from "./pages/TourDetails";
-// import MapPointPage from "./pages/MapPointPage";
-// import Registration from "./pages/Registration";
-// import ToursPage from "./pages/ToursPage";
-// import UserPage from "./pages/UserPage";
-// import TopicsPage from "./pages/TopicsPage";
+import MapPointsPage from "./pages/MapPointsPage";
 
 export const adminRoutes = [
     // {
@@ -78,14 +76,10 @@ export const publicRoutes = [
         path: TOUR_ROUTE,
         Component: TourDetails
     },
-    // {
-    //     path: AUTH_ROUTE,
-    //     Component: Auth
-    // },
-    // {
-    //     path: REGISTRATION_ROUTE,
-    //     Component: Registration
-    // },
+    {
+        path: MAPPOINT_ROUTE,
+        Component: MapPointsPage
+    },
 ]
 
 export const authUserRoutes = [

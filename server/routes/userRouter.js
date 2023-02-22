@@ -13,6 +13,7 @@ router.delete('/',checkIsAdmin,userController.deleteUser)
 router.get('/auth', authMiddleWare, userController.auth)
 router.get('/name', authMiddleWare, userController.getMyName)
 router.get('/all',authMiddleWare, userController.getAll)
+router.get('/allGuides',authMiddleWare, userController.getAllGuides)
 router.get('/:id',authMiddleWare, userController.getById)
 
 module.exports = router

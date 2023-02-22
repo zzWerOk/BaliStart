@@ -51,7 +51,14 @@ const TourMpCard = (props) => {
         }, [])
 
         return (
-            <div>
+            <div
+                style={{
+                    marginLeft: '25px',
+                    marginRight: '15px',
+                    marginTop: '25px',
+                    marginBottom: '15px',
+                }}
+            >
                 <div className="card float-right">
                     <div className="row">
                         <div className="col-sm-5 d-flex align-items-center">
