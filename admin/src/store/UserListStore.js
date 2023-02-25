@@ -1,5 +1,4 @@
 import {makeAutoObservable} from "mobx";
-import UserListCell from "../components/users/UserListCell";
 import React from "react";
 
 export default class UserListStore {
@@ -24,7 +23,7 @@ export default class UserListStore {
 
     saveUserList(newList) {
 
-        let textForSave = ''
+        let textForSave
 
         textForSave = JSON.stringify(newList)
 
@@ -46,6 +45,17 @@ export default class UserListStore {
         return null
     }
 
+    editUserById(id, newUserData) {
+        let userList = this.getSavedUserList
+        for(let i = 0;i < userList.length;i++){
+            if(userList[i].id === newUserData.id){
+                userList[i] = newUserData
+                this.saveUserList(userList)
+                break
+            }
+        }
+
+    }
     setUserActiveById(id, isActive) {
         let userList = this.getSavedUserList
 

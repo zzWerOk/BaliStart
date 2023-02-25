@@ -346,8 +346,6 @@ class TopicsController {
                             let imgFileName = ''
                             try {
                                 if (img) {
-                                    // imgFileName = candidate.file_name.split('\\')[1]
-                                    // imgFileName = candidate.file_name.substring(0, candidate.file_name.lastIndexOf("/") + 1);
                                     imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                                     await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
                                 }

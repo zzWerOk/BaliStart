@@ -3,7 +3,7 @@ import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import DragIcon from '../../../assets/drag-handle_1.svg';
 
 const GuidePhoneComponent = (props) => {
-    const {item, phonesEditHandler} = props
+    const {item, phonesEditHandler, saving} = props
 
     const [phones, setPhones] = useState([])
     const [loading, setLoading] = useState(true)
@@ -41,7 +41,7 @@ const GuidePhoneComponent = (props) => {
 
     const newItemAddHandler = () => {
         let itemsArr = JSON.parse(JSON.stringify(phones))
-        itemsArr.push({"type": "", "phone": ""})
+        itemsArr.push({"type": "wa", "phone": ""})
 
         setPhones(itemsArr)
         phonesEditHandler(itemsArr)
@@ -56,27 +56,28 @@ const GuidePhoneComponent = (props) => {
     }
 
     const onDragEnd = useCallback((params) => {
-        const srcIndex = params.source.index
-        const dstIndex = params.destination?.index
+        if(!saving) {
+            const srcIndex = params.source.index
+            const dstIndex = params.destination?.index
 
-        if (dstIndex !== null) {
-            if (dstIndex !== undefined) {
-                let imagesArr = JSON.parse(JSON.stringify(phones))
-                imagesArr.splice(dstIndex, 0, imagesArr.splice(srcIndex, 1)[0])
+            if (dstIndex !== null) {
+                if (dstIndex !== undefined) {
+                    let imagesArr = JSON.parse(JSON.stringify(phones))
+                    imagesArr.splice(dstIndex, 0, imagesArr.splice(srcIndex, 1)[0])
 
-                setPhones(imagesArr)
-                phonesEditHandler(imagesArr)
+                    setPhones(imagesArr)
+                    phonesEditHandler(imagesArr)
+                }
             }
         }
-    }, [phones]);
+    }, [phones, saving]);
 
     if (loading) {
 
     } else {
 
         return (
-            <div className={'col-12'}>
-
+            <div className={'col-12 d-flex flex-column justify-content-center mt-3'}>
                 <DragDropContext
                     onDragEnd={onDragEnd}
                 >
@@ -123,6 +124,7 @@ const GuidePhoneComponent = (props) => {
                                                                                 aria-label="Default select example"
                                                                                 value={listItem.type}
                                                                                 onChange={e => handleSelect(e.target.value, index)}
+                                                                                disabled={!!saving}
                                                                         >
                                                                             <option disabled>Выбери тип связи</option>
                                                                             <option value="wa">WhatsApp</option>
@@ -133,7 +135,7 @@ const GuidePhoneComponent = (props) => {
                                                                         </select>
                                                                     </div>
 
-                                                                    <div className={'col-6'}>
+                                                                    <div className={'col-7'}>
                                                                         <input
                                                                             type="phoneText"
                                                                             id="phoneText"
@@ -141,6 +143,7 @@ const GuidePhoneComponent = (props) => {
                                                                             placeholder='Phone No'
                                                                             value={listItem.phone}
                                                                             onChange={e => itemPhonesEdit(e.target.value, index)}
+                                                                            disabled={!!saving}
                                                                         />
                                                                     </div>
 
@@ -150,6 +153,7 @@ const GuidePhoneComponent = (props) => {
                                                                         onClick={() => {
                                                                             itemDeleteHandler(index)
                                                                         }}
+                                                                        disabled={!!saving}
                                                                     >
                                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                                              width="16" height="16"
@@ -180,21 +184,23 @@ const GuidePhoneComponent = (props) => {
                     </div>
                 </DragDropContext>
 
-                <button
-                    type="button"
-                    className="btn btn-info"
-                    onClick={newItemAddHandler}
-                    style={{
-                        marginTop: '10px',
-                    }}
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                         className="bi bi-plus" viewBox="0 0 16 16">
-                        <path
-                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                    </svg>
-                </button>
-
+                <div className={'d-flex justify-content-center'}>
+                    <button
+                        type="button"
+                        className="btn btn-info "
+                        onClick={newItemAddHandler}
+                        style={{
+                            marginTop: '10px',
+                        }}
+                        disabled={!!saving}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             className="bi bi-plus" viewBox="0 0 16 16">
+                            <path
+                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         );
     }

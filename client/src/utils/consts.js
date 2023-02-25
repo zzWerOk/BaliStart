@@ -34,10 +34,6 @@ export const epochToDateWithTime_seconds = epoch => {
 
 export const epochToDateWithTime = epoch => {
 
-    // console.log(epoch)
-    // 1675845044
-            // 1675845044
-            // 1675675403464
     if(epoch < 9999999999){
         epoch = epoch * 1000
     }else{

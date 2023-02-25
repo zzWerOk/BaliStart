@@ -5,7 +5,7 @@ import classes from './LoginPage.module.css'
 import SpinnerSm from "../components/SpinnerSM";
 import {Context} from "../index";
 import {AxiosError} from "axios";
-import {getById, getMyName, loginApi, registerApi} from "../http/userAPI";
+import {getMyName, loginApi, registerApi} from "../http/userAPI";
 
 const LoginPage = (props) => {
 

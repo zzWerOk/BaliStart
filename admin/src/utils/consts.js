@@ -1,4 +1,5 @@
 import sideBarItem from '../classes/sideBarItem'
+const moment = require('moment');
 
 export const delay = ms => new Promise(res => setTimeout(res, ms))
 
@@ -12,6 +13,12 @@ export const epochToDate = epoch => {
     if(day < 10){day = "0" + day}
 
     return (day + "." + month + "." + year);
+}
+
+export const epochToDate_guide = epoch => {
+    const m = moment(epoch * 1000);
+
+    return m.format('yyyy-MM-D')
 }
 
 export const epochToDateWithTime_seconds = epoch => {
@@ -33,7 +40,12 @@ export const epochToDateWithTime_seconds = epoch => {
 }
 
 export const epochToDateWithTime = epoch => {
-    const date = new Date(epoch * 1);
+    if(epoch < 9999999999){
+        epoch = epoch * 1000
+    }else{
+        epoch = epoch * 1
+    }
+    const date = new Date(epoch);
 
     const year = date.getFullYear();
     let month = date.getMonth() + 1;

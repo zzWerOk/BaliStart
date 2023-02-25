@@ -32,6 +32,18 @@ readFile = function (fileName) {
 
 }
 
+readFileImage = function (fileName) {
+
+    try {
+        const filePath = path.resolve(__dirname, '..', "static", fileName)
+        let data = fs.readFileSync(filePath, 'utf8')
+        return {status: 'ok', data}
+    } catch (e) {
+        return {status: 'error', message: e.message}
+    }
+
+}
+
 reWrightFile = async function (textData, tableName, fileName) {
     try {
         let dirName = getDirName(tableName)
@@ -54,7 +66,7 @@ reWrightFile = async function (textData, tableName, fileName) {
         //     }
         // });
 
-        fs.mkdirSync(dirPath + "/" + dirName,  { recursive: true });
+        fs.mkdirSync(dirPath + "/" + dirName, {recursive: true});
 
         const filePath = path.resolve(__dirname, '..', "data", fileName)
 
@@ -77,38 +89,16 @@ createNewFile = async function (textData, tableName, img) {
         const fileName = getFreeFileName(dirName)
 
         const dirPath = path.resolve(__dirname, '..', "data")
-        // // fs.mkdir(dirPath, { recursive: true },(err) => {
-        // //     if (err) {
-        // //         return {err}
-        // //     }
-        // // });
-        // fs.mkdir(dirPath + "/" + dirName,  { recursive: true },(err) => {
-        //     if (err) {
-        //         return {err}
-        //     }
-        // });
-        // // fs.mkdirSync(dirPath + "/" + dirName,  { recursive: true });
-        // // await fs.promises.mkdir(dirPath + "/" + dirName, { recursive: true })
-        //
-        // // let fullPath = dirPath + "/" + dirName
-        // // fullPath.split('/').reduce(
-        // //     (directories, directory) => {
-        // //         directories += `${directory}/`;
-        // //         if (!fs.existsSync(directories)) {
-        // //             fs.mkdirSync(directories);
-        // //         }
-        // //         return directories;
-        // //     },
-        // //     '',
-        // // );
 
-        fs.mkdirSync(dirPath + "/" + dirName,  { recursive: true });
+        fs.mkdirSync(dirPath + "/" + dirName, {recursive: true});
 
         const filePath = path.resolve(__dirname, '..', "data", fileName)
 
-        await fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
-            return {error: 'error', message: err}
-        })
+        if (tableName !== 'img') {
+            await fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
+                return {error: 'error', message: err}
+            })
+        }
 
         let imageMd5 = ''
 
@@ -121,7 +111,6 @@ createNewFile = async function (textData, tableName, img) {
         let imgFileName = ''
         if (img) {
             try {
-                // imgFileName = fileName.split('\\')[1]
                 imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
                 await img.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
                 return {'status': 'ok', fileName, imgFileName}

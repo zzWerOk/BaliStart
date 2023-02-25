@@ -2,6 +2,8 @@ const {User, Guide, TableUpdates} = require('../models/models')
 const ApiError = require('../error/ApiError')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const {createNewFile, readFile} = require("../utils/consts");
+const path = require("path");
 
 const generateJWT = (id, email, isAdmin, isGuide) => {
     return jwt.sign(
@@ -100,6 +102,93 @@ class UserController {
         } else {
             return res.json({error: "Необходимо указать все данные пользователя..."})
             // return next(ApiError.forbidden("Необходимо указать все данные пользователя..."))
+        }
+    }
+
+    async changeAdmin(req, res) {
+        try {
+            const {
+                id,
+                name,
+                email,
+                is_active,
+                is_admin,
+                is_guide,
+            } = req.body
+
+            if (email) {
+                const candidate = await User.findOne({where: {id}})
+                if (candidate) {
+
+                    if (email !== candidate.email) {
+                        const userNewEmail = await User.findOne({where: {email}})
+                        if (userNewEmail) {
+                            return res.json({status: 'error', message: "Cannot change email"})
+                        }
+                    }
+
+                    let img
+                    if (req.files) {
+                        img = req.files.img
+                    }
+
+                    let imgFileName = candidate.avatar_img
+                    const userImageFile = readFile(candidate.avatar_img)
+                    if (!userImageFile || candidate.avatar_img === '') {
+
+                        const result = await createNewFile('', 'img', img)
+
+                        if (result.hasOwnProperty('status')) {
+                            if (result.status === 'ok') {
+                                if (result.imgFileName) {
+                                    imgFileName = result.imgFileName
+                                }
+                            }
+                        }
+
+                    } else {
+                        if (img) {
+                            imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
+                            await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                        }
+
+                    }
+
+                    await User.update(
+                        {
+                            name,
+                            email,
+                            avatar_img: imgFileName,
+                            is_active,
+                            is_admin,
+                            is_guide,
+                        },
+                        {
+                            where: {id: candidate.id},
+                        }
+                    );
+                    const selectedByUser = req.user
+
+                    const updatedUser = await User.findOne({
+                        attributes: {exclude: ['password']},
+                        where: {id: candidate.id}
+                    })
+
+                    const userDataJson = JSON.parse(JSON.stringify(updatedUser))
+                    if ((candidate.id + '') === (selectedByUser.id + '')) {
+                        userDataJson.editable = true
+                    }
+
+                    return res.json({status: 'ok', data: userDataJson})
+
+                } else {
+                    return res.json({status: 'error', message: "No user found"})
+                }
+            }
+
+            return res.json({status: 'error', message: "Необходимо указать все данные пользователя..."})
+        } catch (e) {
+            return res.json({status: 'error', message: e.message})
         }
     }
 
@@ -228,16 +317,27 @@ class UserController {
 
     async getById(req, res, next) {
         // const {id} = req.query
-        const {id} = req.params
-        if (!id) {
-            return next(ApiError.badRequest("Ошибка параметра"))
-        } else {
-            const currUser = await User.findOne({
-                attributes: {exclude: ['password']},
-                where: {id: id}
-            })
+        try {
+            const {id} = req.params
+            const selectedByUser = req.user
+            if (!id) {
+                return next(ApiError.badRequest("Ошибка параметра"))
+            } else {
+                const currUser = await User.findOne({
+                    attributes: {exclude: ['password']},
+                    where: {id: id}
+                })
 
-            return res.json(currUser)
+                const userDataJson = JSON.parse(JSON.stringify(currUser))
+                if ((userDataJson.id + '') === (selectedByUser.id + '')) {
+                    userDataJson.editable = true
+                }
+
+
+                return res.json({status: 'ok', data: userDataJson})
+            }
+        } catch (e) {
+            return res.json({status: 'error', message: e.message})
         }
     }
 
@@ -256,16 +356,28 @@ class UserController {
 
     async getAllGuides(req, res) {
         const usersList = await User.findAndCountAll({
-                attributes: {exclude: ['password']},
-                where: {is_guide: true},
-                order: [
-                    ['id', 'ASC'],
-                    // ['name', 'DESC'],
-                ]
-                // limit: 10,
+            attributes: {exclude: ['password']},
+            where: {is_guide: true},
+            order: [
+                ['id', 'ASC'],
+                // ['name', 'DESC'],
+            ]
+            // limit: 10,
+        })
+
+        const guidesArr = []
+        for (let i = 0; i < usersList.count; i++) {
+            let currUser = JSON.parse(JSON.stringify(usersList.rows[i]))
+            const currGuide = await Guide.findOne({where: {user_id: currUser.id}})
+            if(currGuide){
+                currUser.avatar_img = currGuide.avatar_img
+
             }
-        )
-        return res.json(usersList)
+            guidesArr.push(currUser)
+        }
+
+        // return res.json(usersList)
+        return res.json({count: usersList.count, rows: guidesArr})
     }
 
     async deleteUser(req, res, next) {

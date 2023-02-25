@@ -24,13 +24,12 @@ const UserListCell = (currUser) => {
     const [showModal, setShowModal] = useState(false)
 
     let userPageCardComponent = () => ( <UserPageCard selectedUser={selectedUser} /> );
-    //<UserPageCard selectedUser={selectedUser}/>
 
     /**
      Изменение активен ли пользователь API
      **/
     const setIsActive_server = (isActiveValue) => {
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             setIsActiveAPI(selectedUser.id, isActiveValue).then(data => {
                 try {
@@ -171,9 +170,6 @@ const UserListCell = (currUser) => {
                 child={userPageCardComponent}
             />
         </div>
-        // <div>
-        //     {currUser.currUser.name}
-        // </div>
     );
 };
 
