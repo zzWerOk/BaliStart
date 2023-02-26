@@ -17,6 +17,7 @@ const UserEditCard = (props) => {
     const [currUser, setCurrUser] = useState({})
     const [currUserEditable, setCurrUserEditable] = useState({})
     const [currUserIsAdmin, setCurrUserIsAdmin] = useState(false)
+    const [currUserIsAgent, setCurrUserIsAgent] = useState(false)
     const [currUserIsGuide, setCurrUserIsGuide] = useState(false)
     const [userImageLogo, setUserImageLogo] = useState(false)
     const [userAvatar, setUserAvatar] = useState('')
@@ -34,6 +35,7 @@ const UserEditCard = (props) => {
 
         setCurrUserIsGuide(data.is_guide)
         setCurrUserIsAdmin(data.is_admin)
+        setCurrUserIsAgent(data.is_agent)
 
         setCurUserIsActive(data.is_active)
 
@@ -83,6 +85,9 @@ const UserEditCard = (props) => {
                 if (currUser.is_admin) {
                     currUser.is_admin = false
                 }
+                if (currUser.is_agent) {
+                    currUser.is_agent = false
+                }
                 break
             case 'admin':
                 currUser.is_admin = !currUser.is_admin;
@@ -90,10 +95,13 @@ const UserEditCard = (props) => {
             case 'guide':
                 currUser.is_guide = !currUser.is_guide;
                 break
+            case 'agent':
+                currUser.is_agent = !currUser.is_agent;
+                break
         }
         setCurrUserIsAdmin(currUser.is_admin)
         setCurrUserIsGuide(currUser.is_guide)
-        // setUserEdited(true)
+        setCurrUserIsAgent(currUser.is_agent)
         setUserEdited(isUserChanged())
     }
 
@@ -120,7 +128,8 @@ const UserEditCard = (props) => {
             } else {
                 setUserImageLogo(false)
             }
-            currUser.avatar_img = fileName
+            // currUser.avatar_img = fileName
+            currUser.img = fileName
             // setUserEdited(true)
             setUserEdited(isUserChanged())
         }
@@ -144,7 +153,8 @@ const UserEditCard = (props) => {
                 currUser.is_active,
                 currUser.is_admin,
                 currUser.is_guide,
-                currUser.avatar_img,
+                currUser.is_agent,
+                currUser.img,
             ).then(data => {
 
                 if (data.hasOwnProperty('status')) {
@@ -351,6 +361,22 @@ const UserEditCard = (props) => {
                                                     </label>
 
                                                     <input type="checkbox"
+                                                           className={`btn-check `}
+                                                           checked={!!currUserIsAgent}
+                                                           id="btncheck3"
+                                                           onChange={() => {
+                                                               onRoleSelectHandler('agent')
+                                                           }}
+                                                           disabled={!!saving}
+
+                                                           autoComplete="off"/>
+                                                    <label className="btn btn-outline-primary"
+                                                           htmlFor="btncheck3"
+                                                    >
+                                                        Agent
+                                                    </label>
+
+                                                    <input type="checkbox"
                                                            className={`btn-check`}
                                                            checked={!!currUserIsGuide}
                                                            id="btncheck2"
@@ -381,6 +407,7 @@ const UserEditCard = (props) => {
                                                     >
                                                         Admin
                                                     </label>
+
                                                 </div>
 
                                             </div>

@@ -30,12 +30,13 @@ export const setIsActiveAPI = async (id, active) => {
 }
 
 export const saveUserData = async (id,
-                                  name,
-                                  email,
-                                  is_active,
-                                  is_admin,
-                                  is_guide,
-                                  avatar_img,
+                                   name,
+                                   email,
+                                   is_active,
+                                   is_admin,
+                                   is_guide,
+                                   is_agent,
+                                   avatar_img,
 ) => {
     let formData = new FormData();
     formData = addToFormData(formData,
@@ -45,6 +46,7 @@ export const saveUserData = async (id,
         is_active,
         is_admin,
         is_guide,
+        is_agent,
         avatar_img,
     )
 
@@ -64,6 +66,7 @@ const addToFormData = (formData,
                        is_active,
                        is_admin,
                        is_guide,
+                       is_agent,
                        avatar_img,
 ) => {
     try {
@@ -72,14 +75,19 @@ const addToFormData = (formData,
         formData.append("email", email);
         formData.append("is_active", is_active);
         formData.append("is_admin", is_admin);
+        formData.append("is_agent", is_agent);
         formData.append("is_guide", is_guide);
 
-        if (avatar_img !== '') {
+        if (avatar_img !== null) {
             if (avatar_img !== undefined) {
-                try {
-                    formData.append("img", avatar_img, "imageFile");
-                } catch (e) {
-                    console.log('File apply error: ', e.message)
+                if (avatar_img !== '') {
+                    // if (avatar_img !== '') {
+                    // if (avatar_img !== undefined) {
+                    try {
+                        formData.append("img", avatar_img, "imageFile");
+                    } catch (e) {
+                        console.log('File apply error: ', e.message)
+                    }
                 }
             }
         }

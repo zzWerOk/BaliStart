@@ -1,76 +1,58 @@
 import React, {useEffect, useState} from 'react';
-import GuideTextComponent from "../../guides/components/GuideTextComponent";
 import {Button, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
-import GuidePhoneComponent from "../../guides/components/GuidePhoneComponent";
-import noImageLogo from "../../../img/nophoto.jpg";
+import noImageLogo from "../../img/nophoto.jpg";
 import {MDBFile} from "mdb-react-ui-kit";
-import {getById, saveGuideData} from "../../../http/guideAPI";
-import {dateToEpoch, delay, epochToDate_guide} from "../../../utils/consts";
+import {dateToEpoch, delay, epochToDate_guide} from "../../utils/consts";
 import {Form} from 'react-bootstrap';
-import GuideLinkComponent from "../../guides/components/GuideLinkComponent";
+import {getById, saveAgentData} from "../../http/agentAPI";
+import GuidePhoneComponent from "../guides/components/GuidePhoneComponent";
+import GuideTextComponent from "../guides/components/GuideTextComponent";
+import GuideLinkComponent from "../guides/components/GuideLinkComponent";
 
-const TourGuideEditCard = (props) => {
+const AgentEditCard = (props) => {
 
     const {tourGuideClicked, setGuideEdited, setUserSaved, setGuideDates, clickTourGuide} = props
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [currGuide, setCurrGuide] = useState({})
-    const [guideImageLogo, setGuideImageLogo] = useState(false)
-    const [guideAvatar, setGuideAvatar] = useState('')
+    const [currAgent, setCurrAgent] = useState({})
+    const [agentImageLogo, setAgentImageLogo] = useState(false)
+    const [agentAvatar, setAgentAvatar] = useState('')
 
-    const [guideName, setGuideName] = useState('')
-    const [guideAbout, setGuideAbout] = useState('')
-    const [guideLanguages, setGuideLanguages] = useState([])
-    const [guidePhones, setGuidePhones] = useState([])
-    const [guideLinks, setGuideLinks] = useState([])
-    const [guideExperience, setGuideExperience] = useState(0)
-    const [guideReligion, setGuideReligion] = useState('')
-    const [guideActiveTill, setGuideActiveTill] = useState('')
+    const [agentName, setAgentName] = useState('')
+    const [agentAbout, setAgentAbout] = useState('')
+    const [agentLanguages, setAgentLanguages] = useState([])
+    const [agentPhones, setAgentPhones] = useState([])
+    const [agentLinks, setAgentLinks] = useState([])
+    const [agentActiveTill, setAgentActiveTill] = useState('')
 
-    const [currGuideSave, setCurrGuideSave] = useState('')
+    const [currAgentSave, setCurrAgentSave] = useState('')
 
-    const [curGuideIsChanged, setCurGuideIsChanged] = useState(false)
+    const [currAgentIsChanged, setCurrAgentIsChanged] = useState(false)
 
     const isGuideChanged = () => {
-        const isChanged = currGuideSave !== JSON.stringify(currGuide)
-        setCurGuideIsChanged(isChanged)
+        const isChanged = currAgentSave !== JSON.stringify(currAgent)
+        setCurrAgentIsChanged(isChanged)
         return isChanged
     }
 
-    const setGuideData = (data) => {
-        setCurrGuide(data)
+    const setAgentData = (data) => {
+        setCurrAgent(data)
+        setCurrAgentSave(JSON.stringify(data))
 
-        setCurrGuideSave(JSON.stringify(data))
+        setAgentName(data.name)
+        setAgentAbout(data.about)
+        setAgentLanguages(JSON.parse(data.languages))
 
-        setGuideName(data.name)
-        setGuideAbout(data.about)
-        try {
-            setGuideLanguages(JSON.parse(data.languages))
-        } catch (e) {
-            setGuideLanguages([])
-        }
+        setAgentPhones(JSON.parse(data.phones))
+        setAgentLinks(JSON.parse(data.links))
 
-        try {
-            setGuidePhones(JSON.parse(data.phones))
-        } catch (e) {
-            setGuidePhones([])
-        }
-
-        try {
-            setGuideLinks(JSON.parse(data.links))
-        } catch (e) {
-            setGuideLinks([])
-        }
-        setGuideExperience(data.experience)
-        setGuideReligion(data.religion)
-
-        setGuideActiveTill(epochToDate_guide(data.active_till))
+        setAgentActiveTill(epochToDate_guide(data.active_till))
 
         setGuideDates({createdAt: data.createdAt, updatedAt: data.updatedAt})
 
         if (data.avatar_img) {
-            setGuideAvatar(process.env.REACT_APP_API_URL + '/static/' + data.avatar_img + '?' + Date.now())
+            setAgentAvatar(process.env.REACT_APP_API_URL + '/static/' + data.avatar_img + '?' + Date.now())
         }
 
     }
@@ -81,7 +63,10 @@ const TourGuideEditCard = (props) => {
         getById(tourGuideClicked).then((data) => {
             if (data.hasOwnProperty('status')) {
                 if (data.status === 'ok') {
-                    setGuideData(data.data)
+
+                    console.log(data)
+
+                    setAgentData(data.data)
                 }
             }
         }).catch(() => {
@@ -95,17 +80,17 @@ const TourGuideEditCard = (props) => {
 
     const onLanguageSelectHandler = (value) => {
         if (!saving) {
-            const currLangArr = guideLanguages
+            const currLangArr = agentLanguages
             const found = currLangArr.find(element => element === value)
             if (found) {
                 const filtered = currLangArr.filter(function (value) {
                     return value !== found;
                 })
-                currGuide.languages = JSON.stringify(filtered)
-                setGuideLanguages(filtered)
+                currAgent.languages = JSON.stringify(filtered)
+                setAgentLanguages(filtered)
             } else {
-                currGuide.languages = JSON.stringify([...currLangArr, value])
-                setGuideLanguages([...currLangArr, value])
+                currAgent.languages = JSON.stringify([...currLangArr, value])
+                setAgentLanguages([...currLangArr, value])
             }
 
             setGuideEdited(isGuideChanged())
@@ -113,54 +98,36 @@ const TourGuideEditCard = (props) => {
     }
 
     const phonesEditHandler = (phones) => {
-        currGuide.phones = JSON.stringify(phones)
-        setGuidePhones(phones)
+        currAgent.phones = JSON.stringify(phones)
+        setAgentPhones(phones)
         setGuideEdited(isGuideChanged())
     }
 
     const linksEditHandler = (links) => {
-        currGuide.links = JSON.stringify(links)
-        setGuideLinks(links)
+        currAgent.links = JSON.stringify(links)
+        setAgentLinks(links)
         setGuideEdited(isGuideChanged())
     }
 
     const visibleNameEditHandler = (value) => {
-        currGuide.name = value
-        setGuideName(value)
+        currAgent.name = value
+        setAgentName(value)
         setGuideEdited(isGuideChanged())
     }
-
-    // const emailEditHandler = (value) => {
-    //     currGuide.email = value
-    //
-    //     setGuideEdited(isGuideChanged())
-    // }
 
     const aboutEditHandler = (value) => {
-        currGuide.about = value
-        setGuideAbout(value)
-        setGuideEdited(isGuideChanged())
-    }
-
-    const religionEditHandler = (value) => {
-        currGuide.religion = value
-        setGuideReligion(value)
-        setGuideEdited(isGuideChanged())
-    }
-
-    const experienceEditHandler = (value) => {
-        currGuide.experience = value
-        setGuideExperience(value)
+        currAgent.about = value
+        setAgentAbout(value)
         setGuideEdited(isGuideChanged())
     }
 
     const onFileChooseHandler = (fileName) => {
         if (fileName) {
-            setGuideImageLogo(true)
+            setAgentImageLogo(true)
         } else {
-            setGuideImageLogo(false)
+            setAgentImageLogo(false)
         }
-        currGuide.img = fileName
+        currAgent.img = fileName
 
         setGuideEdited(isGuideChanged())
     }
@@ -171,28 +138,27 @@ const TourGuideEditCard = (props) => {
         setSaving(true)
         delay(0).then(() => {
 
-            saveGuideData(
-                currGuide.user_id,
-                currGuide.img,
-                currGuide.name,
-                currGuide.about,
-                currGuide.religion,
-                currGuide.experience,
-                currGuide.active_till,
-                currGuide.visible_till,
-                currGuide.phones,
-                currGuide.links,
-                currGuide.languages,
+            saveAgentData(
+                currAgent.user_id,
+                currAgent.img,
+                currAgent.name,
+                currAgent.about,
+                currAgent.active_till,
+                currAgent.visible_till,
+                currAgent.phones,
+                currAgent.links,
+                currAgent.languages,
+
             ).then(data => {
 
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
                         setUserSaved(JSON.parse(JSON.stringify(data.data)))
-                        setCurrGuideSave(JSON.stringify(data.data))
+                        setCurrAgentSave(JSON.stringify(data.data))
 
-                        setGuideData(data.data)
+                        setAgentData(data.data)
 
-                        setCurGuideIsChanged(false)
+                        setCurrAgentIsChanged(false)
                         setGuideEdited(false)
                     }
                 }
@@ -204,13 +170,13 @@ const TourGuideEditCard = (props) => {
     }
 
     const onActiveTillDateChangeHandler = (value) => {
-        setGuideActiveTill(value)
-        currGuide.active_till = dateToEpoch(value)
+        setAgentActiveTill(value)
+        currAgent.active_till = dateToEpoch(value)
         setGuideEdited(isGuideChanged())
     }
 
     const add1MonthToActiveTillDateHandler = () => {
-        let date = epochToDate_guide(currGuide.active_till)
+        let date = epochToDate_guide(currAgent.active_till)
         let year = date.split('-')[0]
         let month = date.split('-')[1]
         let day = date.split('-')[2]
@@ -229,13 +195,13 @@ const TourGuideEditCard = (props) => {
         }
         date = year + '-' + month + '-' + day
 
-        setGuideActiveTill(date)
-        currGuide.active_till = dateToEpoch(date)
+        setAgentActiveTill(date)
+        currAgent.active_till = dateToEpoch(date)
         setGuideEdited(isGuideChanged())
     }
 
     const add1DayToActiveTillDateHandler = () => {
-        let date = epochToDate_guide(parseInt(currGuide.active_till) + 86400)
+        let date = epochToDate_guide(parseInt(currAgent.active_till) + 86400)
         let year = date.split('-')[0]
         let month = date.split('-')[1]
         let day = date.split('-')[2]
@@ -245,8 +211,8 @@ const TourGuideEditCard = (props) => {
         }
         date = year + '-' + month + '-' + day
 
-        setGuideActiveTill(date)
-        currGuide.active_till = dateToEpoch(date)
+        setAgentActiveTill(date)
+        currAgent.active_till = dateToEpoch(date)
         setGuideEdited(isGuideChanged())
     }
 
@@ -261,7 +227,7 @@ const TourGuideEditCard = (props) => {
                             onClick={() => {
                                 saveGuideChanges()
                             }}
-                            disabled={!!saving || !curGuideIsChanged}
+                            disabled={!!saving || !currAgentIsChanged}
                     >
                         Save
                     </button>
@@ -275,7 +241,9 @@ const TourGuideEditCard = (props) => {
                     </button>
                 </div>
 
-                <div className="container py-1">
+                <div className="container py-1"
+                >
+
                     <div className="row">
                         <div className="col-lg-4">
                             <div className="card mb-4">
@@ -292,9 +260,9 @@ const TourGuideEditCard = (props) => {
                                             }}>
 
                                             <img
-                                                src={guideAvatar
+                                                src={agentAvatar
                                                     ?
-                                                    guideAvatar
+                                                    agentAvatar
                                                     :
                                                     noImageLogo
                                                 }
@@ -313,7 +281,7 @@ const TourGuideEditCard = (props) => {
                                         </div>
 
                                         <MDBFile
-                                            className={`btn w-75 ${guideImageLogo ? 'btn-primary' : 'btn-secondary'} `}
+                                            className={`btn w-75 ${agentImageLogo ? 'btn-primary' : 'btn-secondary'} `}
                                             id='topicLogo'
                                             style={{
                                                 position: 'absolute',
@@ -328,18 +296,13 @@ const TourGuideEditCard = (props) => {
 
 
                                     <GuideTextComponent className="my-3" onTextEditHandler={visibleNameEditHandler}
-                                                        text={guideName}
+                                                        text={agentName}
                                                         placeholder={'Visible Name'}
                                                         disabled={!!saving}
                                     />
                                     <GuideTextComponent className="my-3" onTextEditHandler={aboutEditHandler}
-                                                        text={guideAbout}
+                                                        text={agentAbout}
                                                         placeholder={'About guide (few words)'}
-                                                        disabled={!!saving}
-                                    />
-                                    <GuideTextComponent className="my-3" onTextEditHandler={religionEditHandler}
-                                                        text={guideReligion}
-                                                        placeholder={'Guide religion'}
                                                         disabled={!!saving}
                                     />
                                 </div>
@@ -361,16 +324,16 @@ const TourGuideEditCard = (props) => {
                                     <hr/>
                                     <div className="row">
                                         <div className="col-sm-3">
-                                            <p className="mb-0">Guide ID</p>
+                                            <p className="mb-0">Agent ID</p>
                                         </div>
                                         <div className="col-sm-9 text-center">
-                                            <span> {currGuide.id} </span>
+                                            <span> {currAgent.id} </span>
                                         </div>
                                     </div>
                                     <hr/>
                                     <div className="row">
                                         <div className="col-sm-3">
-                                            <p className="mb-0">Date</p>
+                                            <p className="mb-0">Active till</p>
                                         </div>
                                         <div className="col-sm-9 d-flex justify-content-between">
                                             <Form.Group controlId="duedate" className={'col-5'}>
@@ -378,7 +341,7 @@ const TourGuideEditCard = (props) => {
                                                     type="date"
                                                     name="duedate"
                                                     placeholder="Due date"
-                                                    value={guideActiveTill}
+                                                    value={agentActiveTill}
                                                     onChange={(e) => onActiveTillDateChangeHandler(e.target.value)}
                                                 />
                                             </Form.Group>
@@ -403,26 +366,12 @@ const TourGuideEditCard = (props) => {
                                     <hr/>
                                     <div className="row">
                                         <div className="col-sm-3">
-                                            <p className="mb-0">Experience as a guide</p>
-                                        </div>
-                                        <div className="col-sm-9">
-                                            <GuideTextComponent className=""
-                                                                text={guideExperience}
-                                                                onTextEditHandler={experienceEditHandler}
-                                                                placeholder={'Experience as a guide (years)'}
-                                                                disabled={!!saving}
-                                            />
-                                        </div>
-                                    </div>
-                                    <hr/>
-                                    <div className="row">
-                                        <div className="col-sm-3">
                                             <p className="mb-0">Language</p>
                                         </div>
                                         <div className="col-sm-9">
                                             <div>
                                                 <ToggleButtonGroup type="checkbox" name="activity"
-                                                                   defaultValue={guideLanguages}
+                                                                   defaultValue={agentLanguages}
                                                                    disabled={!!saving}
                                                 >
                                                     <ToggleButton
@@ -466,7 +415,7 @@ const TourGuideEditCard = (props) => {
                                         <div className="col">
                                             Phones
                                             <GuidePhoneComponent
-                                                item={guidePhones}
+                                                item={agentPhones}
                                                 saving={saving}
                                                 phonesEditHandler={phonesEditHandler}
                                             />
@@ -477,12 +426,13 @@ const TourGuideEditCard = (props) => {
                                         <div className="col">
                                             Links
                                             <GuideLinkComponent
-                                                item={guideLinks}
+                                                item={agentLinks}
                                                 saving={saving}
                                                 dataItemEditHandler={linksEditHandler}
                                             />
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
 
@@ -495,4 +445,4 @@ const TourGuideEditCard = (props) => {
     }
 };
 
-export default TourGuideEditCard;
+export default AgentEditCard;

@@ -10,6 +10,7 @@ const User = sequelize.define('user', {
     is_active: {type: DataTypes.BOOLEAN, defaultValue: true},
     is_admin: {type: DataTypes.BOOLEAN, defaultValue: false},
     is_guide: {type: DataTypes.BOOLEAN, defaultValue: false},
+    is_agent: {type: DataTypes.BOOLEAN, defaultValue: false},
     date_last_login: {type: DataTypes.BIGINT}
 })
 
@@ -24,6 +25,7 @@ const Guide = sequelize.define('guide', {
     active_till: {type: DataTypes.BIGINT, defaultValue:0 ,allowNull: false},
     visible_till: {type: DataTypes.BIGINT, defaultValue:0 ,allowNull: false},
     phones: {type: DataTypes.STRING},
+    links: {type: DataTypes.STRING},
     email: {type: DataTypes.STRING},
     is_has_car: {type: DataTypes.BOOLEAN},
     languages: {type: DataTypes.STRING, allowNull: false},
@@ -32,6 +34,20 @@ const Guide = sequelize.define('guide', {
     emergency_help_price: {type: DataTypes.STRING},
     is_can_discount: {type: DataTypes.BOOLEAN},
     holidays: {type: DataTypes.INTEGER}
+})
+
+const Agent = sequelize.define('agent', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    user_id: {type: DataTypes.INTEGER, allowNull: false},
+    avatar_img: {type: DataTypes.STRING},
+    name: {type: DataTypes.STRING},
+    about: {type: DataTypes.STRING},
+    active_till: {type: DataTypes.BIGINT, defaultValue:0 ,allowNull: false},
+    visible_till: {type: DataTypes.BIGINT, defaultValue:0 ,allowNull: false},
+    phones: {type: DataTypes.STRING},
+    links: {type: DataTypes.STRING},
+    email: {type: DataTypes.STRING},
+    languages: {type: DataTypes.STRING, allowNull: false},
 })
 
 const Tours = sequelize.define('tours', {
@@ -143,18 +159,10 @@ Guide.belongsTo(User)
 User.hasOne(Topics)
 Topics.belongsTo(User)
 
-// Guide.hasMany(Tours)
-// Tours.belongsTo(Guide)
-
-// Tours.hasMany(MapPoint)
-// MapPoint.belongsTo(Tours)
-
-// Guide.hasMany(MapPoint)
-// MapPoint.belongsTo(Guide)
-
 module.exports = {
     User,
     Guide,
+    Agent,
     Tours,
     MapPoint,
     Topics,

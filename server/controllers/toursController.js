@@ -573,6 +573,7 @@ class ToursController {
                                 guideDataJson.languages = currGuide.languages
                                 guideDataJson.name = currGuide.name
                                 guideDataJson.phones = currGuide.phones
+                                guideDataJson.links = currGuide.links
                                 guideDataJson.religion = currGuide.religion
                                 guideDataJson.avatar_img = currGuide.avatar_img
                                 guideDataJson.email = currGuide.email

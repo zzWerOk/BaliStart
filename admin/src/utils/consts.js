@@ -72,6 +72,7 @@ export const LOGOUT_ROUTE = '/logout'
 export const REGISTRATION_ROUTE = '/registration'
 export const MAIN_ROUTE = '/'
 export const GUIDE_ROUTE = '/guide'
+export const AGENT_ROUTE = '/agent'
 export const TOURS_ROUTE = '/tours'
 export const MAPPOINT_ROUTE = '/mappoint'
 export const AUTH_ROUTE = '/auth'
@@ -82,6 +83,7 @@ export const SIDEBAR_ISADMIN = [
     new sideBarItem('Admin',ADMIN_ROUTE),
     new sideBarItem('User',USER_ROUTE),
     new sideBarItem('Guide',GUIDE_ROUTE),
+    new sideBarItem('Agent',AGENT_ROUTE),
     new sideBarItem('Topics',TOPICS_ROUTE),
     new sideBarItem('Tours',TOURS_ROUTE),
     new sideBarItem('Map Point',MAPPOINT_ROUTE),

@@ -1,4 +1,4 @@
-const {User, Guide, TableUpdates} = require('../models/models')
+const {User, Guide, TableUpdates, Agent} = require('../models/models')
 const ApiError = require('../error/ApiError')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -114,6 +114,7 @@ class UserController {
                 is_active,
                 is_admin,
                 is_guide,
+                is_agent,
             } = req.body
 
             if (email) {
@@ -162,6 +163,7 @@ class UserController {
                             is_active,
                             is_admin,
                             is_guide,
+                            is_agent,
                         },
                         {
                             where: {id: candidate.id},
@@ -378,6 +380,32 @@ class UserController {
 
         // return res.json(usersList)
         return res.json({count: usersList.count, rows: guidesArr})
+    }
+
+    async getAllAgents(req, res) {
+        const usersList = await User.findAndCountAll({
+            attributes: {exclude: ['password']},
+            where: {is_agent: true},
+            order: [
+                ['id', 'ASC'],
+                // ['name', 'DESC'],
+            ]
+            // limit: 10,
+        })
+
+        const agentsArr = []
+        for (let i = 0; i < usersList.count; i++) {
+            let currUser = JSON.parse(JSON.stringify(usersList.rows[i]))
+            const currAgent = await Agent.findOne({where: {user_id: currUser.id}})
+            if(currAgent){
+                currUser.avatar_img = currAgent.avatar_img
+
+            }
+            agentsArr.push(currUser)
+        }
+
+        // return res.json(usersList)
+        return res.json({count: usersList.count, rows: agentsArr})
     }
 
     async deleteUser(req, res, next) {

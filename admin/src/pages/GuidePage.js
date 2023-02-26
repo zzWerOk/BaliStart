@@ -3,6 +3,10 @@ import {Context} from "../index";
 import {getAllGuides} from "../http/guideAPI";
 import TourGuidesCard from "../components/tours/components/TourGuidesCard";
 import TourGuideEditCard from "../components/tours/components/TourGuideEditCard";
+import {useLocation} from "react-router-dom";
+import {AGENT_ROUTE, GUIDE_ROUTE} from "../utils/consts";
+import AgentEditCard from "../components/agents/AgentEditCard";
+import {getAllAgents} from "../http/agentAPI";
 
 const GuidePage = () => {
     const {navBarTitle} = useContext(Context)
@@ -16,6 +20,8 @@ const GuidePage = () => {
     const [selectedGuideEdited, setSelectedGuideEdited] = useState(false)
 
     const [redraw, setRedraw] = useState(false)
+
+    const [isGuide, setIsGuide] = useState(true)
 
     const clickTourGuide = (guideId) => {
 
@@ -38,22 +44,48 @@ const GuidePage = () => {
         }
 
     }
+    const location = useLocation();
 
     useEffect(() => {
         setLoading(true)
-        navBarTitle.navBarTitle = 'Guide Page'
 
-        getAllGuides().then(data => {
-            if (data.hasOwnProperty('count') && data.hasOwnProperty('rows')) {
-                setGuidesList(data.rows)
 
-                // console.log(data.rows)
-            }
-        }).catch(() => {
+        if (location.pathname === GUIDE_ROUTE) {
+            navBarTitle.navBarTitle = 'Guide Page'
+            setIsGuide(true)
 
-        }).finally(() => {
-            setLoading(false)
-        })
+            getAllGuides().then(data => {
+                if (data.hasOwnProperty('count') && data.hasOwnProperty('rows')) {
+                    setGuidesList(data.rows)
+
+                    // console.log(data.rows)
+                }
+            }).catch(() => {
+
+            }).finally(() => {
+                setLoading(false)
+            })
+
+
+
+        } else if (location.pathname === AGENT_ROUTE) {
+            navBarTitle.navBarTitle = 'Agent Page'
+            setIsGuide(false)
+
+            getAllAgents().then(data => {
+                if (data.hasOwnProperty('count') && data.hasOwnProperty('rows')) {
+                    setGuidesList(data.rows)
+
+                    // console.log(data.rows)
+                }
+            }).catch(() => {
+
+            }).finally(() => {
+                setLoading(false)
+            })
+
+
+        }
 
     }, [])
 
@@ -86,7 +118,6 @@ const GuidePage = () => {
     const setGuideDates = (value) => {
         setSelectedGuideDates(value)
     }
-
 
 
     if (loading) {
@@ -125,13 +156,23 @@ const GuidePage = () => {
                 {
                     selectedGuide
                         ?
-                        <TourGuideEditCard
-                            tourGuideClicked={tourGuideClicked}
-                            setGuideEdited={setGuideEdited}
-                            setUserSaved={setUserSaved}
-                            setGuideDates={setGuideDates}
-                            clickTourGuide={clickTourGuide}
-                        />
+                        isGuide
+                            ?
+                            <TourGuideEditCard
+                                tourGuideClicked={tourGuideClicked}
+                                setGuideEdited={setGuideEdited}
+                                setUserSaved={setUserSaved}
+                                setGuideDates={setGuideDates}
+                                clickTourGuide={clickTourGuide}
+                            />
+                            :
+                            <AgentEditCard
+                                tourGuideClicked={tourGuideClicked}
+                                setGuideEdited={setGuideEdited}
+                                setUserSaved={setUserSaved}
+                                setGuideDates={setGuideDates}
+                                clickTourGuide={clickTourGuide}
+                            />
                         :
                         null
                 }

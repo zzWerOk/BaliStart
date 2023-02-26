@@ -1,6 +1,6 @@
 import Admin from "./pages/Admin";
 import {
-    ADMIN_ROUTE,
+    ADMIN_ROUTE, AGENT_ROUTE,
     AUTH_ROUTE,
     GUIDE_ROUTE,
     LOGIN_ROUTE,
@@ -35,6 +35,10 @@ export const adminRoutes = [
         Component: GuidePage
     },
     {
+        path: AGENT_ROUTE + '/:id',
+        Component: GuidePage
+    },
+    {
         path: TOPICS_ROUTE,
         Component: TopicsPage
     },
@@ -63,6 +67,10 @@ export const authUserRoutes = [
     },
     {
         path: GUIDE_ROUTE,
+        Component: GuidePage
+    },
+    {
+        path: AGENT_ROUTE,
         Component: GuidePage
     },
     {

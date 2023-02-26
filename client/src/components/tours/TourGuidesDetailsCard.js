@@ -4,6 +4,7 @@ import ElementName from "../topics/components/ElementName";
 import ElementText from "../topics/components/ElementText";
 import TopicDetailPhoneComponent from "../topics/components/TopicDetailPhoneComponent";
 import ElementEmail from "../topics/components/ElementEmail";
+import TopicDetailLinkComponent from "../topics/components/TopicDetailLinkComponent";
 
 const TourGuidesDetailsCard = (props) => {
     const {currGuide, index, tourGuideClicked, clickTourGuide} = props
@@ -21,8 +22,6 @@ const TourGuidesDetailsCard = (props) => {
 
     useEffect(() => {
         setLoading(true)
-
-        console.log(currGuide)
 
         if (currGuide.hasOwnProperty('avatar_img') && currGuide.avatar_img !== '') {
             setGuideImage(process.env.REACT_APP_API_URL + '/static/' + currGuide.avatar_img + '?' + Date.now())
@@ -98,9 +97,9 @@ const TourGuidesDetailsCard = (props) => {
                             {
                                 tourGuideClicked === currGuide.id
                                     ?
-                                    <div className={'col'}>
+                                    <div className={'col-9'}>
                                         <div className={'row d-flex justify-content-around'}>
-                                            <div className={'col'}>
+                                            <div className={'col-11'}>
 
                                             </div>
                                             <div className={'col-1'}>
@@ -121,7 +120,7 @@ const TourGuidesDetailsCard = (props) => {
                                                             <div className={'col-5'}>
                                                                 <ElementName name={'Guide experience (years)'}/>
                                                             </div>
-                                                            <div className={'col'}>
+                                                            <div className={'col-7'}>
                                                                 <ElementText text={currGuide.experience}/>
                                                             </div>
                                                         </div>
@@ -134,7 +133,7 @@ const TourGuidesDetailsCard = (props) => {
                                                 <div className={'col-5'}>
                                                     <ElementName name={'Guide email'}/>
                                                 </div>
-                                                <div className={'col'}>
+                                                <div className={'col-7'}>
                                                     <ElementEmail item={currGuide.email}/>
                                                     <br/>
                                                 </div>
@@ -144,8 +143,20 @@ const TourGuidesDetailsCard = (props) => {
                                                 <div className={'col-5'}>
                                                     <ElementName name={'Languages'}/>
                                                 </div>
-                                                <div className={'col'}>
+                                                <div className={'col-7'}>
                                                     <ElementText text={getGuideLanguagesEl()}/>
+                                                </div>
+                                            </div>
+                                            <hr/>
+                                            <div className={'row d-flex align-content-center'}>
+                                                <div className={'col-5'}>
+                                                    <ElementName name={'Links'}/>
+                                                </div>
+                                                <div className={'col-7'}>
+                                                    <TopicDetailLinkComponent fieldWidth={'full'} element={{
+                                                        name: '',
+                                                        items: currGuide.links
+                                                    }}/>
                                                 </div>
                                             </div>
                                             <hr/>
@@ -153,8 +164,11 @@ const TourGuidesDetailsCard = (props) => {
                                                 <div className={'col-5'}>
                                                     <ElementName name={'Contacts'}/>
                                                 </div>
-                                                <div className={'col'}>
-                                                    <TopicDetailPhoneComponent fieldWidth={'full'} element={{name: '', items: currGuide.phones}}/>
+                                                <div className={'col-7'}>
+                                                    <TopicDetailPhoneComponent fieldWidth={'full'} element={{
+                                                        name: '',
+                                                        items: currGuide.phones
+                                                    }}/>
                                                 </div>
                                             </div>
 
@@ -167,7 +181,7 @@ const TourGuidesDetailsCard = (props) => {
                                                             <div className={'col-5'}>
                                                                 <ElementName name={'Religion'}/>
                                                             </div>
-                                                            <div className={'col'}>
+                                                            <div className={'col-7'}>
                                                                 <ElementText text={currGuide.religion}/>
                                                             </div>
                                                         </div>

@@ -2,74 +2,77 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import DragIcon from '../../../assets/drag-handle_1.svg';
 
-const GuidePhoneComponent = (props) => {
-    const {item, phonesEditHandler, saving} = props
+const GuideLinkComponent = (props) => {
+    const {item, dataItemEditHandler, saving} = props
 
-    const [phones, setPhones] = useState([])
+    const [links, setLinks] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (item) {
-            setPhones(item)
+            setLinks(item)
         } else {
-            setPhones([])
+            setLinks([])
         }
-
         setLoading(false)
     }, [])
 
-    const itemPhonesEdit = (text, index) => {
-        let newArr = JSON.parse(JSON.stringify(phones))
+    const itemLinksEdit = (text, index) => {
+        let newArr = JSON.parse(JSON.stringify(links))
         let currItem = newArr[index]
-        currItem.phone = text
+        currItem.link = text
         newArr[index] = currItem
+        setLinks(newArr)
 
-        setPhones(newArr)
-        phonesEditHandler(newArr)
+        dataItemEditHandler(newArr)
     }
 
     const handleSelect = (value, index) => {
-        let newArr = JSON.parse(JSON.stringify(phones))
+        let newArr = JSON.parse(JSON.stringify(links))
         let currItem = newArr[index]
         currItem.type = value
         newArr[index] = currItem
+        setLinks(newArr)
 
-        setPhones(newArr)
-        phonesEditHandler(newArr)
+        // item.itemitems = JSON.stringify(newArr)
+        // item.items = newArr
+        dataItemEditHandler(newArr)
     }
 
     const newItemAddHandler = () => {
-        let itemsArr = JSON.parse(JSON.stringify(phones))
-        itemsArr.push({"type": "wa", "phone": ""})
+        let itemsArr = JSON.parse(JSON.stringify(links))
+        itemsArr.push({"type": "in", "link": ""})
+        setLinks(itemsArr)
 
-        setPhones(itemsArr)
-        phonesEditHandler(itemsArr)
+        // item.items = itemsArr
+        dataItemEditHandler(itemsArr)
     }
 
     const itemDeleteHandler = (index) => {
-        let itemsArr = JSON.parse(JSON.stringify(phones))
+        let itemsArr = JSON.parse(JSON.stringify(links))
         itemsArr.splice(index, 1)
+        setLinks(itemsArr)
 
-        setPhones(itemsArr)
-        phonesEditHandler(itemsArr)
+        // item.items = itemsArr
+        dataItemEditHandler(itemsArr)
     }
 
     const onDragEnd = useCallback((params) => {
-        if(!saving) {
-            const srcIndex = params.source.index
-            const dstIndex = params.destination?.index
+        const srcIndex = params.source.index
+        const dstIndex = params.destination?.index
 
-            if (dstIndex !== null) {
-                if (dstIndex !== undefined) {
-                    let imagesArr = JSON.parse(JSON.stringify(phones))
-                    imagesArr.splice(dstIndex, 0, imagesArr.splice(srcIndex, 1)[0])
+        if (dstIndex !== null) {
+            if (dstIndex !== undefined) {
+                let imagesArr = item.items
+                imagesArr.splice(dstIndex, 0, imagesArr.splice(srcIndex, 1)[0])
 
-                    setPhones(imagesArr)
-                    phonesEditHandler(imagesArr)
-                }
+                // item.items = imagesArr
+                setLinks(imagesArr)
+
+                dataItemEditHandler(imagesArr)
             }
         }
-    }, [phones, saving]);
+    }, [links, saving]);
 
     if (loading) {
 
@@ -81,15 +84,15 @@ const GuidePhoneComponent = (props) => {
                     onDragEnd={onDragEnd}
                 >
                     <div>
-                        <Droppable droppableId="droppable-phones" type="PERSON">
+                        <Droppable droppableId="droppable-links" type="PERSON">
                             {(provided, _) => (
                                 <div
                                     ref={provided.innerRef}
                                     {...provided.droppableProps}
                                 >
                                     {
-                                        phones.map(function (listItem, index) {
-                                            return <div key={index + ' ' + listItem}>
+                                        links.map(function (listItem, index) {
+                                            return <div key={index + ' ' + listItem.type + listItem.link}>
                                                 <Draggable draggableId={"draggable-" + index} index={index}>
                                                     {(provided, snapshot) => (
                                                         <div
@@ -105,8 +108,9 @@ const GuidePhoneComponent = (props) => {
 
                                                         >
 
-                                                            <div
+                                                            <div key={index}
                                                                  className={'d-flex col-12'}>
+
                                                                 <img
                                                                     src={DragIcon}
                                                                     alt="React Logo"
@@ -123,37 +127,37 @@ const GuidePhoneComponent = (props) => {
                                                                                 onChange={e => handleSelect(e.target.value, index)}
                                                                                 disabled={!!saving}
                                                                         >
-                                                                            <option disabled>Выбери тип связи</option>
-                                                                            <option value="wa">WhatsApp</option>
-                                                                            <option value="vb">Viber</option>
+                                                                            <option disabled>Выбери тип ссылки</option>
+                                                                            <option value="fb">Facebook</option>
+                                                                            <option value="gg">Google</option>
+                                                                            <option value="vk">VK</option>
                                                                             <option value="tg">Telegram</option>
-                                                                            <option value="ph">Phone call + sms</option>
-                                                                            <option value="al">All</option>
+                                                                            <option value="in">Internet</option>
                                                                         </select>
                                                                     </div>
 
                                                                     <div className={'col-7'}>
                                                                         <input
-                                                                            type="phoneText"
-                                                                            id="phoneText"
-                                                                            className="form-control"
-                                                                            placeholder='Phone No'
-                                                                            value={listItem.phone}
-                                                                            onChange={e => itemPhonesEdit(e.target.value, index)}
+                                                                            type="linkText"
+                                                                            id="linkText"
+                                                                            className="form-control "
+                                                                            placeholder='Link'
+                                                                            value={listItem.link}
+                                                                            onChange={e => itemLinksEdit(e.target.value, index)}
                                                                             disabled={!!saving}
                                                                         />
                                                                     </div>
-
                                                                     <button
                                                                         type="button"
-                                                                        className="btn btn-outline-danger"
+                                                                        className="btn btn-outline-danger col-auto"
                                                                         onClick={() => {
                                                                             itemDeleteHandler(index)
                                                                         }}
                                                                         disabled={!!saving}
                                                                     >
                                                                         <svg xmlns="http://www.w3.org/2000/svg"
-                                                                             width="16" height="16"
+                                                                             width="16"
+                                                                             height="16"
                                                                              fill="currentColor" className="bi bi-x"
                                                                              viewBox="0 0 16 16">
                                                                             <path
@@ -163,6 +167,7 @@ const GuidePhoneComponent = (props) => {
 
                                                                 </div>
                                                             </div>
+                                                            {/*</div>*/}
 
                                                         </div>
                                                     )}
@@ -173,6 +178,7 @@ const GuidePhoneComponent = (props) => {
                                         })
                                     }
 
+
                                     {provided.placeholder}
                                 </div>
                             )}
@@ -180,11 +186,11 @@ const GuidePhoneComponent = (props) => {
 
                     </div>
                 </DragDropContext>
-
                 <div className={'d-flex justify-content-center'}>
+
                     <button
                         type="button"
-                        className="btn btn-info "
+                        className="btn btn-info"
                         onClick={newItemAddHandler}
                         style={{
                             marginTop: '10px',
@@ -199,8 +205,9 @@ const GuidePhoneComponent = (props) => {
                     </button>
                 </div>
             </div>
-        );
+        )
+            ;
     }
 };
 
-export default GuidePhoneComponent;
+export default GuideLinkComponent;

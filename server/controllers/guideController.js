@@ -16,6 +16,7 @@ class GuideController {
             active_till,
             visible_till,
             phones,
+            links,
             email,
             is_has_car,
             languages,
@@ -44,6 +45,7 @@ class GuideController {
                             active_till,
                             visible_till,
                             phones,
+                            links,
                             email,
                             is_has_car,
                             languages,
@@ -96,6 +98,7 @@ class GuideController {
                 active_till,
                 visible_till,
                 phones,
+                links,
                 languages,
             } = req.body
 
@@ -103,6 +106,7 @@ class GuideController {
             let userAvatar = ''
             let guideLanguages
             let guidePhones
+            let guideLinks
 
             if (languages === null || languages === undefined || languages === '') {
                 guideLanguages = '[]'
@@ -114,6 +118,12 @@ class GuideController {
                 guidePhones = '[]'
             } else {
                 guidePhones = phones
+            }
+
+            if (links === null || links === undefined || links === '') {
+                guideLinks = '[]'
+            } else {
+                guideLinks = links
             }
 
             if (user_id) {
@@ -139,6 +149,7 @@ class GuideController {
                         active_till,
                         visible_till,
                         phones: guidePhones,
+                        links: guideLinks,
                         languages: guideLanguages,
                         email: userEmail,
                         is_has_car: false,
@@ -196,6 +207,7 @@ class GuideController {
                                 active_till,
                                 visible_till,
                                 phones: guidePhones,
+                                links: guideLinks,
                                 languages: guideLanguages,
                             },
                             {
@@ -225,6 +237,11 @@ class GuideController {
                     // updatedAt
                     // user_id
                     // visible_till
+
+                    if(guideDataJson.links === null || guideDataJson.links === undefined || guideDataJson.links === ''){
+                        guideDataJson.links = '[]'
+                    }
+
 
                     delete guideDataJson.editable
                     delete guideDataJson.email
@@ -284,6 +301,7 @@ class GuideController {
                             active_till: 0,
                             visible_till: 0,
                             phones: [],
+                            links: [],
                             languages: [],
                         }
                     })

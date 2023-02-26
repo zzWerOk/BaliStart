@@ -1,16 +1,14 @@
 import {$authHost, $authHostUpload} from "./index";
 
 export const getById = async (id) => {
-    const {data} = await $authHost.get('api/guide/getById/' + id)
+    const {data} = await $authHost.get('api/agent/getById/' + id)
     return data
 }
 
-export const saveGuideData = async (user_id,
+export const saveAgentData = async (user_id,
                                     avatar_img,
                                     name,
                                     about,
-                                    religion,
-                                    experience,
                                     active_till,
                                     visible_till,
                                     phones,
@@ -23,8 +21,6 @@ export const saveGuideData = async (user_id,
         avatar_img,
         name,
         about,
-        religion,
-        experience,
         active_till,
         visible_till,
         phones,
@@ -37,7 +33,8 @@ export const saveGuideData = async (user_id,
         return null
     }
 
-    const {data} = await $authHostUpload.post('api/guide/changeAdmin', formData)
+    const {data} = await $authHostUpload.post('api/agent/changeAdmin', formData)
+    console.log(data)
     return data
 }
 
@@ -46,8 +43,6 @@ const addToFormData = (formData,
                        avatar_img,
                        name,
                        about,
-                       religion,
-                       experience,
                        active_till,
                        visible_till,
                        phones,
@@ -58,8 +53,6 @@ const addToFormData = (formData,
         formData.append("user_id", user_id);
         formData.append("name", name);
         formData.append("about", about);
-        formData.append("religion", religion);
-        formData.append("experience", experience);
         formData.append("active_till", active_till);
         formData.append("visible_till", visible_till);
         formData.append("phones", phones);
@@ -84,8 +77,8 @@ const addToFormData = (formData,
     }
 }
 
-export const getAllGuides = async () => {
-    const {data} = await $authHost.get('api/user/allGuides')
+export const getAllAgents = async () => {
+    const {data} = await $authHost.get('api/user/allAgents')
     return data
 }
 
