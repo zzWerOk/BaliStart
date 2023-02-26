@@ -1,4 +1,4 @@
-const {TableUpdates, User, Tours, Files} = require("../models/models");
+const {TableUpdates, User, Tours, Files, Guide} = require("../models/models");
 const {Op} = require("sequelize");
 const ApiError = require("../error/ApiError");
 const path = require("path");
@@ -544,22 +544,73 @@ class ToursController {
                 const guidesIdsArr = JSON.parse(newItem.selected_guides)
                 for (let i = 0; i < guidesIdsArr.length; i++) {
                     const currGuideId = guidesIdsArr[i]
-                    const currGuide = await User.findOne({
-                        where: {id: currGuideId, is_guide: true},
+                    const currUser = await User.findOne({
+                        where: {id: currGuideId, is_guide: true, is_active: true},
                         attributes: {
                             exclude: ['password', 'updatedAt', 'is_admin', 'is_guide', 'is_active', 'date_last_login', 'createdAt'],
                         },
                     })
 
-                    selectedGuides.push(currGuide)
-                }
+                    if (currUser) {
+                        const currGuide = await Guide.findOne({
+                            where: {user_id: currGuideId},
+                            attributes: {
+                                exclude: ['createdAt', 'updatedAt', 'visible_till', 'user_id', 'emergency_help_price', 'holidays', 'is_can_discount',
+                                    'is_emergency_help', 'is_has_car', 'tours_ids', 'userId'],
+                            },
+                        })
 
-                // await JSON.parse(newItem.selected_guides).map(async function (currGuideId) {
-                //     const currGuide = await User.findOne({where: {id: currGuideId}})
-                //     // if(currGuide.is_guide){
-                //         selectedGuides.push(currGuide)
-                //     // }
-                // })
+                        if (currGuide) {
+                            // let guideDataJson = JSON.parse(JSON.stringify(currGuide))
+                            let guideDataJson = {}
+
+                            const diff = Date.now() / 1000 - Number(currGuide.active_till)
+
+                            if (diff < 0) {
+                                guideDataJson.about = currGuide.about
+                                guideDataJson.experience = currGuide.experience
+                                guideDataJson.id = currUser.id
+                                guideDataJson.languages = currGuide.languages
+                                guideDataJson.name = currGuide.name
+                                guideDataJson.phones = currGuide.phones
+                                guideDataJson.religion = currGuide.religion
+                                guideDataJson.avatar_img = currGuide.avatar_img
+                                guideDataJson.email = currGuide.email
+                                // guideDataJson.user_id = currGuide.user_id
+
+                                if (!guideDataJson.email || guideDataJson.email === '') {
+                                    guideDataJson.email = currUser.email
+                                }
+
+                                if (!guideDataJson.name || guideDataJson.name === '') {
+                                    guideDataJson.name = currUser.name
+                                }
+
+                                if (!guideDataJson.avatar_img || guideDataJson.avatar_img === '') {
+                                    guideDataJson.avatar_img = currUser.avatar_img
+                                }
+
+                                // delete guideDataJson.createdAt
+                                // delete guideDataJson.updatedAt
+                                // delete guideDataJson.visible_till
+                                // delete guideDataJson.active_till
+                                // delete guideDataJson.editable
+                                // delete guideDataJson.user_id
+                                // // delete guideDataJson.email
+                                // delete guideDataJson.emergency_help_price
+                                // delete guideDataJson.holidays
+                                // delete guideDataJson.is_can_discount
+                                // delete guideDataJson.is_emergency_help
+                                // delete guideDataJson.is_has_car
+                                // delete guideDataJson.tours_ids
+                                // delete guideDataJson.userId
+
+
+                                selectedGuides.push(guideDataJson)
+                            }
+                        }
+                    }
+                }
 
                 newItem.selected_guides = selectedGuides
 
@@ -579,21 +630,11 @@ class ToursController {
                 delete newItem.createdAt
                 delete newItem.image_logo
 
-                // newRows.push(newItem)
-
                 return res.json({
                     status: 'ok',
                     'data': newItem
                 })
 
-                // usersArr.map(currUser => {
-                //     if (currUser.id === item.created_by_user_id) {
-                //         newItem.created_by_user_name = currUser.name
-                //         newRows.push(newItem)
-                //     }
-                // })
-
-                // return res.json(readFile(candidate.file_name))
             }
         }
         return next(ApiError.internal("Ошибка чтения данных файла"))

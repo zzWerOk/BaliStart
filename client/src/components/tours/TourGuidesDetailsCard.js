@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import './TourGuidesDetailsCard.css'
+import ElementName from "../topics/components/ElementName";
+import ElementText from "../topics/components/ElementText";
+import TopicDetailPhoneComponent from "../topics/components/TopicDetailPhoneComponent";
+import ElementEmail from "../topics/components/ElementEmail";
 
 const TourGuidesDetailsCard = (props) => {
     const {currGuide, index, tourGuideClicked, clickTourGuide} = props
 
     const [isHover, setIsHover] = useState(false);
+    const [guideImage, setGuideImage] = useState('');
+    const [loading, setLoading] = useState(true);
 
     const handleMouseEnter = () => {
         setIsHover(true);
@@ -14,77 +20,176 @@ const TourGuidesDetailsCard = (props) => {
     };
 
     useEffect(() => {
+        setLoading(true)
 
+        console.log(currGuide)
+
+        if (currGuide.hasOwnProperty('avatar_img') && currGuide.avatar_img !== '') {
+            setGuideImage(process.env.REACT_APP_API_URL + '/static/' + currGuide.avatar_img + '?' + Date.now())
+        } else {
+            setGuideImage(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar.png' + '?' + Date.now())
+        }
+
+        setLoading(false)
     }, [])
 
-    return (
-        <div key={currGuide.id + ' ' + index}
-            className={`${tourGuideClicked === currGuide.id ? 'col-xl-12' : 'col-xl-4'} mb-4 `}
-             // className={`col-xl-4 mb-4`}
-        >
-            <div className={` rounded py-3 px-4 ${isHover ? 'shadow' : 'shadow-sm'} 
-            ${tourGuideClicked === currGuide.id ? 'clicked' : null} 
+    const getGuideLanguagesEl = () => {
+        const langArr = JSON.parse(currGuide.languages)
+        return langArr.map(lang => {
+            switch (lang) {
+                case "ru":
+                    return 'Russian '
+                case "en":
+                    return 'English '
+                case "id":
+                    return 'Indonesian '
+            }
+        })
+    }
+
+    if (loading) {
+
+    } else {
+        return (
+            <div key={currGuide.id + ' ' + index}
+                 className={`${tourGuideClicked === currGuide.id ? 'col-xl-12' : 'col-xl-4'} mb-4 `}
+                // className={`col-xl-4 mb-4`}
+                 onClick={() => {
+                     if (tourGuideClicked !== currGuide.id) {
+                         clickTourGuide(currGuide.id)
+                     }
+                 }}
+
+            >
+                <div className={` rounded py-3 px-4 ${isHover ? 'shadow' : 'shadow-sm'} 
+            
             ${tourGuideClicked === currGuide.id ? 'd-flex justify-content-start' : null} 
             `}
-                 onMouseEnter={handleMouseEnter}
-                 onMouseLeave={handleMouseLeave}
-                 onClick={() => {
-                     clickTourGuide(currGuide.id)
-                 }}
-                // style={{backgroundColor: tourGuideClicked === currGuide.id ? 'rgba(204,204,204,0.4)' : null }}
-            >
+                     onMouseEnter={handleMouseEnter}
+                     onMouseLeave={handleMouseLeave}
+                >
 
-                {
-                    tourGuideClicked === currGuide.id
-                        ?
+                    {
+
                         <>
-                            <div className={'col-3'}>
+                            <div className={`${tourGuideClicked === currGuide.id ? 'col-3' : null}
+                                        ${tourGuideClicked === currGuide.id ? 'clicked' : null} 
+                        `}
+                                 onClick={() => {
+                                     if (tourGuideClicked === currGuide.id) {
+                                         clickTourGuide(currGuide.id)
+                                     }
+                                 }}
+                            >
                                 <img
-                                    src="https://bootstrapious.com/i/snippets/sn-team/teacher-4.jpg" alt="" width="100"
-                                    className={`img-fluid rounded-circle mb-3 img-thumbnail shadow-sm`}
-                                />
+                                    src={guideImage} alt="Guide avatar"
+                                    width="100"
+                                    // className={`img-fluid rounded-circle mb-3 img-thumbnail shadow-sm`}
+                                    className={`rounded-circle mb-3 img-thumbnail shadow-sm`}
+                                    style={{
+                                        width: '100px',
+                                        height: '100px',
+                                        objectFit: 'cover',
+                                    }}/>
                                 <h5 className="mb-0">{currGuide.name}</h5><span
-                                className="small text-uppercase text-muted">Guide experience 15 years</span>
-                                <ul className="social mb-0 list-inline mt-3">
-                                    <li className="list-inline-item"><a href="#" className="social-link"><i
-                                        className="fa fa-facebook-f"></i></a></li>
-                                    <li className="list-inline-item"><a href="#" className="social-link"><i
-                                        className="fa fa-twitter"></i></a></li>
-                                    <li className="list-inline-item"><a href="#" className="social-link"><i
-                                        className="fa fa-instagram"></i></a></li>
-                                    <li className="list-inline-item"><a href="#" className="social-link"><i
-                                        className="fa fa-linkedin"></i></a></li>
-                                </ul>
+                                className="small text-uppercase text-muted">&nbsp;{currGuide.about}&nbsp;</span>
                             </div>
-                            <div className={'col'}>
-                                Guide info
-                            </div>
+
+                            {
+                                tourGuideClicked === currGuide.id
+                                    ?
+                                    <div className={'col'}>
+                                        <div className={'row d-flex justify-content-around'}>
+                                            <div className={'col'}>
+
+                                            </div>
+                                            <div className={'col-1'}>
+                                                <button className={'btn-close'}
+                                                        onClick={() => {
+                                                            clickTourGuide(currGuide.id)
+                                                        }}
+                                                >
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className={'row'}>
+                                            {
+                                                currGuide.experience && currGuide.experience > 0
+                                                    ?
+                                                    <>
+                                                        <div className={'row d-flex align-content-center'}>
+                                                            <div className={'col-5'}>
+                                                                <ElementName name={'Guide experience (years)'}/>
+                                                            </div>
+                                                            <div className={'col'}>
+                                                                <ElementText text={currGuide.experience}/>
+                                                            </div>
+                                                        </div>
+                                                        <hr/>
+                                                    </>
+                                                    :
+                                                    null
+                                            }
+                                            <div className={'row d-flex align-content-center'}>
+                                                <div className={'col-5'}>
+                                                    <ElementName name={'Guide email'}/>
+                                                </div>
+                                                <div className={'col'}>
+                                                    <ElementEmail item={currGuide.email}/>
+                                                    <br/>
+                                                </div>
+                                            </div>
+                                            <hr/>
+                                            <div className={'row d-flex align-content-center'}>
+                                                <div className={'col-5'}>
+                                                    <ElementName name={'Languages'}/>
+                                                </div>
+                                                <div className={'col'}>
+                                                    <ElementText text={getGuideLanguagesEl()}/>
+                                                </div>
+                                            </div>
+                                            <hr/>
+                                            <div className={'row d-flex align-content-center'}>
+                                                <div className={'col-5'}>
+                                                    <ElementName name={'Contacts'}/>
+                                                </div>
+                                                <div className={'col'}>
+                                                    <TopicDetailPhoneComponent fieldWidth={'full'} element={{name: '', items: currGuide.phones}}/>
+                                                </div>
+                                            </div>
+
+                                            {
+                                                currGuide.religion && currGuide.religion !== ''
+                                                    ?
+                                                    <>
+                                                        <hr/>
+                                                        <div className={'row d-flex align-content-center'}>
+                                                            <div className={'col-5'}>
+                                                                <ElementName name={'Religion'}/>
+                                                            </div>
+                                                            <div className={'col'}>
+                                                                <ElementText text={currGuide.religion}/>
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                    :
+                                                    null
+                                            }
+                                        </div>
+                                    </div>
+                                    :
+                                    null
+                            }
+
                         </>
-                        :
-                        <>
-                            <img
-                                src="https://bootstrapious.com/i/snippets/sn-team/teacher-4.jpg" alt="" width="100"
-                                className={`img-fluid rounded-circle mb-3 img-thumbnail shadow-sm`}
-                            />
-                            <h5 className="mb-0">{currGuide.name}</h5><span
-                            className="small text-uppercase text-muted">Guide experience 15 years</span>
-                            <ul className="social mb-0 list-inline mt-3">
-                                <li className="list-inline-item"><a href="#" className="social-link"><i
-                                    className="fa fa-facebook-f"></i></a></li>
-                                <li className="list-inline-item"><a href="#" className="social-link"><i
-                                    className="fa fa-twitter"></i></a></li>
-                                <li className="list-inline-item"><a href="#" className="social-link"><i
-                                    className="fa fa-instagram"></i></a></li>
-                                <li className="list-inline-item"><a href="#" className="social-link"><i
-                                    className="fa fa-linkedin"></i></a></li>
-                            </ul>
-                        </>
-                }
+
+                    }
+
+                </div>
 
             </div>
-
-        </div>
-    );
+        );
+    }
 };
 
 export default TourGuidesDetailsCard;

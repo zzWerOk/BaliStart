@@ -3,7 +3,7 @@ import {useLongPress} from "use-long-press";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 
 const ElementPhone = (props) => {
-    const {item} = props
+    const {item, fieldWidth} = props
 
     const [loading, setLoading] = useState(true)
     const [elementName, setElementName] = useState('')
@@ -131,12 +131,11 @@ const ElementPhone = (props) => {
                 target={target.current}
                 defaultShow={false} onHide={null} onToggle={null} popperConfig={{}}
             >
-                <div className="col-5 btn d-flex justify-content-start text-secondary"
+                <div className={`${fieldWidth === 'full' ? 'col-12' : 'col-5'}  btn d-flex justify-content-start text-secondary`}
                      {...bind()}
                      ref={target}
                 >
                     {drawIconByType()}
-
 
                     <a className="text-primary col-11 align-self-start text-truncate text-lowercase"
                        href={`tel:${elementPhone}`}

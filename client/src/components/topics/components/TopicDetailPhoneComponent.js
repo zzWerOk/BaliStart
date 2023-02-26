@@ -4,7 +4,7 @@ import ElementPhone from "./ElementPhone";
 import ElementName from "./ElementName";
 
 const TopicDetailPhoneComponent = (props) => {
-    const {element} = props
+    const {element, fieldWidth} = props
 
     const [loading, setLoading] = useState(true)
     const [elementName, setElementName] = useState('')
@@ -49,7 +49,9 @@ const TopicDetailPhoneComponent = (props) => {
                         <ul className="list-group list-group-flush">
 
                             {elementListArr.map(function (item, index) {
-                                return <ElementPhone key={index} item={item}/>
+                                if(item.phone !== '') {
+                                    return <ElementPhone fieldWidth={fieldWidth} key={index} item={item}/>
+                                }
                             })}
 
                         </ul>

@@ -15,7 +15,6 @@ const ElementEmail = (props) => {
         } else {
             navigator.clipboard.writeText(item).then(
                 function () {
-                    // alert("yeah!"); // success
                     setShowToolTip(true)
                     setTimeout(() => {
                         setShowToolTip(false)
@@ -37,9 +36,6 @@ const ElementEmail = (props) => {
             <div className="col-12 btn d-flex justify-content-between text-secondary"
                  {...bind()}
                  ref={target}
-                 // onClick={function (event) {
-                 //     event.preventDefault()
-                 // }}
             >
 
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"

@@ -68,6 +68,8 @@ const TourDetails = () => {
 
                         setTourGuides(dataJson.data.selected_guides)
 
+                        console.log(dataJson.data.selected_guides)
+
                         setTourCategories(JSON.parse(dataJson.data.tour_category))
 
                         if (dataJson.data.image) {

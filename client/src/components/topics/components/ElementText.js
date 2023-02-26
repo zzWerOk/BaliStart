@@ -1,6 +1,6 @@
 import React from 'react';
 
-const NameElement = (props) => {
+const ElementText = (props) => {
     const {text} = props
     return (
         <p
@@ -9,4 +9,4 @@ const NameElement = (props) => {
     );
 };
 
-export default NameElement;
+export default ElementText;
