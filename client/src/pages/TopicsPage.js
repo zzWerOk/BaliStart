@@ -3,7 +3,6 @@ import {delay} from "../utils/consts";
 import {getAll} from "../http/topicsAPI";
 import SpinnerSm from "../components/SpinnerSM";
 import FeedTopBar from "../components/mainpage/FeedTopBar";
-import FeedAddNewPostBtn from "../components/mainpage/FeedAddNewPostBtn";
 import FeedTopic from "../components/mainpage/feed/Feed_topic";
 
 const TopicsPage = (props) => {
@@ -30,9 +29,7 @@ const TopicsPage = (props) => {
             }).finally(() => {
                 setLoading(false)
             })
-
         })
-
     }, [])
 
     if (loading) {
@@ -47,27 +44,30 @@ const TopicsPage = (props) => {
                         isBackBtn={!!id}
                         backBtnTitle={'Back'}
                     />
-                    <FeedAddNewPostBtn/>
+                    {/*<FeedAddNewPostBtn/>*/}
 
                     {
                         topicsList.length === 0
                             ?
-                            <div style={{marginTop: '20px'}}>
+                            <div //style={{marginTop: '20px'}}
+                            >
                                 <span>Нет записей</span>
                             </div>
                             :
-                            <div>
+                            <div
+                                style={{height: 'calc(100vh - 129px', overflowX: 'hidden', overflowY: 'auto',}}
+                            >
                                 <ul
                                     className="list-group list-group-flush"
-                                    style={{padding: '0 40px'}}
+                                    // style={{overflowX: 'hidden', overflowY: 'auto', }}
                                 >
                                     {topicsList.map(function (item, index) {
-                                        console.log(item)
                                         return <FeedTopic item={item} key={index}/>
                                     })}
                                 </ul>
                             </div>
                     }
+
                 </div>
             </div>
         );

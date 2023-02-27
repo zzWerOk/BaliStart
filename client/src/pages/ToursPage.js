@@ -84,17 +84,19 @@ const ToursPage = (props) => {
                     {
                         toursList.length === 0
                             ?
-                            <div style={{marginTop: '20px'}}>
+                            <div //style={{marginTop: '20px'}}
+                            >
                                 <span>Нет записей</span>
                             </div>
                             :
-                            <div>
+                            <div
+                                style={{height: 'calc(100vh - 129px', overflowX: 'hidden', overflowY: 'auto',}}
+                            >
                                 <ul
                                     className="list-group list-group-flush"
                                     style={{padding: '0 40px'}}
                                 >
                                     {toursList.map(function (item, index) {
-                                        console.log(item)
                                         return <FeedTour item={item} key={index}/>
                                     })}
                                 </ul>

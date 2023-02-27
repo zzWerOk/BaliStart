@@ -121,16 +121,14 @@ const TopicDetails = () => {
 
     } else {
         return (
-            <div className={''}
+            <div
             >
-                <div className={''}
+                <div
                      style={{marginTop: '20px', flex: '1'}}
                 >
                     <FeedTopBar
                         isBackBtn={true}
                         backBtnTitle={'Back'}
-                        // prevLocation={usePrevLocation()}
-                        // prevLocation={prevLocation}
                         rightSideBarElements={
                             <div className={'d-flex'}>
                                 <div className={'d-flex justify-content-between align-items-center'}>
@@ -203,10 +201,11 @@ const TopicDetails = () => {
                             </div>
                         }
                     />
+
                     <div className={'d-flex'}
                          style={{height: 'calc(100vh - 129px'}}
                     >
-                        <Col className={' '}
+                        <Col
                              style={{overflowX: 'hidden', overflowY: 'auto'}}
                         >
                             <Row className={classes.topic_row_top}>

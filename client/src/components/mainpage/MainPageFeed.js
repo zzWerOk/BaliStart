@@ -17,10 +17,16 @@ const MainPageFeed = () => {
                 itemsType={itemsType}
                 isSearch={true}
             />
-            {/*<FeedAddNewPostBtn/>*/}
-            <FeedItemsList
-                itemsType={itemsType}
-            />
+            <div
+                style={{height: 'calc(100vh - 129px', overflowX: 'hidden', overflowY: 'auto',}}
+            >
+
+                <FeedItemsList
+                    itemsType={itemsType}
+                />
+
+            </div>
+
         </div>
     );
 };
