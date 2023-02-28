@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../index";
-import {delay} from "../utils/consts";
+import {delay, sortCategories} from "../utils/consts";
 import {getAll} from "../http/topicsCategoryAPI";
 import SpinnerSm from "../components/SpinnerSM";
 import MainPageFeed from "../components/mainpage/MainPageFeed";
@@ -8,31 +8,54 @@ import MainPageFeed from "../components/mainpage/MainPageFeed";
 const Categories = () => {
     const {topicsCategoryStore} = useContext(Context)
 
+    const [items, setItems] = useState([])
     const [loading, setLoading] = useState(true)
+    const [loadingSorted, setLoadingSorted] = useState(true)
+    const [sortCode, setSortCode] = useState('alpha')
+    const [searchKey, setSearchKey] = useState('')
 
     useEffect(() => {
         setLoading(true)
 
+        const sortCode = localStorage.getItem("sort_code_Categories") || 'alpha'
+
+        setSortCode(sortCode)
+
         delay(0).then(() => {
 
-            if (!topicsCategoryStore.loaded) {
-
-                getAll(true).then(data => {
-                    /**
-                     Сохраняем список
-                     **/
-                    topicsCategoryStore.saveCategoriesList(data.rows)
-                }).catch(() => {
-                    topicsCategoryStore.saveCategoriesList([])
-                }).finally(() => {
-
-                })
-            }
-
-            setLoading(false)
+            getCategoriesData(sortCode, searchKey)
 
         })
     }, [])
+
+    const getCategoriesData = (sortCode, search) => {
+        setLoadingSorted(true)
+        getAll(sortCode, search).then(data => {
+            /**
+             Сохраняем список
+             **/
+            topicsCategoryStore.saveCategoriesList(JSON.parse(JSON.stringify(data.rows)))
+            setItems(JSON.parse(JSON.stringify(data.rows)))
+        }).catch(() => {
+            topicsCategoryStore.saveCategoriesList([])
+        }).finally(() => {
+            setLoading(false)
+            setLoadingSorted(false)
+        })
+
+    }
+
+    const setSortHandler = (value) => {
+        setSortCode(value)
+        localStorage.setItem("sort_code_Categories", value)
+        getCategoriesData(value, searchKey)
+    }
+
+    const setSearchHandler = (value) => {
+        setSearchKey(value)
+        getCategoriesData(sortCode, value)
+    }
+
 
     if (loading) {
         return <SpinnerSm/>
@@ -40,7 +63,14 @@ const Categories = () => {
 
         return (
             <div>
-                <MainPageFeed/>
+                <MainPageFeed items={items}
+                              setSortHandler={setSortHandler}
+                              isLoadingSorted={loadingSorted}
+                              selectedSortCode={sortCode}
+                              sortCodes={sortCategories}
+                              setSearchHandler={setSearchHandler}
+                />
+
             </div>
         );
     }

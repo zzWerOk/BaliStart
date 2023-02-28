@@ -1,36 +1,15 @@
-import React, {useContext, useEffect, useState} from 'react';
-import MainPageFeed from "../components/mainpage/MainPageFeed";
-import {Context} from "../index";
-import {delay} from "../utils/consts";
-import {getAll} from "../http/topicsCategoryAPI";
+import React, {useEffect, useState} from 'react';
 import SpinnerSm from "../components/SpinnerSM";
+import Categories from "./Categories";
 
 const Main = () => {
-    const {topicsCategoryStore} = useContext(Context)
 
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         setLoading(true)
 
-        delay(0).then(() => {
-
-            if (!topicsCategoryStore.loaded) {
-                getAll(true).then(data => {
-                    /**
-                     Сохраняем список
-                     **/
-                    topicsCategoryStore.saveCategoriesList(data.rows)
-                }).catch(() => {
-                    topicsCategoryStore.saveCategoriesList([])
-                }).finally(() => {
-
-                })
-            }
-
-            setLoading(false)
-
-        })
+        setLoading(false)
     }, [])
 
     if (loading) {
@@ -39,7 +18,7 @@ const Main = () => {
 
         return (
             <div>
-                <MainPageFeed/>
+                <Categories/>
             </div>
         );
     }

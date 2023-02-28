@@ -5,9 +5,9 @@ import TopicsPage from "./TopicsPage";
 const Category = () => {
     let {id} = useParams();
 
-        return (<div>
-            <TopicsPage id={id}/>
-        </div>);
+    return <div>
+        <TopicsPage id={id}/>
+    </div>
 };
 
 export default Category;

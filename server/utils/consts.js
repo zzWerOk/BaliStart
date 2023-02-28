@@ -169,6 +169,8 @@ addNewFileNameToTable = async function (tableName, fileName, next, md5 = '') {
     Files.create({table_name: tableName, file_name: fileName, md5}).then(next)
 }
 
+
+
 module.exports = {
     getFreeFileName,
     getDirName,

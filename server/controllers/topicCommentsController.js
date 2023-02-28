@@ -279,6 +279,12 @@ class TopicCommentsController {
                     case 'reid':
                         sortOrder = ['id', 'DESC']
                         break
+                    case 'alpha':
+                        sortOrder = ['name', 'ASC']
+                        break
+                    case 'realpha':
+                        sortOrder = ['name', 'DESC']
+                        break
                 }
 
                 // const isIdUnique = id =>

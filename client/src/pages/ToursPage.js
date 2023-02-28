@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {delay} from "../utils/consts";
+import {delay, sortTours} from "../utils/consts";
 import SpinnerSm from "../components/SpinnerSM";
 import FeedTopBar from "../components/mainpage/FeedTopBar";
 import {getAllTours} from "../http/toursAPI";
@@ -8,65 +8,94 @@ import {getAll_ToursCat} from "../http/toursCategoryAPI";
 import {Context} from "../index";
 import FeedTour from "../components/mainpage/feed/Feed_Tour";
 
-const ToursPage = (props) => {
+const ToursPage = () => {
 
     const {toursCategoryStore, toursTypeStore} = useContext(Context)
 
-    const {id} = props
+    // const {id} = props
 
     const [loading, setLoading] = useState(true)
     const [loadingType, setLoadingType] = useState(true)
     const [loadingCat, setLoadingCat] = useState(true)
     const [toursList, setToursList] = useState([])
 
+    const [selectedSortCode, setSelectedSortCode] = useState('')
+    const [isLoadingSorted, setIsLoadingSorted] = useState(true)
+    const [sortCode, setSortCode] = useState('alpha')
+    const [searchKey, setSearchKey] = useState('')
+
     useEffect(() => {
         setLoading(true)
 
-        let tourId = id || null
-
         delay(0).then(() => {
 
-            getAllTours(tourId).then(data => {
+            getAllTours_Type().then(data => {
+
                 if (data.hasOwnProperty('count')) {
                     if (data.hasOwnProperty('rows')) {
                         if (data.count > 0) {
-                            setToursList(data.rows)
+                            toursTypeStore.itemsArr = data.rows
                         }
                     }
                 }
+
             }).finally(() => {
-                setLoading(false)
-                getAllTours_Type().then(data => {
+                setLoadingType(false)
+                getAll_ToursCat().then(data => {
 
                     if (data.hasOwnProperty('count')) {
                         if (data.hasOwnProperty('rows')) {
                             if (data.count > 0) {
-                                toursTypeStore.itemsArr = data.rows
+                                toursCategoryStore.itemsArr = data.rows
                             }
                         }
                     }
 
                 }).finally(() => {
-                    setLoadingType(false)
-                    getAll_ToursCat().then(data => {
+                    setLoadingCat(false)
 
-                        if (data.hasOwnProperty('count')) {
-                            if (data.hasOwnProperty('rows')) {
-                                if (data.count > 0) {
-                                    toursCategoryStore.itemsArr = data.rows
-                                }
-                            }
-                        }
+                    const sortCode = localStorage.getItem("sort_code_Tours") || 'alpha'
+                    setSelectedSortCode(sortCode)
+                    setSortCode(sortCode)
 
-                    }).finally(() => {
-                        setLoadingCat(false)
-                    })
+                    getToursData(sortCode, searchKey)
+
                 })
             })
+
 
         })
 
     }, [])
+
+    const getToursData = (sortCode, searchKey) => {
+        setIsLoadingSorted(true)
+
+        getAllTours(sortCode, searchKey).then(data => {
+            if (data.hasOwnProperty('count')) {
+                if (data.hasOwnProperty('rows')) {
+                    setToursList(JSON.parse(JSON.stringify(data.rows)))
+                }
+            }
+        }).finally(() => {
+            setLoading(false)
+            setIsLoadingSorted(false)
+        })
+
+    }
+
+    const setSortHandler = (value) => {
+
+        setSortCode(value)
+        localStorage.setItem("sort_code_Tours", value)
+        getToursData(value, searchKey)
+    }
+
+    const setSearchHandler = (value) => {
+        setSearchKey(value)
+        getToursData(sortCode, value)
+    }
+
 
     if (loading || loadingType || loadingCat) {
         return <SpinnerSm/>
@@ -76,16 +105,18 @@ const ToursPage = (props) => {
                 <div style={{marginTop: '20px'}}>
 
                     <FeedTopBar
-                        isSearch={false}
-                        isBackBtn={!!id}
-                        backBtnTitle={'Back'}
+                        isSearch={true}
+                        setSearchHandler={setSearchHandler}
+                        setSort={setSortHandler}
+                        isLoading={isLoadingSorted}
+                        selectedSortCode={selectedSortCode}
+                        sortCodes={sortTours}
                     />
 
                     {
                         toursList.length === 0
                             ?
-                            <div //style={{marginTop: '20px'}}
-                            >
+                            <div>
                                 <span>Нет записей</span>
                             </div>
                             :
@@ -96,9 +127,15 @@ const ToursPage = (props) => {
                                     className="list-group list-group-flush"
                                     style={{padding: '0 40px'}}
                                 >
-                                    {toursList.map(function (item, index) {
-                                        return <FeedTour item={item} key={index}/>
-                                    })}
+                                    {
+                                        !isLoadingSorted
+                                            ?
+                                            toursList.map(function (item, index) {
+                                                return <FeedTour item={item} key={index}/>
+                                            })
+                                            :
+                                            null
+                                    }
                                 </ul>
                             </div>
                     }

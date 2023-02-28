@@ -160,6 +160,52 @@ export const tourLanguages = (lang) => {
     return langText
 }
 
+export const sortCategories = () => {
+    let sortCodes = []
+
+    sortCodes.push({name: 'Alphabetic', code: 'alpha', sort: 'up'})
+    sortCodes.push({name: 'Alphabetic', code: 'realpha', sort: 'down'})
+    sortCodes.push({name: 'Activity', code: 'date', sort: 'up'})
+    sortCodes.push({name: 'Activity', code: 'redate', sort: 'down'})
+
+    return sortCodes
+}
+
+export const sortTopics = () => {
+    let sortCodes = []
+
+    sortCodes.push({name: 'Alphabetic', code: 'alpha', sort: 'up'})
+    sortCodes.push({name: 'Alphabetic', code: 'realpha', sort: 'down'})
+    sortCodes.push({name: 'Date', code: 'date', sort: 'up'})
+    sortCodes.push({name: 'Date', code: 'redate', sort: 'down'})
+
+    return sortCodes
+}
+
+export const sortTours = () => {
+    let sortCodes = []
+
+    sortCodes.push({name: 'Alphabetic', code: 'alpha', sort: 'up'})
+    sortCodes.push({name: 'Alphabetic', code: 'realpha', sort: 'down'})
+    sortCodes.push({name: 'Date', code: 'date', sort: 'up'})
+    sortCodes.push({name: 'Date', code: 'redate', sort: 'down'})
+
+    return sortCodes
+}
+
+export const sortMapPoints = () => {
+    let sortCodes = []
+
+    sortCodes.push({name: 'Alphabetic', code: 'alpha', sort: 'up'})
+    sortCodes.push({name: 'Alphabetic', code: 'realpha', sort: 'down'})
+    // sortCodes.push({name: 'Date', code: 'date', sort: 'up'})
+    // sortCodes.push({name: 'Date', code: 'redate', sort: 'down'})
+
+    return sortCodes
+}
+
+
+
 // module.exports = {
 //     tourLanguages,
 //     getTourActivityLevel,

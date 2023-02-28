@@ -1,4 +1,4 @@
-import {$authHost, $host} from "./index";
+import {$authHost, } from "./index";
 
 const apiUrl = 'api/topicscategory'
 
@@ -17,9 +17,9 @@ export const setIsActiveAPI = async (id, active) => {
     return data
 }
 
-export const getAll = async (isSortASC) => {
-    const sort = isSortASC ? 'ASC' : 'DESC'
-    const {data} = await $authHost.get(apiUrl+'/all',{ params: { sort } })
+export const getAll = async (sortCode, searchKey) => {
+
+    const {data} = await $authHost.get(apiUrl+'/all',{ params: { sortCode , searchKey} })
     return data
 }
 

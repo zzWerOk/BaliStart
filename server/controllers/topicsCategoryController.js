@@ -1,5 +1,6 @@
 const {TopicsCategory, TableUpdates} = require("../models/models");
 const ApiError = require("../error/ApiError");
+const {Op} = require("sequelize");
 
 class TopicsCategoryController {
 
@@ -37,7 +38,7 @@ class TopicsCategoryController {
     }
 
     async change(req, res, next) {
-        const {id, category_name, is_for_tour=false, description} = req.body
+        const {id, category_name, is_for_tour = false, description} = req.body
         if (!id) {
             return next(ApiError.badRequest("Ошибка параметра"))
         }
@@ -64,20 +65,53 @@ class TopicsCategoryController {
         return next(ApiError.badRequest("Ошибка установки параметра"))
     }
 
-    async getAll(req, res) {
-        const {sort} = req.query
+    async getAll(req, res, next) {
+        try {
+            const {sortCode, searchKey} = req.query
 
-        const sortTag = sort || 'DESC'
-
-        const topicsCategoriesList = await TopicsCategory.findAndCountAll({
-                // limit: 10,
-                order: [
-                    ['id', sortTag],
-                    // ['name', 'ASC'],
-                ]
+            let sortOrder = ['name', 'ASC']
+            switch (sortCode) {
+                case 'user':
+                    sortOrder = ['created_by_user_id', 'ASC']
+                    break
+                case 'reuser':
+                    sortOrder = ['created_by_user_id', 'DESC']
+                    break
+                case 'date':
+                    sortOrder = ['updatedAt', 'ASC']
+                    break
+                case 'redate':
+                    sortOrder = ['updatedAt', 'DESC']
+                    break
+                case 'id':
+                    sortOrder = ['id', 'ASC']
+                    break
+                case 'reid':
+                    sortOrder = ['id', 'DESC']
+                    break
+                case 'alpha':
+                    sortOrder = ['category_name', 'ASC']
+                    break
+                case 'realpha':
+                    sortOrder = ['category_name', 'DESC']
+                    break
             }
-        )
-        return res.json(topicsCategoriesList)
+
+            const topicsCategoriesList = await TopicsCategory.findAndCountAll({
+                    // limit: 10,
+                    order: [sortOrder],
+                    where: {
+                        is_active: true,
+                        category_name: {
+                            [Op.iLike]: '%' + searchKey + '%'
+                        },
+                    }
+                }
+            )
+            return res.json(topicsCategoriesList)
+        } catch (e) {
+            return next(ApiError.internal("Ошибка параметра " + e.message))
+        }
     }
 
     async setActive(req, res, next) {
@@ -138,7 +172,7 @@ class TopicsCategoryController {
             }
 
             const count = await TopicsCategory.destroy({where: {id: id}})
-            if(count > 0) {
+            if (count > 0) {
                 // return res.json(`Удалено записей: ${count}`)
                 return res.json({status: 'ok'})
             }

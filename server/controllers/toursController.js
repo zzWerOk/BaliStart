@@ -369,11 +369,6 @@ class ToursController {
             const {tag_search, sort_code} = req.query
             let sortOrder = ['id', 'ASC']
 
-            let tagSearch = tag_search
-            if (!tagSearch) {
-                tagSearch = ''
-            }
-
             switch (sort_code) {
                 case 'user':
                     sortOrder = ['created_by_user_id', 'ASC']
@@ -382,10 +377,10 @@ class ToursController {
                     sortOrder = ['created_by_user_id', 'DESC']
                     break
                 case 'date':
-                    sortOrder = ['created_date', 'ASC']
+                    sortOrder = ['updatedAt', 'ASC']
                     break
                 case 'redate':
-                    sortOrder = ['created_date', 'DESC']
+                    sortOrder = ['updatedAt', 'DESC']
                     break
                 case 'id':
                     sortOrder = ['id', 'ASC']
@@ -393,23 +388,26 @@ class ToursController {
                 case 'reid':
                     sortOrder = ['id', 'DESC']
                     break
+                case 'alpha':
+                    sortOrder = ['name', 'ASC']
+                    break
+                case 'realpha':
+                    sortOrder = ['name', 'DESC']
+                    break
             }
 
             const toursList = await Tours.findAndCountAll({
-                    order: [sortOrder
-                    ],
+                    order: [sortOrder],
                     where: {
                         active: true,
-                        tour_category: {
-                            [Op.like]: '%' + tagSearch + '%'
-                        }
+                        name: {
+                            [Op.iLike]: '%' + tag_search + '%'
+                        },
                     }
                 }
             )
 
             let newRows = []
-
-            // const usersArr = await User.findAll()
 
             toursList.rows.map(item => {
                 let newItem = JSON.parse(JSON.stringify(item))
@@ -426,14 +424,8 @@ class ToursController {
                 delete newItem.guide_can_add
                 delete newItem.file_name
                 delete newItem.created_date
-                // delete newItem.updatedAt
                 delete newItem.image_logo
 
-
-                // usersArr.map(currUser => {
-                //     if (currUser.id === item.created_by_user_id) {
-                //     }
-                // })
             })
 
             return res.json({
@@ -486,7 +478,7 @@ class ToursController {
                     ],
                     where: {
                         tour_category: {
-                            [Op.like]: '%' + tagSearch + '%'
+                            [Op.iLike]: '%' + tagSearch + '%'
                         }
                     }
                 }

@@ -20,7 +20,6 @@ const App = observer(() => {
             check().then(data => {
                 user.setUser(data)
 
-                // getById(data.id).then((item) => {
                 getMyName().then((item) => {
                     user.setUser(data)
                     if (item.hasOwnProperty('status')) {

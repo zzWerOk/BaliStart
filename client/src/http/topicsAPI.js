@@ -2,17 +2,19 @@ import {$authHost, $authHostUpload, $host} from "./index";
 
 const apiUrl = 'api/topics'
 
-export const getAll = async (tag_search) => {
+export const getAll = async (categoryId, tagSearch, sortCode) => {
 
-    // let tag_search = localStorage.getItem("tag_search_Topics")
-    let sort_code = localStorage.getItem("sort_code_Topics")
+    // let sort_code = localStorage.getItem("sort_code_Topics")
 
     const params = new URLSearchParams();
-    if(tag_search) {
-        params.append("tag_search", tag_search);
+    if(categoryId) {
+        params.append("category_id", categoryId);
     }
-    if(sort_code) {
-        params.append("sort_code", sort_code);
+    if(tagSearch !== null) {
+        params.append("tag_search", tagSearch);
+    }
+    if(sortCode) {
+        params.append("sort_code", sortCode);
     }
     const request = {
         params: params

@@ -24,7 +24,7 @@ const NavBar = observer(() => {
         setShowModal(false)
     }
 
-    const mapPointsPageCardComponent = () => (
+    const modalChildComponent = () => (
         <LoginPage
             onAuthFinish={onAuthFinish}
         />
@@ -92,7 +92,7 @@ const NavBar = observer(() => {
                 onHide={() => {
                     setShowModal(false)
                 }}
-                child={mapPointsPageCardComponent}
+                child={modalChildComponent}
             />
 
         </div>

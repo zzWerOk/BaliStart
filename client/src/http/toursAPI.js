@@ -2,22 +2,18 @@ import {$authHost, $authHostUpload, $host} from "./index";
 
 const apiUrl = 'api/tours'
 
-export const getAllTours = async () => {
-
-    let tag_search = localStorage.getItem("tag_search_Tours")
-    let sort_code = localStorage.getItem("sort_code_Tours")
+export const getAllTours = async (sort_code, tag_search) => {
 
     const params = new URLSearchParams();
-    if(tag_search) {
+    if(tag_search !== null || true) {
         params.append("tag_search", tag_search);
     }
-    if(sort_code) {
+    if(sort_code !== null || true) {
         params.append("sort_code", sort_code);
     }
     const request = {
         params: params
     }
-
     const {data} = await $host.get(apiUrl+'/getAll', request)
     return data
 }

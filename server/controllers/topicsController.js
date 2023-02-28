@@ -27,7 +27,7 @@ const removeTopicsCountFromCategories = (removeArr) => {
 const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
     let dataText_json = JSON.parse(dataText)
 
-    for(let i = 0;i < dataText_json.length;i++) {
+    for (let i = 0; i < dataText_json.length; i++) {
         let item = dataText_json[i]
         if (item.hasOwnProperty('type')) {
             if (item.type === 'images') {
@@ -516,13 +516,8 @@ class TopicsController {
 
     async getAll(req, res, next) {
         try {
-            const {tag_search, sort_code} = req.query
+            const {category_id, tag_search, sort_code} = req.query
             let sortOrder = ['id', 'ASC']
-
-            let tagSearch = tag_search
-            if (!tagSearch) {
-                tagSearch = ''
-            }
 
             switch (sort_code) {
                 case 'user':
@@ -543,24 +538,44 @@ class TopicsController {
                 case 'reid':
                     sortOrder = ['id', 'DESC']
                     break
+                case 'alpha':
+                    sortOrder = ['name', 'ASC']
+                    break
+                case 'realpha':
+                    sortOrder = ['name', 'DESC']
+                    break
             }
 
-            const topicsCategoriesList = await Topics.findAndCountAll({
-                    // limit: 10,
-                    // attributes: ['tag', tagSearch],
-                    order: [sortOrder
-                        // ['id', 'ASC'],
-                        // ['name', 'DESC'],
-                        // ['name', 'ASC'],
-                    ],
-                    where: {
-                        active: true,
-                        tag: {
-                            [Op.like]: '%' + tagSearch + '%'
+            let topicsCategoriesList
+
+            category_id
+                ?
+                topicsCategoriesList = await Topics.findAndCountAll({
+                        // limit: 10,
+                        order: [sortOrder],
+                        where: {
+                            active: true,
+                            name: {
+                                [Op.iLike]: '%' + tag_search + '%'
+                            },
+                            tag: {
+                                [Op.like]: '%' + category_id + '%'
+                            },
                         }
                     }
-                }
-            )
+                )
+                :
+                topicsCategoriesList = await Topics.findAndCountAll({
+                        // limit: 10,
+                        order: [sortOrder],
+                        where: {
+                            active: true,
+                            name: {
+                                [Op.iLike]: '%' + tag_search + '%'
+                            },
+                        }
+                    }
+                )
 
             let newRows = []
 
@@ -685,7 +700,7 @@ class TopicsController {
                     ],
                     where: {
                         tag: {
-                            [Op.like]: '%' + tagSearch + '%'
+                            [Op.iLike]: '%' + tagSearch + '%'
                         }
                     }
                 }

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {delay} from "../utils/consts";
+import {sortTopics} from "../utils/consts";
 import {getAll} from "../http/topicsAPI";
 import SpinnerSm from "../components/SpinnerSM";
 import FeedTopBar from "../components/mainpage/FeedTopBar";
@@ -11,26 +11,54 @@ const TopicsPage = (props) => {
     const [loading, setLoading] = useState(true)
     const [topicsList, setTopicsList] = useState([])
 
+    const [categoryId, setCategoryId] = useState(-1)
+    const [selectedSortCode, setSelectedSortCode] = useState('')
+    const [isLoadingSorted, setIsLoadingSorted] = useState(true)
+    const [sortCode, setSortCode] = useState('alpha')
+    const [searchKey, setSearchKey] = useState('')
+
     useEffect(() => {
         setLoading(true)
 
-        let topicId = id || null
+        setCategoryId(id)
 
-        delay(0).then(() => {
+        const sortCode = localStorage.getItem("sort_code_Topics") || 'alpha'
+        setSelectedSortCode(sortCode)
+        setSortCode(sortCode)
 
-            getAll(topicId).then(data => {
-                if (data.hasOwnProperty('count')) {
-                    if (data.hasOwnProperty('rows')) {
-                        if (data.count > 0) {
-                            setTopicsList(data.rows)
-                        }
-                    }
-                }
-            }).finally(() => {
-                setLoading(false)
-            })
-        })
+        getTopicsData(id, sortCode, searchKey)
+
     }, [])
+
+    const getTopicsData = (categoryId, selectedSortCode, searchKey) => {
+        setIsLoadingSorted(true)
+
+        getAll(categoryId, searchKey, selectedSortCode).then(data => {
+
+            if (data.hasOwnProperty('count')) {
+                if (data.hasOwnProperty('rows')) {
+
+                    setTopicsList(JSON.parse(JSON.stringify(data.rows)))
+
+                }
+            }
+        }).finally(() => {
+            setIsLoadingSorted(false)
+            setLoading(false)
+        })
+    }
+
+    const setSortHandler = (value) => {
+        setSortCode(value)
+        localStorage.setItem("sort_code_Topics", value)
+        getTopicsData(categoryId, value, searchKey)
+    }
+
+    const setSearchHandler = (value) => {
+        setSearchKey(value)
+        getTopicsData(categoryId, sortCode, value)
+    }
+
 
     if (loading) {
         return <SpinnerSm/>
@@ -40,17 +68,23 @@ const TopicsPage = (props) => {
                 <div style={{marginTop: '20px'}}>
 
                     <FeedTopBar
-                        isSearch={false}
+                        isSearch={true}
                         isBackBtn={!!id}
                         backBtnTitle={'Back'}
+
+                        setSearchHandler={setSearchHandler}
+                        setSort={setSortHandler}
+                        isLoading={isLoadingSorted}
+                        selectedSortCode={selectedSortCode}
+                        sortCodes={sortTopics}
+
                     />
                     {/*<FeedAddNewPostBtn/>*/}
 
                     {
                         topicsList.length === 0
                             ?
-                            <div //style={{marginTop: '20px'}}
-                            >
+                            <div>
                                 <span>Нет записей</span>
                             </div>
                             :
@@ -59,11 +93,17 @@ const TopicsPage = (props) => {
                             >
                                 <ul
                                     className="list-group list-group-flush"
-                                    // style={{overflowX: 'hidden', overflowY: 'auto', }}
                                 >
-                                    {topicsList.map(function (item, index) {
-                                        return <FeedTopic item={item} key={index}/>
-                                    })}
+
+                                    {
+                                        !isLoadingSorted
+                                            ?
+                                            topicsList.map(function (item, index) {
+                                                return <FeedTopic item={item} key={index}/>
+                                            })
+                                            :
+                                            null
+                                    }
                                 </ul>
                             </div>
                     }

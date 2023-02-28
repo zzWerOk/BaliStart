@@ -3,6 +3,7 @@ const ApiError = require("../error/ApiError");
 const {createNewFile, readFile, reWrightFile, removeFile} = require("../utils/consts");
 const path = require("path");
 const fs = require("fs");
+const {Op} = require("sequelize");
 
 class MapPointController {
 
@@ -172,7 +173,7 @@ class MapPointController {
 
     async getAll(req, res, next) {
         try {
-            const {sort_code} = req.query
+            const {tag_search, sort_code} = req.query
             let sortOrder = ['id', 'ASC']
 
             switch (sort_code) {
@@ -194,21 +195,26 @@ class MapPointController {
                 case 'reid':
                     sortOrder = ['id', 'DESC']
                     break
+                case 'alpha':
+                    sortOrder = ['name', 'ASC']
+                    break
+                case 'realpha':
+                    sortOrder = ['name', 'DESC']
+                    break
             }
 
             const mapPointsList = await MapPoint.findAndCountAll({
-                    // limit: 10,
-                    // attributes: ['tag', tagSearch],
-                    order: [sortOrder,
-                        // ['name', 'DESC'],
-                        // ['name', 'ASC'],
-                    ],
+                    order: [sortOrder],
+                    where: {
+                        active: true,
+                        name: {
+                            [Op.iLike]: '%' + tag_search + '%'
+                        },
+                    }
                 }
             )
 
             let newRows = []
-
-            // const usersArr = await User.findAll()
 
             mapPointsList.rows.map(item => {
                 let newItem = JSON.parse(JSON.stringify(item))

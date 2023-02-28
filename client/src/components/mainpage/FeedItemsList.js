@@ -1,8 +1,7 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import FeedCategory from "./feed/Feed_category";
 import FeedTopic from "./feed/Feed_topic";
 import SpinnerSm from "../SpinnerSM";
-import {Context} from "../../index";
 
 const feedItems = [
     {
@@ -49,16 +48,14 @@ const feedItems = [
     },
 ]
 const FeedItemsList = (props) => {
-    const {itemsType} = props
-
-    const {topicsCategoryStore} = useContext(Context)
+    const {items, itemsType} = props
 
     const [categoriesItemsArr, setCategoriesItemsArr] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
 
-        setCategoriesItemsArr(topicsCategoryStore.getSavedCategoriesList())
+        setCategoriesItemsArr(items || [])
 
         setLoading(false)
 
@@ -72,7 +69,7 @@ const FeedItemsList = (props) => {
 
                 {
                     itemsType === 'categories'
-                    ?
+                        ?
                         <div className="list-group">
                             {categoriesItemsArr.map(function (item, index) {
                                 return <FeedCategory item={item} key={index}/>

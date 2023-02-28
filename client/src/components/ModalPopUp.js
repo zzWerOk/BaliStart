@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import {Button, Modal} from "react-bootstrap";
 
 const ModalPopUp = (props) => {
@@ -6,7 +6,7 @@ const ModalPopUp = (props) => {
 
     return (
         <Modal
-            size='lg'
+            // size='sm'
             centered
             show={show}
             onHide={onHide}
