@@ -54,20 +54,16 @@ const TopicListsCell = (props) => {
     } else {
 
         return (
-            <div
+            <div className={'py-2'}
                 style={{cursor: 'pointer'}}
             >
 
-                <Row onClick={() => {
-                    onClickHandler()
-                }}
-                     style={{
-                         display: "flex",
-                         marginBottom: '10px',
-                         minHeight: '220px',
-                         backgroundColor: currItem.isSaved ? 'white' : 'rgba(204,204,204,0.59)',
-                     }}>
-                    <Col md={4} style={{border: '1px solid rgba(40, 44, 52, 0.66)'}}>
+                <div className={'d-flex'}
+                     onClick={() => {
+                         onClickHandler()
+                     }}
+                >
+                    <Col style={{border: '1px solid rgba(40, 44, 52, 0.66)'}}>
                         <div className={'align-items-center justify-content-center'}
                              style={{
                                  height: '250px',
@@ -138,7 +134,7 @@ const TopicListsCell = (props) => {
                             </div>
                         </Row>
                     </Col>
-                </Row>
+                </div>
 
                 <ModalPopUp
                     show={showModal}

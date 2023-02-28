@@ -19,6 +19,6 @@ module.exports = function (req, res, next) {
         req.user = decoded
         next()
     }catch (e) {
-        return next(ApiError.notAuth("Пользователь не авторизован"))
+        return next(ApiError.notAuth("Пользователь не авторизован "))
     }
 }

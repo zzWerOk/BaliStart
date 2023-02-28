@@ -1,10 +1,9 @@
 import React, {useContext, useEffect, useState} from 'react';
 import MapPointsListCell from "./MapPointsListsCell";
-import {Button, Dropdown, Row, ToggleButton} from "react-bootstrap";
+import {Button, Dropdown, Row, } from "react-bootstrap";
 import {Context} from "../../index";
 import SpinnerSM from "../SpinnerSM";
 import {delay} from "../../utils/consts";
-import {ReactComponent as CloseIco} from "../../img/svg/close.svg";
 
 const sortItems = [
     {name: `By user (a-b)`, code: 'user'},
@@ -26,14 +25,14 @@ const MapPointsList = (props) => {
     const [selectedName, setSelectedName] = useState('')
 
     useEffect(() => {
-        delay(0).then(r => {
+        delay(0).then(() => {
             let mapPointsArr = mapPointsStore.getMapPointList
             if (!mapPointsArr) {
                 mapPointsArr = []
             }
 
             setSelectedCode(mapPointsStore.sort_code)
-            setSelectedName(sortItems.filter(function (value, index, arr) {
+            setSelectedName(sortItems.filter(function (value) {
                 return value.code === mapPointsStore.sort_code;
             })[0].name)
 
@@ -77,32 +76,6 @@ const MapPointsList = (props) => {
 
         getAllData()
     }
-
-    // const addNewTagHandler = (value) => {
-    //     let newCategory = null
-    //
-    //     for (let i = 0; i < topicCategoriesItems.length; i++) {
-    //         if (topicCategoriesItems[i].id === value) {
-    //             newCategory = topicCategoriesItems[i]
-    //         }
-    //     }
-    //
-    //     setSelectedTagId(newCategory.id)
-    //
-    //     newCategory.id === -1
-    //         ?
-    //         setSelectedTagName('')
-    //         :
-    //         setSelectedTagName(newCategory.category_name)
-    //
-    //     newCategory.id === -1
-    //         ?
-    //         mapPointsStore.tag_search = ''
-    //         :
-    //         mapPointsStore.tag_search = newCategory.id
-    //
-    //     getAllData()
-    // }
 
     if (loading) {
         return <SpinnerSM/>
@@ -171,9 +144,9 @@ const MapPointsList = (props) => {
                     />
                 )}
 
-                <Row>
+                <Row className={'d-flex justify-content-center pt-4'}>
                     <Button
-                        className={'btn btn-primary btn-lg w-75 btn-block'}
+                        className={'btn btn-primary btn-lg btn-block col-6'}
                         onClick={createNewMapPoint}
                     >New topic</Button>
                 </Row>

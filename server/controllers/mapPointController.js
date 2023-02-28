@@ -13,8 +13,9 @@ class MapPointController {
             const {
                 name,
                 description,
-                google_map_url,
-                topics = '[]',
+                types,
+                // google_map_url,
+                // topics = '[]',
                 active,
                 created_by_user_id,
                 data_text = '',
@@ -45,8 +46,9 @@ class MapPointController {
                             name: name,
                             description: description,
                             image_logo: imgFileName,
-                            google_map_url: google_map_url,
-                            topics: topics,
+                            types,
+                            // google_map_url: google_map_url,
+                            // topics: topics,
                             active: active,
                             created_by_user_id: created_by_user_id,
                             created_date: created_date,
@@ -89,8 +91,9 @@ class MapPointController {
                 id,
                 name,
                 description,
-                google_map_url,
-                topics = '[]',
+                types,
+                // google_map_url,
+                // topics = '[]',
                 active,
                 created_by_user_id,
                 data_text = '',
@@ -125,8 +128,9 @@ class MapPointController {
                             await MapPoint.update({
                                 name: name,
                                 description: description,
-                                google_map_url: google_map_url,
-                                topics: topics,
+                                types,
+                                // google_map_url: google_map_url,
+                                // topics: topics,
                                 active: active,
                             }, {where: {id: id}})
 
@@ -267,6 +271,7 @@ class MapPointController {
             const {sort_code} = req.query
             let sortOrder = ['id', 'ASC']
 
+
             switch (sort_code) {
                 case 'user':
                     sortOrder = ['created_by_user_id', 'ASC']
@@ -304,30 +309,6 @@ class MapPointController {
 
             mapPointsList.rows.map(item => {
                 let newItem = JSON.parse(JSON.stringify(item))
-
-                // const result = readFile(candidate.file_name)
-                // if (result.hasOwnProperty('status')) {
-                //     if (result.status === 'ok') {
-                //         resultItem.data = result.data
-                //     }
-                // }
-                // resultItem.image = resultItem.image_logo
-                //
-                //
-                // delete resultItem.active
-                // delete resultItem.createdAt
-                // delete resultItem.created_by_user_id
-                // delete resultItem.created_date
-                // // data
-                // // description
-                // delete resultItem.file_name
-                // delete resultItem.google_map_url
-                // delete resultItem.image_logo
-                // // id
-                // // name
-                // delete resultItem.topics
-                // delete resultItem.updatedAt
-                //
 
                 usersArr.map(currUser => {
                     if (currUser.id === item.created_by_user_id) {
@@ -370,42 +351,47 @@ class MapPointController {
 
     async getById(req, res, next) {
         const {id} = req.params
-        if (!id) {
-            return next(ApiError.badRequest("Ошибка параметра"))
-        } else {
-            const candidate = await MapPoint.findOne({where: {id}})
-            let resultItem = JSON.parse(JSON.stringify(candidate))
-            if (candidate) {
-                if (candidate.active) {
-                    const result = await readFile(candidate.file_name)
-                    if (result.hasOwnProperty('status')) {
-                        if (result.status === 'ok') {
-                            resultItem.data = result.data
+        try {
+            if (!id) {
+                return next(ApiError.badRequest("Ошибка параметра"))
+            } else {
+                const candidate = await MapPoint.findOne({where: {id}})
+                if (candidate) {
+                    let resultItem = JSON.parse(JSON.stringify(candidate))
+                    if (candidate.active) {
+                        const result = await readFile(candidate.file_name)
+                        if (result.hasOwnProperty('status')) {
+                            if (result.status === 'ok') {
+                                resultItem.data = result.data
+                            }
                         }
+                        resultItem.image = resultItem.image_logo
+
+
+                        delete resultItem.active
+                        delete resultItem.createdAt
+                        delete resultItem.created_by_user_id
+                        delete resultItem.created_date
+                        // data
+                        // description
+                        delete resultItem.file_name
+                        delete resultItem.google_map_url
+                        delete resultItem.image_logo
+                        // id
+                        // name
+                        delete resultItem.topics
+                        delete resultItem.updatedAt
+
+                        return res.json({status: 'ok', data: resultItem})
                     }
-                    resultItem.image = resultItem.image_logo
-
-
-                    delete resultItem.active
-                    delete resultItem.createdAt
-                    delete resultItem.created_by_user_id
-                    delete resultItem.created_date
-                    // data
-                    // description
-                    delete resultItem.file_name
-                    delete resultItem.google_map_url
-                    delete resultItem.image_logo
-                    // id
-                    // name
-                    delete resultItem.topics
-                    delete resultItem.updatedAt
-
-                    return res.json({status: 'ok', data: resultItem})
+                }else {
+                    return res.json({status: 'error', message: 'Object not found'})
                 }
             }
+            return next(ApiError.internal("Ошибка чтения данных файла"))
+        }catch (e) {
+            return next(ApiError.internal(e.message))
         }
-        return next(ApiError.internal("Ошибка чтения данных файла"))
-
     }
 
     async getByTour(req, res) {

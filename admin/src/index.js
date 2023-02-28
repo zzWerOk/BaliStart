@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import UserStore from "./store/UserStore";
+import AgentsStore from "./store/AgentsStore";
 import TopicsCategoryStore from "./store/TopicsCategoryStore";
 import ToursCategoryStore from "./store/ToursCategoryStore";
 import ToursTypeStore from "./store/ToursTypeStore";
@@ -26,6 +27,7 @@ root.render(
         toursTypeStore: new ToursTypeStore(),
         toursStore: new ToursStore(),
         topicsStore: new TopicsStore(),
+        agentsStore: new AgentsStore(),
         mapPointsStore: new MapPointsStore(),
         topicDetailsStore: new TopicDetailsStore(),
         navBarTitle: new NavBarStore()

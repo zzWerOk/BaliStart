@@ -36,21 +36,7 @@ const ToursPage = () => {
     useEffect(() => {
         delay(0).then(() => {
 
-            // getTableUpdateByName('Tours').then(tuData => {
-            //     const lastDateTable = toursStore.getSavedLastDateTableTours()
-            //
-            //     if (tuData.date !== lastDateTable) {
-                    getAllData()
-            //         /**
-            //          Сохраняем дату последнего изменения таблицы
-            //          **/
-            //         toursStore.saveLastDateTableTours(tuData.date)
-            //     } else {
-            //         toursStore.loadToursList()
-            //         setLoading(false)
-            //     }
-            //
-            // })
+            getAllData()
 
         })
     }, [])

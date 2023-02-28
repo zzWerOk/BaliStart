@@ -1,4 +1,4 @@
-import {$authHost, $host} from "./index";
+import {$authHost} from "./index";
 
 
 export const createAPI = async (name, description) => {
@@ -17,7 +17,7 @@ export const setIsActiveAPI = async (id, active) => {
 }
 
 export const getAll = async () => {
-    const {data} = await $authHost.get('api/topicscategory/all')
+    const {data} = await $authHost.get('api/topicscategory/allAdmin')
     return data
 }
 

@@ -5,10 +5,12 @@ import {getAll} from "../http/mapPointsAPI";
 import {delay} from "../utils/consts";
 import {getTableUpdateByName} from "../http/tableUpdatesAPI";
 import MapPointsList from "../components/mappoints/MapPointsList";
+import {getAllAgents} from "../http/agentAPI";
+import ToursCategories from "../components/ToursCategories";
 
 const MapPointPage = () => {
     const {navBarTitle} = useContext(Context)
-    const {mapPointsStore, user} = useContext(Context)
+    const {mapPointsStore, agentsStore} = useContext(Context)
     const [loading, setLoading] = useState(true)
     const [redraw, setRedraw] = useState(true)
 
@@ -27,7 +29,19 @@ const MapPointPage = () => {
 
         }).finally(() => {
             mapPointsStore.loadMapPointsList()
-            setLoading(false)
+
+            getAllAgents().then(data => {
+
+                if (data.hasOwnProperty('rows')) {
+
+                    agentsStore.saveAgentsListRows(data.rows)
+
+                }
+            }).finally(() => {
+                // agentsStore.loadAgentsList()
+                setLoading(false)
+            })
+
         })
 
     }
@@ -36,7 +50,7 @@ const MapPointPage = () => {
         navBarTitle.navBarTitle = 'Map Point Page'
         setLoading(true)
 
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             getTableUpdateByName('MapPoints').then(tuData => {
                 const lastDateTable = mapPointsStore.getSavedLastDateTableMapPoints()
@@ -61,14 +75,19 @@ const MapPointPage = () => {
         setRedraw(!redraw)
     }
 
-
     if (loading) {
         return <SpinnerSM/>
     } else {
         return (
-            <div>
-                <MapPointsList getAllData={getAllData} redrawPage={redrawPage}/>
-            </div>
+            <>
+                <div className={'pt-3'}>
+                    <ToursCategories tagType={'types'}/>
+                </div>
+
+                <div>
+                    <MapPointsList getAllData={getAllData} redrawPage={redrawPage}/>
+                </div>
+            </>
         )
     }
 };

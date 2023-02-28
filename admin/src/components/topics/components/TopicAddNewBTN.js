@@ -1,11 +1,11 @@
 import React from 'react';
-import {Dropdown, DropdownButton} from "react-bootstrap";
+import {Dropdown, } from "react-bootstrap";
 
 const TopicAddNewBtn = (props) => {
     const {addNewItemHandler, dropDownItems, disabled} = props
 
     return (
-        <div>
+        <div className={'col-12 d-flex justify-content-center pt-3'}>
 
             <Dropdown>
                 <Dropdown.Toggle
@@ -19,14 +19,15 @@ const TopicAddNewBtn = (props) => {
 
                 <Dropdown.Menu>
 
-                    {dropDownItems.map(item => {
-                        return <Dropdown.Item
-                            key={item.id}
-                            onClick={() => {
-                                addNewItemHandler(item.id)
-                            }}
-                        >{item.name}</Dropdown.Item>
-                    })}
+                        {dropDownItems.map(item => {
+                            return <Dropdown.Item
+                                key={item.id}
+                                onClick={() => {
+                                    addNewItemHandler(item.id)
+                                }}
+                            >{item.name}</Dropdown.Item>
+                        })}
+
                 </Dropdown.Menu>
             </Dropdown>
         </div>

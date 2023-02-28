@@ -114,6 +114,54 @@ class TopicsCategoryController {
         }
     }
 
+    async getAllAdmin(req, res, next) {
+        try {
+            const {sortCode} = req.query
+
+            let sortOrder = ['name', 'ASC']
+            switch (sortCode) {
+                case 'user':
+                    sortOrder = ['created_by_user_id', 'ASC']
+                    break
+                case 'reuser':
+                    sortOrder = ['created_by_user_id', 'DESC']
+                    break
+                case 'date':
+                    sortOrder = ['updatedAt', 'ASC']
+                    break
+                case 'redate':
+                    sortOrder = ['updatedAt', 'DESC']
+                    break
+                case 'id':
+                    sortOrder = ['id', 'ASC']
+                    break
+                case 'reid':
+                    sortOrder = ['id', 'DESC']
+                    break
+                case 'alpha':
+                    sortOrder = ['category_name', 'ASC']
+                    break
+                case 'realpha':
+                    sortOrder = ['category_name', 'DESC']
+                    break
+            }
+
+            const topicsCategoriesList = await TopicsCategory.findAndCountAll({
+                    // limit: 10,
+                    order: [sortOrder],
+                    // where: {
+                    //     category_name: {
+                    //         [Op.iLike]: '%' + searchKey + '%'
+                    //     },
+                    // }
+                }
+            )
+            return res.json(topicsCategoriesList)
+        } catch (e) {
+            return next(ApiError.internal("Ошибка параметра " + e.message))
+        }
+    }
+
     async setActive(req, res, next) {
         const {id, active} = req.body
 

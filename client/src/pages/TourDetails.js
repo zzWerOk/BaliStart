@@ -36,9 +36,9 @@ const TourDetails = () => {
 
     const clickTourGuide = (guideId) => {
 
-        if(guideId === tourGuideClicked){
+        if (guideId === tourGuideClicked) {
             setTourGuideClicked(-1)
-        }else {
+        } else {
             setTourGuideClicked(guideId)
         }
     }
@@ -361,7 +361,6 @@ const TourDetails = () => {
                                         {/*{epochToDateWithTime(currTour.created_date)}*/}
                                     </small>
                                     <div className={'price'}>
-                                        {/*{currTour.userName}*/}
                                         {currTour.price_usd}
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                              fill="currentColor"
@@ -419,7 +418,12 @@ const TourDetails = () => {
 
                             </Row>
                             <Row className={classes.topic_row}>
-                                <ElementName name={'Guides'}/>
+                                {tourGuides.length > 0
+                                    ?
+                                    <ElementName name={'Guides'}/>
+                                    :
+                                    null
+                                }
                                 <TourGuidesCard
                                     items={tourGuides}
                                     tourGuideClicked={tourGuideClicked}

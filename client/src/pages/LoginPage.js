@@ -34,7 +34,6 @@ const LoginPage = (props) => {
 
             getMyName().then((item) => {
                 user.setUser(response)
-                console.log(item)
                 if (item.hasOwnProperty('status')) {
                     if (item.status === 'ok') {
                         user.name = item.message
@@ -45,14 +44,6 @@ const LoginPage = (props) => {
             }).catch(() => {
                 setIsError('Error')
             })
-
-            // getById(response.id).then((item) => {
-            //     setIsError('')
-            //     user.setUser(item)
-            //     onAuthFinish()
-            // }).catch(() => {
-            //     setIsError('Error')
-            // })
 
         } catch (e) {
             if (e instanceof AxiosError) {

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {ListGroup} from "react-bootstrap";
 import TopicsCategoryItem_new from "./TopicsCategoryItem_new";
 import TopicsCategoryItem_ready from "./TopicsCategoryItem_ready";
@@ -11,7 +11,6 @@ import {observer} from "mobx-react-lite";
 import {createAPI} from "../../http/topicsCategoryAPI";
 
 const TopicsCategoryPage = observer(() => {
-    // const deleteItemTrigger = useRef(null)
 
     const {topicsCategoryStore} = useContext(Context)
     const [loading, setLoading] = useState(true)
@@ -22,35 +21,25 @@ const TopicsCategoryPage = observer(() => {
 
     const addItemTrigger = React.useRef(null)
 
-
     useEffect(() => {
         setLoading(true)
 
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             getTableUpdateByName('TopicsCategory').then(tuData => {
-                const lastDateTable = topicsCategoryStore.getSavedLastDateTableTopicsCategory()
-
-                // if (tuData.date.toString() !== lastDateTable.toString() || topicsCategoryStore.getSavedCategoriesList().length === 0) {
                     getAll().then(data => {
                         /**
                          Сохраняем список
                          **/
-                        // console.log(data)
                         topicsCategoryStore.saveCategoriesList(data.rows)
-                        // console.log('Даты не равны, получаем данные с сервера')
                         setItems_arr(data.rows)
                     }).finally(() => {
-                        // setItems_arr(topicsCategoryStore.itemsArr)
+
                     })
                     /**
                      Сохраняем дату последнего изменения таблицы
                      **/
                     topicsCategoryStore.saveLastDateTableTopicsCategory(tuData.date)
-                // } else {
-                //     setItems_arr(topicsCategoryStore.getSavedCategoriesList())
-                //     // console.log('Даты равны, получаем данные с LocalStorage')
-                // }
 
             }).finally(() => {
                 setLoading(false)
@@ -71,7 +60,7 @@ const TopicsCategoryPage = observer(() => {
                 /**
                  Изменение роли пользователя API
                  **/
-                delay(0).then(r => {
+                delay(0).then(() => {
                     createAPI(newItemData.name, newItemData.description).then(data => {
                         if (data.hasOwnProperty('status')) {
 

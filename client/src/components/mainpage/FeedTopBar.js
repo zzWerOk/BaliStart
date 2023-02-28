@@ -200,7 +200,7 @@ const FeedTopBar = (props) => {
                     <form onSubmit={handleSubmit}>
                         <label>
                             <input
-                                className={'me-2'}
+                                className={'me-2 form-control'}
                                 type="search"
                                 placeholder="Search"
                                 value={searchKey}

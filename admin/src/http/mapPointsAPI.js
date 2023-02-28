@@ -1,4 +1,4 @@
-import {$authHost, $authHostUpload, $host} from "./index";
+import {$authHost, $authHostUpload,} from "./index";
 
 const apiUrl = 'api/mappoint'
 
@@ -13,7 +13,7 @@ export const getAll = async () => {
         params: params
     }
 
-    const {data} = await $host.get(apiUrl+'/getAll', request)
+    const {data} = await $authHost.get(apiUrl+'/getAllAdmin', request)
     return data
 }
 
@@ -25,8 +25,9 @@ export const getMapPointData = async (id) => {
 export const saveMapPointAPI = async (
     name,
     description,
-    google_map_url,
-    topics,
+    types,
+    // google_map_url,
+    // topics,
     active,
     created_by_user_id,
     created_date,
@@ -40,8 +41,9 @@ export const saveMapPointAPI = async (
             name,
             description,
             image_logo_file,
-            google_map_url,
-            topics,
+            types,
+            // google_map_url,
+            // topics,
             active,
             created_by_user_id,
             created_date,
@@ -65,8 +67,9 @@ export const changeMapPointAPI = async (
     id,
     name,
     description,
-    google_map_url,
-    topics,
+    types,
+    // google_map_url,
+    // topics,
     active,
     created_by_user_id,
     created_date,
@@ -83,8 +86,9 @@ export const changeMapPointAPI = async (
             name,
             description,
             image_logo_file,
-            google_map_url,
-            topics,
+            types,
+            // google_map_url,
+            // topics,
             active,
             created_by_user_id,
             created_date,
@@ -108,8 +112,9 @@ const addToFormData = (formData,
                        name,
                        description,
                        image_logo,
-                       google_map_url,
-                       topics,
+                       types,
+                       // google_map_url,
+                       // topics,
                        active,
                        created_by_user_id,
                        created_date,
@@ -119,8 +124,9 @@ const addToFormData = (formData,
         formData.append("name", name);
         formData.append("description", description);
         formData.append("image_logo", image_logo);
-        formData.append("google_map_url", google_map_url);
-        formData.append("topics", topics);
+        formData.append("types", types);
+        // formData.append("google_map_url", google_map_url);
+        // formData.append("topics", topics);
         formData.append("active", active);
         formData.append("created_by_user_id", created_by_user_id);
         formData.append("created_date", created_date);

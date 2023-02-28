@@ -60,6 +60,11 @@ const TourMpCard = (props) => {
                 }}
             >
                 <div className="card float-right">
+                    <div className={'align-self-center pt-2'}>
+                        <h3>
+                            {item.name}
+                        </h3>
+                    </div>
                     <div className="row">
                         <div className="col-sm-5 d-flex align-items-center">
                             <img className="d-block w-100 rounded shadow p-2 bg-white"
@@ -68,6 +73,8 @@ const TourMpCard = (props) => {
                                  alt={nameMP}
                             />
                         </div>
+
+
                         <div className="col-sm-7">
                             <div className="card-block" style={{padding: '20px'}}>
                                 <p>{descriptionMP}</p>
@@ -100,7 +107,6 @@ const TourMpCard = (props) => {
                                                 <ElementLinkBtn item={{
                                                     link: '/topic/' + itemTopic.topicId,
                                                     name: 'Read more',
-                                                    // name: itemTopic.name,
                                                 }}/>
                                                 :
                                                 null

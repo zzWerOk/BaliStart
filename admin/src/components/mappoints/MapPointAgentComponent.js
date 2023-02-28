@@ -1,50 +1,46 @@
 import React, {useContext, useEffect, useState} from 'react';
-import SpinnerSM from "../../SpinnerSM";
+import SpinnerSM from "../SpinnerSM";
 import {Dropdown} from "react-bootstrap";
-import {Context} from "../../../index";
+import {Context} from "../../index";
 
-const MapPointTopicComponent = (props) => {
+const MapPointAgentComponent = (props) => {
     const {item, dataItemEditHandler} = props
-    const {topicsStore} = useContext(Context)
+    const {agentsStore} = useContext(Context)
 
-    // const [isSaving, stIsSaving] = useState(false)
-    const [topicName, setTopicName] = useState('')
-    // const [topicId, setTopicId] = useState('')
-    const [topicsItems, setTopicsItems] = useState([])
+    const [agentName, setAgentName] = useState('')
+    const [agentsItems, setAgentsItems] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        setTopicName(item.topicName)
-        // setTopicId(item.topicId)
+        setAgentName(item.agentName)
         setLoading(false)
-        setTopicsItems(topicsStore.getTopicsList)
+        setAgentsItems(agentsStore.getAgentsList)
     }, [])
 
-    const handleTopicName = (value) => {
-        item.topicName = value
-        setTopicName(value)
+    const handleAgentName = (value) => {
+        item.agentName = value
+        setAgentName(value)
         dataItemEditHandler(item)
     }
 
-    const handleTopicId = (value) => {
+    const handleAgentId = (value) => {
         item.topicId = value
-        // setTopicId(value)
         dataItemEditHandler(item)
     }
 
-    const selectTopicHandler = (topicId, topicName) => {
+    const selectAgentHandler = (agentId, agentName) => {
 
-        handleTopicId(topicId)
-        handleTopicName(topicName)
+        handleAgentId(agentId)
+        handleAgentName(agentName)
     }
 
     const searchTopicByName = (topicSearchName) => {
 
-        const filtered = topicsStore.getTopicsList.filter(function (value) {
+        const filtered = agentsStore.getAgentsList.filter(function (value) {
             return value.name.toLowerCase().includes(topicSearchName.toLowerCase());
         })
 
-        setTopicsItems(filtered)
+        setAgentsItems(filtered)
     }
 
     if (loading) {
@@ -54,11 +50,11 @@ const MapPointTopicComponent = (props) => {
         return (
             <div>
                 <span
-                    id="topicName"
+                    id="agentName"
                     className="form-control"
                     placeholder='Select topic'
                 >
-                    {topicName}
+                    {agentName}
                 </span>
 
                 <Dropdown>
@@ -66,9 +62,8 @@ const MapPointTopicComponent = (props) => {
                         variant="outline-secondary"
                         size="sm"
                         id="dropdown-tag"
-                        // disabled={!!isSaving}
                     >
-                        Select topic
+                        Select agent
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu>
@@ -77,19 +72,19 @@ const MapPointTopicComponent = (props) => {
                                 <input type="topic_name"
                                        className="form-control"
                                        id="topicSearch"
-                                       placeholder="Topic name"
+                                       placeholder="Agent name"
                                        onChange={e => searchTopicByName(e.target.value)}
                                 />
 
                             </div>
                         <Dropdown.Divider/>
-                    {topicsItems.map(item => {
+                    {agentsItems.map(item => {
                         return <Dropdown.Item
                             key={item.id}
                             name={item.name}
                             id={item.id}
                             onClick={() => {
-                                selectTopicHandler(item.id, item.name)
+                                selectAgentHandler(item.id, item.name)
                             }}
                         >{item.name}</Dropdown.Item>
                     })}
@@ -104,4 +99,4 @@ const MapPointTopicComponent = (props) => {
     }
 };
 
-export default MapPointTopicComponent;
+export default MapPointAgentComponent;

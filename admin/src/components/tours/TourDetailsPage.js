@@ -77,8 +77,6 @@ const TourDetailsPage = observer((props) => {
             await getTourData(item.id).then(data => {
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
-                        // currTour.data = data.data
-                        console.log(data.data)
                         item.data = data.data.data
                     }
                 }
@@ -249,57 +247,6 @@ const TourDetailsPage = observer((props) => {
         onItemEditHandler(currTour.getAsJson())
     }
 
-    // const getNewDataItemByType = (type) => {
-    //     let newItem = {}
-    //     switch (type) {
-    //         case "text":
-    //             newItem = {"type": type, "name": "", "text": ""}
-    //             break
-    //         case "comment":
-    //             newItem = {"type": type, "name": "", "text": ""}
-    //             break
-    //         case "list":
-    //             newItem = {"type": type, "name": "", "items": '[""]'}
-    //             break
-    //         case "link":
-    //             newItem = {"type": type, "name": "", "items": '[{"type":"","link":""}]'}
-    //             break
-    //         case "email":
-    //             newItem = {"type": type, "name": "", "email": ""}
-    //             break
-    //         case "phone":
-    //             newItem = {"type": type, "name": "", "items": '[{"type":"","phone":""}]'}
-    //             break
-    //         case "images":
-    //             newItem = {"type": type, "name": "", "items": '[""]'}
-    //             break
-    //         case "googleMapUrl":
-    //             newItem = {"type": type, "name": "", "url": ""}
-    //             break
-    //     }
-    //     return newItem
-    // }
-
-    // const addNewItemHandler = useCallback((value) => {
-    //     let type = ''
-    //
-    //     for (let i = 0; i < dropDownItems.length; i++) {
-    //         if (dropDownItems[i].id === value) {
-    //             type = dropDownItems[i].type
-    //         }
-    //     }
-    //
-    //     let newItem = getNewDataItemByType(type)
-    //
-    //     currTour.addNewItemJSON(newItem)
-    //     currTour.isSaved = false
-    //     onItemEditHandler(currTour.getAsJson())
-    //
-    //     setItemData(currTour.dataJSON)
-    //
-    //     // the function only changes when any of these dependencies change
-    // }, [topicDetailsStore, currTour])
-
     const addNewTagHandler = (value) => {
         let newCategory = null
 
@@ -340,17 +287,6 @@ const TourDetailsPage = observer((props) => {
         }
     }
 
-    // const dataItemEditHandler = (item) => {
-    //     if (item.hasOwnProperty('index')) {
-    //         let dataArr = JSON.parse(currTour.data)
-    //         const itemIndex = item.index
-    //         dataArr[itemIndex] = item
-    //         currTour.data = JSON.stringify(dataArr)
-    //         currTour.isSaved = false
-    //         onItemEditHandler(currTour.getAsJson())
-    //     }
-    // }
-
     const deleteNewTagHandler = (value) => {
         let newCategory = null
 
@@ -359,19 +295,6 @@ const TourDetailsPage = observer((props) => {
                 newCategory = tourCategoriesItems[i]
             }
         }
-
-        // if (newCategory) {
-        //     const found = tourTags.find(element => element === newCategory.id)
-        //     if (found) {
-        //         const filtered = tourTags.filter(function (value) {
-        //             return value !== found;
-        //         })
-        //         setTourTags(filtered)
-        //         currTour.tour_category = JSON.stringify(filtered)
-        //         currTour.isSaved = false
-        //         onItemEditHandler(currTour.getAsJson())
-        //     }
-        // }
 
         if (newCategory) {
             const found = tourTags.find(element => element === newCategory.id)
@@ -444,36 +367,6 @@ const TourDetailsPage = observer((props) => {
         }
     }
 
-    // const deleteDataItemByIndex = (index) => {
-    //     const currItem = itemData[index]
-    //
-    //     const filtered = itemData.filter(function (value, index, arr) {
-    //         return value !== currItem;
-    //     })
-    //
-    //     setItemData(filtered)
-    //     currTour.data = JSON.stringify(filtered)
-    //     currTour.isSaved = false
-    //     onItemEditHandler(currTour.getAsJson())
-    // }
-
-    // const changeItemType = (id, type) => {
-    //     let newArr = []
-    //     for (let i = 0; i < itemData.length; i++) {
-    //         if (i === id) {
-    //             let newItem = getNewDataItemByType(type)
-    //             newItem.name = itemData[i].name
-    //             itemData[i] = newItem
-    //         }
-    //         newArr.push(itemData[i])
-    //     }
-    //
-    //     setItemData(newArr)
-    //     currTour.data = JSON.stringify(itemData)
-    //     currTour.isSaved = false
-    //     onItemEditHandler(currTour.getAsJson())
-    // }
-
     const onDeleteHandler = () => {
         setIsDeleting(true)
         setTimeout(() => {
@@ -496,7 +389,6 @@ const TourDetailsPage = observer((props) => {
             setIsSaving(true)
             setIsGuideCanAdd(value)
             currTour.guide_can_add = value
-            // currTour.isSaved = false
             onItemEditHandler(currTour.getAsJson())
 
         }).finally(() => {
@@ -709,14 +601,6 @@ const TourDetailsPage = observer((props) => {
         onItemEditHandler(currTour.getAsJson())
     }
 
-    // const getMapPointName_byId = (id) => {
-    //     for (let i = 0; i < mapPointsArr.length; i++) {
-    //         if (parseInt(mapPointsArr[i].id) === parseInt(id)) {
-    //             return mapPointsArr[i].name
-    //         }
-    //     }
-    // }
-
     const getMapPointDataItems = (selectedMapPoint) => {
         if (selectedMapPoint.hasOwnProperty('data')) {
             let newDataItems = []
@@ -754,7 +638,6 @@ const TourDetailsPage = observer((props) => {
 
     const getMapPoint_byId = (id) => {
         for (let i = 0; i < mapPointsArr.length; i++) {
-            // console.log(mapPointsArr[i])
             if (parseInt(mapPointsArr[i].id) === parseInt(id)) {
                 return mapPointsArr[i]
             }
@@ -806,9 +689,6 @@ const TourDetailsPage = observer((props) => {
             }
         }
         mapPointsStore.setMapPointsListFromArr(newArr)
-        // setTourMapPoints(JSON.stringify(newArr))
-        // currTour.isSaved = false
-        // onItemEditHandler(currTour.getAsJson())
 
     }
 
@@ -904,18 +784,15 @@ const TourDetailsPage = observer((props) => {
             return !isThere
         }
     }
+
     const getMapPointsTimeLine = () => {
-
-
         return (
-
             mapPointsArr_Loading
                 ?
                 <SpinnerSM/>
                 :
-                <MDBContainer className="py-5">
+                <MDBContainer className="py-2">
                     <ul className="timeline-with-icons">
-
                         {
                             JSON.parse(tourMapPoints).map(function (currMapPoint, index) {
                                 let selectedMapPoint = getMapPoint_byId(currMapPoint)
@@ -926,12 +803,10 @@ const TourDetailsPage = observer((props) => {
                                         description={getMapPointDataDescription(selectedMapPoint)}
                                         image_logo={selectedMapPoint.image_logo}
                                         index={index}
-                                        // dataItems={selectedMapPoint.data}
                                         dataItems={getMapPointDataItems(selectedMapPoint)}
                                     />
                             })
                         }
-
                     </ul>
                 </MDBContainer>
         );
@@ -1001,20 +876,22 @@ const TourDetailsPage = observer((props) => {
                 {/***
                  ACTIVE BTN
                  ***/}
-                <Row>
+                <Row className={'topic-detail-row'}>
                     <div
-                        className={'col-sm-5 justify-content-start '}
+                        className={'col-12 justify-content-between'}
                         style={{display: 'flex'}}
                     >
-                        <input
-                            type="categoryName"
-                            id="formTopicName"
-                            className="form-control"
-                            placeholder='Category'
-                            value={currName}
-                            disabled={!!isSaving}
-                            onChange={e => onNameHandler(e.target.value)}
-                        />
+                        <div className={'col-10'}>
+                            <input
+                                type="categoryName"
+                                id="formTopicName"
+                                className="form-control"
+                                placeholder='Category'
+                                value={currName}
+                                disabled={!!isSaving}
+                                onChange={e => onNameHandler(e.target.value)}
+                            />
+                        </div>
                         <ToggleButton
                             id="toggle-active"
                             type="checkbox"
@@ -1052,32 +929,33 @@ const TourDetailsPage = observer((props) => {
                         </ToggleButton>
                     </div>
                 </Row>
+
                 {/***
                  DESCRIPTION
                  ***/}
-                <Row>
-
-                    <div className={'col-lg-10 justify-content-center '}>
-                    <textarea
-                        name="topicDescription"
-                        id="topicDescription"
-                        cols="50" rows="3"
-                        onChange={e => onDescriptionHandler(e.target.value)}
-                        value={currDescription}
-                        disabled={!!isSaving}
+                <Row className={'topic-detail-row'}>
+                    <div className={'col-12 justify-content-center '}>
+                    <textarea className={'col-12'}
+                              name="topicDescription"
+                              id="topicDescription"
+                              rows="3"
+                              onChange={e => onDescriptionHandler(e.target.value)}
+                              value={currDescription}
+                              disabled={!!isSaving}
                     />
                     </div>
                 </Row>
+                <hr/>
                 {/***
                  CATEGORIES
                  ***/}
-                <Row>
+                <Row className={'topic-detail-row'}>
 
                     {tourCategoriesItems_load
                         ?
                         <SpinnerSM/>
                         :
-                        <div style={{display: 'flex'}}>
+                        <div className={'d-flex flex-wrap'}>
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant="outline-secondary"
@@ -1107,11 +985,8 @@ const TourDetailsPage = observer((props) => {
                                 tourTags.map(item => {
                                     return <Button
                                         key={item}
-                                        className="badge btn-secondary"
+                                        className="badge btn-secondary mb-2 mx-1"
                                         disabled={!!isSaving}
-                                        style={{
-                                            margin: '0 3px'
-                                        }}
                                     >
                                         {getTagNameById(item)}
                                         <CloseIco
@@ -1139,8 +1014,7 @@ const TourDetailsPage = observer((props) => {
                 {/***
                  IMAGE
                  ***/}
-                <Row>
-
+                <Row className={'topic-detail-row'}>
                     <div
                         className={'d-flex align-items-center justify-content-center'}
                     >
@@ -1186,13 +1060,13 @@ const TourDetailsPage = observer((props) => {
                 {/***
                  TYPES
                  ***/}
-                <Row>
+                <Row className={'topic-detail-row'}>
 
                     {tourCategoriesItems_load
                         ?
                         <SpinnerSM/>
                         :
-                        <div style={{display: 'flex'}}>
+                        <div className={'d-flex flex-wrap '}>
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant="outline-secondary"
@@ -1222,11 +1096,9 @@ const TourDetailsPage = observer((props) => {
                                 tourTypes.map(item => {
                                     return <Button
                                         key={item}
-                                        className="badge btn-secondary"
+                                        className="badge btn-secondary mb-2 mx-1"
                                         disabled={!!isSaving}
-                                        style={{
-                                            margin: '0 3px'
-                                        }}
+
                                     >
                                         {getTypeNameById(item)}
                                         <CloseIco
@@ -1251,13 +1123,19 @@ const TourDetailsPage = observer((props) => {
                     }
 
                 </Row>
+                <hr/>
                 {/***
                  DURATION
                  ***/}
-                <Row>
+                <Row className={'topic-detail-row'}>
                     <span>Tour duration</span>
                     <div>
-                        <ToggleButtonGroup type="radio" name="hourday" defaultValue={durationTimeType === 'h' ? 1 : 2}>
+                        <ToggleButtonGroup
+                            className={'col-7 py-2'}
+                            type="radio"
+                            name="hourday"
+                            defaultValue={durationTimeType === 'h' ? 1 : 2}
+                        >
                             <ToggleButton
                                 variant={'outline-success'}
                                 id={`days-radio-1`}
@@ -1279,7 +1157,7 @@ const TourDetailsPage = observer((props) => {
                                 Days
                             </ToggleButton>
                         </ToggleButtonGroup>
-                        <div style={{overflow: 'auto', paddingLeft: '10px', paddingRight: '10px',}}>
+                        <div style={{overflow: 'auto', paddingLeft: '1px', paddingRight: '1px',}}>
                             <ToggleButtonGroup type="radio" name="time" defaultValue={durationTime}>
                                 {
                                     durationItems.map(durationItem => {
@@ -1303,13 +1181,19 @@ const TourDetailsPage = observer((props) => {
                         </div>
                     </div>
                 </Row>
+                <hr/>
                 {/***
                  ACTIVITY LEVEL
                  ***/}
-                <Row>
+                <Row className={'topic-detail-row'}>
                     <span>Tour activity level</span>
                     <div>
-                        <ToggleButtonGroup type="radio" name="activity" defaultValue={activityType}>
+                        <ToggleButtonGroup
+                            className={'col-7 py-2'}
+                            type="radio"
+                            name="activity"
+                            defaultValue={activityType}
+                        >
                             <ToggleButton
                                 variant={'outline-success'}
                                 id={`activity-radio-1`}
@@ -1364,13 +1248,19 @@ const TourDetailsPage = observer((props) => {
 
                     </div>
                 </Row>
+                <hr/>
                 {/***
                  LANGUAGE
                  ***/}
-                <Row>
+                <Row className={'topic-detail-row'}>
                     <span>Tour languages</span>
                     <div>
-                        <ToggleButtonGroup type="checkbox" name="activity" defaultValue={JSON.parse(tourLanguage)}>
+                        <ToggleButtonGroup
+                            className={'col-7 py-2'}
+                            type="checkbox"
+                            name="activity"
+                            defaultValue={JSON.parse(tourLanguage)}
+                        >
                             <ToggleButton
                                 variant={'outline-success'}
                                 id={`language-check-1`}
@@ -1406,11 +1296,11 @@ const TourDetailsPage = observer((props) => {
 
                     </div>
                 </Row>
-                <br/>
+                <hr/>
                 {/***
                  MAP POINT
                  ***/}
-                <Row>
+                <Row className={'topic-detail-row'}>
                     <span>Itinerary</span>
 
                     {getMapPointsTimeLine()}
@@ -1436,7 +1326,8 @@ const TourDetailsPage = observer((props) => {
                                         onClick={() => {
                                             addToTourId(item.id)
                                         }}
-                                    >{item.name}</Dropdown.Item>
+                                    >{item.name}
+                                    </Dropdown.Item>
                                 })}
                             </Dropdown.Menu>
                         </Dropdown>
@@ -1445,19 +1336,20 @@ const TourDetailsPage = observer((props) => {
                             className='btn btn-sm w-25'
                             disabled={!!isSaving}
                             onClick={addNewMapPointHandler}
-                        >Add new Map Point</Button>
+                        >
+                            Add new Map Point
+                        </Button>
 
-                        <br/>
-                        <br/>
                         <br/>
 
                     </div>
                 </Row>
+                <hr/>
                 {/***
                  WHAT INCLUDE
                  ***/}
-                <Row style={{backgroundColor: 'rgba(0,255,0,0.17)', paddingBottom: '30px', paddingTop: '15px'}}>
-                    <span>Includes</span>
+                <Row className={'topic-detail-row'} style={{backgroundColor: 'rgba(0,255,0,0.17)', paddingBottom: '30px', paddingTop: '15px'}}>
+                    <span className={'py-2'}>Includes</span>
                     <TourIncludeComponent
                         includes={tourIncludes}
                         isSaving={isSaving}
@@ -1468,18 +1360,19 @@ const TourDetailsPage = observer((props) => {
                  WHAT NOT INCLUDE
                  ***/}
                 <Row style={{backgroundColor: 'rgba(255,0,0,0.17)', paddingBottom: '30px', paddingTop: '15px'}}>
-                    <span>Not includes</span>
+                    <span className={'py-2'}>Not includes</span>
                     <TourIncludeComponent
                         includes={tourNotIncludes}
                         isSaving={isSaving}
                         tourIncludesEditHandler={tourNotIncludesEditHandler}
                     />
                 </Row>
+                <hr/>
                 {/***
                  IMAGES
                  ***/}
-                <Row>
-                    <span>Images</span>
+                <Row className={'topic-detail-row'}>
+                    <span className={'py-2'}>Images</span>
                     <TopicImagesComponent
                         index={0}
                         item={imagesItem}
@@ -1489,17 +1382,18 @@ const TourDetailsPage = observer((props) => {
                         onFilesDeleteHandler={onImagesFilesDeleteHandler}
                     />
                 </Row>
+                <hr/>
                 {/***
                  GUIDES
                  ***/}
-                <Row>
-                    <span>Guides</span>
+                <Row className={'topic-detail-row'}>
+                    <span className={'py-2'}>Guides</span>
                     <div className={'d-flex'}>
                         {
                             user.isAdmin
                                 ?
-                                <div className={'d-flex'}>
-                                    <Dropdown>
+                                <div className={'d-flex flex-wrap '}>
+                                    <Dropdown className={'mb-2'}>
                                         <Dropdown.Toggle
                                             variant="outline-secondary"
                                             size="sm"
@@ -1512,7 +1406,6 @@ const TourDetailsPage = observer((props) => {
                                         <Dropdown.Menu>
 
                                             {
-                                                // userListFiltered.length > 0
                                                 !userListLoading === true
                                                     ?
                                                     userListFiltered.map(item => {
@@ -1540,7 +1433,7 @@ const TourDetailsPage = observer((props) => {
                                             selectedUserList.map(item => {
                                                 return <Button
                                                     key={item}
-                                                    className="badge btn-secondary"
+                                                    className="badge btn-secondary mb-2 mx-1"
                                                     disabled={!!isSaving}
                                                     style={{
                                                         margin: '0 3px'
@@ -1582,7 +1475,7 @@ const TourDetailsPage = observer((props) => {
                                 null
                         }
                     </div>
-                    <div className={'d-flex'}>
+                    <div className={'d-flex pt-2'}>
                         <ToggleButton
                             id="toggle-guide-can_add"
                             type="checkbox"
@@ -1623,11 +1516,12 @@ const TourDetailsPage = observer((props) => {
                         This option allows guides to be added to this tour
                     </small>
                 </Row>
+                <hr/>
                 {/***
                  PRICE
                  ***/}
-                <Row>
-                    <span>Tour price USD (per person)</span>
+                <Row className={'topic-detail-row justify-content-end'}>
+                    <span className={'col-5'}>Tour price USD (per person)</span>
                     <div className={'d-flex col-3'}>
                         <input
                             type="tourPrice"
@@ -1642,20 +1536,22 @@ const TourDetailsPage = observer((props) => {
                         />
                     </div>
                 </Row>
+                <hr/>
                 {/***
                  SAVE
                  ***/}
-                <Row>
+                <Row className={'topic-detail-row justify-content-center pt-3'}>
                     <Button
-                        className={`btn ${saveError ? 'btn-danger' : 'btn-primary'}  btn-lg w-75 btn-block`}
+                        className={`btn ${saveError ? 'btn-danger' : 'btn-primary'}  btn-lg w-50 btn-block`}
                         disabled={!!isSaving}
                         onClick={saveHandler}
                     >Save</Button>
                 </Row>
+                <hr/>
                 {/***
                  DELETE
                  ***/}
-                <Row>
+                <Row className={'topic-detail-row'}>
 
                     <div style={{display: "flex"}}>
                         <button

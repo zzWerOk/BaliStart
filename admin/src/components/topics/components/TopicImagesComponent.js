@@ -30,30 +30,6 @@ const TopicImagesComponent = (props) => {
         dataItemEditHandler(item)
     }
 
-    // const itemImagesEdit = (text, index) => {
-    //     let newArr = JSON.parse(images)
-    //     let currItem
-    //     currItem = text
-    //     newArr[index] = currItem
-    //     setImages(JSON.stringify(newArr))
-    //
-    //     item.items = JSON.stringify(newArr)
-    //     dataItemEditHandler(item)
-    // }
-
-    // const newItemAddHandler = () => {
-    //     let itemsArr = JSON.parse(images)
-    //     itemsArr.push("")
-    //     setImages(JSON.stringify(itemsArr))
-    //
-    //     item.items = JSON.stringify(itemsArr)
-    //
-    //     onFilesAddHandler('empty', index, itemsArr.length - 1)
-    //
-    //     dataItemEditHandler(item)
-    // }
-
-
     const itemDeleteHandler = (imageIndex) => {
         let itemsArr = JSON.parse(images)
         itemsArr.splice(imageIndex, 1)
@@ -109,7 +85,7 @@ const TopicImagesComponent = (props) => {
                 <input
                     type="imagesName"
                     id="imagesName"
-                    className="form-control"
+                    className="form-control my-3"
                     placeholder='Images name'
                     value={imagesName}
                     disabled={!!isSaving}

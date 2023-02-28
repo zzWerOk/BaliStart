@@ -5,8 +5,9 @@ export default class mapPointCL {
         this._name = ''
         this._description = ''
         this._image_logo = ''
-        this._google_map_url = ''
-        this._topics = ''
+        this._types = '[]'
+        // this._google_map_url = ''
+        // this._topics = ''
         this._active = true
         this._created_by_user_id = -1
         this._created_date = ''
@@ -38,12 +39,15 @@ export default class mapPointCL {
         if (itemObj.hasOwnProperty('image_logo')) {
             this._image_logo = itemObj.image_logo
         }
-        if (itemObj.hasOwnProperty('google_map_url')) {
-            this._google_map_url = itemObj.google_map_url
+        if (itemObj.hasOwnProperty('types')) {
+            this._types = itemObj.types
         }
-        if (itemObj.hasOwnProperty('topics')) {
-            this._topics = itemObj.topics
-        }
+        // if (itemObj.hasOwnProperty('google_map_url')) {
+        //     this._google_map_url = itemObj.google_map_url
+        // }
+        // if (itemObj.hasOwnProperty('topics')) {
+        //     this._topics = itemObj.topics
+        // }
         if (itemObj.hasOwnProperty('active')) {
             this._active = itemObj.active
         }
@@ -72,8 +76,9 @@ export default class mapPointCL {
                 "name": this._name,
                 "description": this._description,
                 "image_logo": this._image_logo,
-                "google_map_url": this._google_map_url,
-                "topics": this._topics,
+                "types": this._types,
+                // "google_map_url": this._google_map_url,
+                // "topics": this._topics,
                 "active": this._active,
                 "created_by_user_id": this._created_by_user_id,
                 "created_date": this._created_date,
@@ -110,14 +115,18 @@ export default class mapPointCL {
         this._image_logo = value;
     }
 
-    set google_map_url(value) {
-        this._google_map_url = value;
+    set types(value) {
+        this._types = value;
     }
 
-    set topics(value) {
-        this._topics = value;
-    }
-
+    // set google_map_url(value) {
+    //     this._google_map_url = value;
+    // }
+    //
+    // set topics(value) {
+    //     this._topics = value;
+    // }
+    //
     set active(value) {
         this._active = value;
     }
@@ -150,14 +159,18 @@ export default class mapPointCL {
         return this._image_logo;
     }
 
-    get google_map_url() {
-        return this._google_map_url;
+    get types() {
+        return this._types;
     }
 
-    get topics() {
-        return this._topics;
-    }
-
+    // get google_map_url() {
+    //     return this._google_map_url;
+    // }
+    //
+    // get topics() {
+    //     return this._topics;
+    // }
+    //
     get active() {
         return this._active;
     }

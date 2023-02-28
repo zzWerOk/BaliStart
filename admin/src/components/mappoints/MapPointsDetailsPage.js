@@ -1,21 +1,23 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {Button, Image, Row, ToggleButton} from "react-bootstrap";
+import {Button, Dropdown, Image, Row, ToggleButton} from "react-bootstrap";
 import noImageLogo from '../../img/nophoto.jpg'
 import {observer} from "mobx-react-lite";
 
 import {ReactComponent as CircleIco} from "../../img/svg/circle.svg"
 import {ReactComponent as CircleOkIco} from "../../img/svg/circle_ok.svg"
+import {ReactComponent as CloseIco} from "../../img/svg/close.svg"
 import {delay} from "../../utils/consts";
 import {MDBFile} from "mdb-react-ui-kit";
 import TopicAddNewBtn from "../topics/components/TopicAddNewBTN";
 import TopicItemCard from "../topics/components/TopicItemCard";
 import TopicGoogleMapUrlComponent from "../topics/components/TopicGoogleMapUrlComponent";
 import TopicTextComponent from "../topics/components/TopicTextComponent";
-import MapPointTopicComponent from "../topics/components/MapPointTopicComponent";
+import MapPointTopicComponent from "./MapPointTopicComponent";
 import {changeMapPointAPI, deleteMapPointAPI, getMapPointData, saveMapPointAPI} from "../../http/mapPointsAPI";
 import mapPointCL from "../../classes/mapPointCL";
 import SpinnerSM from "../SpinnerSM";
 import {Context} from "../../index";
+import MapPointAgentComponent from "./MapPointAgentComponent";
 
 const dropDownItems = [
     {
@@ -33,12 +35,17 @@ const dropDownItems = [
         name: 'Topic',
         type: 'topic',
     },
+    {
+        id: 3,
+        name: 'Agent',
+        type: 'agent',
+    },
 ]
 let currMapPoint = null
 let item = null
 const MapPointsDetailsPage = observer((props) => {
     const {itemC, onItemEditHandler, deleteMapPoint, addToTourId} = props
-    const {mapPointsStore, user} = useContext(Context)
+    const {mapPointsStore, user, toursTypeStore} = useContext(Context)
 
     const [isSaving, setIsSaving] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
@@ -52,24 +59,29 @@ const MapPointsDetailsPage = observer((props) => {
     const [newImageLogo, setNewImageLogo] = useState(false)
     const [mapPointsItems_load, setMapPointsItems_load] = useState(true)
 
+    const [tourTypesItems, setTourTypesItems] = useState([])
+    const [tourTypes, setTourTypes] = useState([])
 
     useEffect(
         () => {
 
-            if(!itemC){
+            if (!itemC) {
                 item = mapPointsStore.getCreateAndAddMapPointsJson(user.currUserId)
-            }else{
+            } else {
                 item = itemC
             }
+
+            setTourTypesItems(toursTypeStore.getSavedCategoriesList())
 
             currMapPoint = new mapPointCL()
 
             setMapPointsItems_load(true)
             currMapPoint.setFromJson(item)
             setCurrName(currMapPoint.name)
-            // setCurrDescription(currMapPoint.description)
 
             setIsActive(currMapPoint.active)
+
+            setTourTypes(JSON.parse(currMapPoint.types))
 
             if (item.image_logo) {
                 if (item.id >= 0) {
@@ -84,12 +96,14 @@ const MapPointsDetailsPage = observer((props) => {
                             if (data.hasOwnProperty('status')) {
                                 if (data.status === 'ok') {
                                     currMapPoint.data = data.data
+
                                 }
                             }
                         }).finally(() => {
                             setItemData(currMapPoint.dataJSON)
                             setMapPointsItems_load(false)
                             setCurrDescription(currMapPoint.descriptionData)
+
                         })
                     } else {
                         setCurrDescription(currMapPoint.descriptionData)
@@ -118,7 +132,7 @@ const MapPointsDetailsPage = observer((props) => {
     }
 
     const onDescriptionHandler = (value) => {
-        currMapPoint.description = value.substring(0,120)
+        currMapPoint.description = value.substring(0, 120)
         currMapPoint.setDescriptionData(value)
         setCurrDescription(value)
 
@@ -137,6 +151,9 @@ const MapPointsDetailsPage = observer((props) => {
                 break
             case "topic":
                 newItem = {"type": type, "topicId": "", "topicName": ""}
+                break
+            case "agent":
+                newItem = {"type": type, "userId": ""}
                 break
         }
         return newItem
@@ -264,7 +281,7 @@ const MapPointsDetailsPage = observer((props) => {
 
             /***
              * Удаляем поле 'index' с каждого элемента
-            ***/
+             ***/
             let newDataArr = []
             currMapPoint.dataJSON.map(dataItem => {
                 delete dataItem.index
@@ -280,8 +297,9 @@ const MapPointsDetailsPage = observer((props) => {
                 saveMapPointAPI(
                     currMapPoint.name,
                     currMapPoint.description,
-                    currMapPoint.google_map_url,
-                    currMapPoint.topics,
+                    currMapPoint.types,
+                    // currMapPoint.google_map_url,
+                    // currMapPoint.topics,
                     currMapPoint.active,
                     currMapPoint.created_by_user_id,
                     currMapPoint.created_date,
@@ -299,7 +317,7 @@ const MapPointsDetailsPage = observer((props) => {
                             }
 
                             changeTopicId(data.id)
-                            if(addToTourId){
+                            if (addToTourId) {
                                 currMapPoint.id = data.id
                                 addToTourId(data.id)
                             }
@@ -318,8 +336,9 @@ const MapPointsDetailsPage = observer((props) => {
                     currMapPoint.id,
                     currMapPoint.name,
                     currMapPoint.description,
-                    currMapPoint.google_map_url,
-                    currMapPoint.topics,
+                    currMapPoint.types,
+                    // currMapPoint.google_map_url,
+                    // currMapPoint.topics,
                     currMapPoint.active,
                     currMapPoint.created_by_user_id,
                     currMapPoint.created_date,
@@ -361,6 +380,66 @@ const MapPointsDetailsPage = observer((props) => {
         onItemEditHandler(currMapPoint.getAsJson())
     }
 
+    const addNewTypeHandler = (value) => {
+        let newType = null
+
+        for (let i = 0; i < tourTypesItems.length; i++) {
+            if (tourTypesItems[i].id === value) {
+                newType = tourTypesItems[i]
+            }
+        }
+
+        if (newType) {
+            const found = tourTypes.find(element => element === newType.id)
+            if (!found) {
+                setTourTypes([...tourTypes, newType.id])
+                currMapPoint.types = JSON.stringify([...tourTypes, newType.id])
+                currMapPoint.isSaved = false
+                onItemEditHandler(currMapPoint.getAsJson())
+            }
+        }
+    }
+
+    const getTypeNameById = (id) => {
+        for (let i = 0; i < tourTypesItems.length; i++) {
+            if (tourTypesItems[i].id === id) {
+                return tourTypesItems[i].category_name
+            }
+        }
+    }
+
+    const deleteNewTypeHandler = (value) => {
+        let newCategory = null
+
+        for (let i = 0; i < tourTypesItems.length; i++) {
+            if (tourTypesItems[i].id === value) {
+                newCategory = tourTypesItems[i]
+            }
+        }
+
+        if (newCategory) {
+            const found = tourTypes.find(element => element === newCategory.id)
+            if (found) {
+                const filtered = tourTypes.filter(function (typeId) {
+                    return typeId !== found;
+                })
+                setTourTypes(filtered)
+                currMapPoint.types = JSON.stringify(filtered)
+                currMapPoint.isSaved = false
+                onItemEditHandler(currMapPoint.getAsJson())
+            }
+        } else {
+            const filtered = tourTypes.filter(function (typeId) {
+                return value !== typeId;
+            })
+
+            setTourTypes(filtered)
+            currMapPoint.types = JSON.stringify(filtered)
+            currMapPoint.isSaved = false
+            onItemEditHandler(currMapPoint.getAsJson())
+        }
+    }
+
     if (mapPointsItems_load) {
         return <SpinnerSM/>
     } else {
@@ -375,20 +454,22 @@ const MapPointsDetailsPage = observer((props) => {
                      }}>
                 </Row>
 
-                <Row>
+                <Row className={'topic-detail-row'}>
                     <div
-                        className={'col-sm-5 justify-content-start '}
+                        className={'col-12 justify-content-between'}
                         style={{display: 'flex'}}
                     >
-                        <input
-                            type="categoryName"
-                            id="formMapPointName"
-                            className="form-control"
-                            placeholder='Category'
-                            value={currName}
-                            disabled={!!isSaving}
-                            onChange={e => onNameHandler(e.target.value)}
-                        />
+                        <div className={'col-10'}>
+                            <input
+                                type="categoryName"
+                                id="formMapPointName"
+                                className="form-control"
+                                placeholder='Category'
+                                value={currName}
+                                disabled={!!isSaving}
+                                onChange={e => onNameHandler(e.target.value)}
+                            />
+                        </div>
                         <ToggleButton
                             id="toggle-active"
                             type="checkbox"
@@ -425,12 +506,13 @@ const MapPointsDetailsPage = observer((props) => {
                         </ToggleButton>
                     </div>
                 </Row>
-                <Row>
-                    <div className={'col-lg-10 justify-content-center '}>
+                <Row className={'topic-detail-row'}>
+                    <div className={'col-12 justify-content-center '}>
                     <textarea
+                        className={'col-12'}
                         name="mapPointDescription"
                         id="mapPointDescription"
-                        cols="50" rows="3"
+                        rows="3"
                         onChange={e => onDescriptionHandler(e.target.value)}
                         value={currDescription}
                         disabled={!!isSaving}
@@ -438,16 +520,74 @@ const MapPointsDetailsPage = observer((props) => {
                     </div>
                 </Row>
 
-                <Row>
+                <Row className={'topic-detail-row'}>
+                    <div className={'d-flex flex-wrap'}>
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="outline-secondary"
+                                size="sm"
+                                id="dropdown-tag"
+                                disabled={!!isSaving}
+                            >
+                                Add tour type
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+
+                                {tourTypesItems.map(item => {
+                                    return <Dropdown.Item
+                                        key={item.id}
+                                        name={item.category_name}
+                                        id={item.id}
+                                        onClick={() => {
+                                            addNewTypeHandler(item.id)
+                                        }}
+                                    >{item.category_name}</Dropdown.Item>
+                                })}
+                            </Dropdown.Menu>
+                        </Dropdown>
+
+                        {
+                            tourTypes.map(item => {
+                                return <Button
+                                    key={item}
+                                    className="badge btn-secondary mb-2 mx-1"
+                                    disabled={!!isSaving}
+                                    style={{
+                                        margin: '0 3px'
+                                    }}
+                                >
+                                    {getTypeNameById(item)}
+                                    <CloseIco
+                                        onClick={() => {
+                                            deleteNewTypeHandler(item)
+                                        }}
+                                        fill='white'
+                                        style={{
+                                            width: '36px',
+                                            height: '16px',
+                                            marginBottom: '2px',
+                                            marginTop: '2px',
+                                            marginLeft: '-5px',
+                                            marginRight: '-15px',
+                                        }}
+                                    />
+                                </Button>
+                            })
+                        }
+
+                    </div>
+
+                </Row>
+
+                <Row className={'topic-detail-row'}>
                     <div
                         className={'d-flex align-items-center justify-content-center'}
                     >
                         <div
                             style={{
                                 height: '250px',
-                                // display: 'inline-block',
                                 overflow: 'hidden',
-                                // position: 'relative',
                                 margin: 0,
                             }}>
 
@@ -455,14 +595,10 @@ const MapPointsDetailsPage = observer((props) => {
 
                                 style={{
                                     objectFit: 'cover',
-                                    // display: 'block',
                                     position: 'absolute',
                                     width: '100%',
                                     height: '200px',
-                                    // top: '50%',
                                     left: '50%',
-                                    // minHeight: '100%',
-                                    // minWidth: '100%',
                                     transform: 'translate(-50%, 10%)',
                                 }}
                                 src={itemImageLogo
@@ -487,7 +623,7 @@ const MapPointsDetailsPage = observer((props) => {
                         />
                     </div>
                 </Row>
-                <Row>
+                <Row className={'topic-detail-row'}>
                     <div>
 
                         {itemData.map(function (item, index) {
@@ -516,6 +652,13 @@ const MapPointsDetailsPage = observer((props) => {
                                         />
                                         break
                                     }
+                                    case 'agent': {
+                                        child = <MapPointAgentComponent
+                                            item={item}
+                                            dataItemEditHandler={dataItemEditHandler}
+                                        />
+                                        break
+                                    }
                                 }
 
                                 return <TopicItemCard
@@ -531,21 +674,25 @@ const MapPointsDetailsPage = observer((props) => {
                             }
                         })}
 
-                        <TopicAddNewBtn
-                            disabled={!!isSaving}
-                            addNewItemHandler={addNewItemHandler}
-                            dropDownItems={dropDownItems}
-                        />
+                        <div className={'pt-3'}>
+                            <TopicAddNewBtn
+                                disabled={!!isSaving}
+                                addNewItemHandler={addNewItemHandler}
+                                dropDownItems={dropDownItems}
+                            />
+                        </div>
                     </div>
                 </Row>
-                <Row>
+                <hr/>
+                <Row className={'topic-detail-row d-flex justify-content-center pt-3'}>
                     <Button
-                        className={`btn ${saveError ? 'btn-danger' : 'btn-primary'}  btn-lg w-75 btn-block`}
+                        className={`btn ${saveError ? 'btn-danger' : 'btn-primary'}  btn-lg btn-block col-6`}
                         disabled={!!isSaving}
                         onClick={saveHandler}
                     >Save</Button>
                 </Row>
-                <Row>
+                <hr/>
+                <Row className={'topic-detail-row'}>
                     <div style={{display: "flex"}}>
                         <button
                             type="button"

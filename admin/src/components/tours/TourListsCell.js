@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Col, Image, Row} from "react-bootstrap";
 import ModalPopUp from "../modal/ModalPopUp";
 import SpinnerSM from "../SpinnerSM";
@@ -47,20 +47,16 @@ const TourListsCell = (props) => {
     } else {
 
         return (
-            <div
+            <div className={'py-2'}
                 style={{cursor: 'pointer'}}
             >
 
-                <Row onClick={() => {
-                    onClickHandler()
-                }}
-                     style={{
-                         display: "flex",
-                         marginBottom: '10px',
-                         minHeight: '220px',
-                         backgroundColor: currItem.isSaved ? 'white' : 'rgba(204,204,204,0.59)',
-                     }}>
-                    <Col md={4} style={{border: '1px solid rgba(40, 44, 52, 0.66)'}}>
+                <div className={'d-flex'}
+                     onClick={() => {
+                         onClickHandler()
+                     }}
+                >
+                    <Col style={{border: '1px solid rgba(40, 44, 52, 0.66)'}}>
                         <div className={'align-items-center justify-content-center'}
                              style={{
                                  height: '250px',
@@ -114,8 +110,8 @@ const TourListsCell = (props) => {
                         </Row>
                         <Row className={'h-50'}>
                             <div>
-                                <h1>{item.name}</h1>
-                                <h4>{item.description}</h4>
+                                <h1 className={'col-12 text-truncate'}>{item.name}</h1>
+                                <h4 className={'col-12 text-truncate'}>{item.description}</h4>
                             </div>
                         </Row>
                         <Row className={'h-25 align-items-center justify-content-center '}
@@ -131,7 +127,7 @@ const TourListsCell = (props) => {
                             </div>
                         </Row>
                     </Col>
-                </Row>
+                </div>
 
                 <ModalPopUp
                     show={showModal}

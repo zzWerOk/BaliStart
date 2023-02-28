@@ -63,7 +63,6 @@ const MapPointsPage = () => {
                      style={{marginTop: '20px', flex: '1'}}
                 >
                     <FeedTopBar
-
                         isSearch={true}
                         setSearchHandler={setSearchHandler}
                         setSort={setSortHandler}
@@ -71,13 +70,6 @@ const MapPointsPage = () => {
                         selectedSortCode={selectedSortCode}
                         sortCodes={sortMapPoints}
 
-                        // rightSideBarElements={
-                        //     <div className={'d-flex'}>
-                        //         <div className={'d-flex justify-content-between align-items-center'}>
-                        //
-                        //         </div>
-                        //     </div>
-                        // }
                     />
                     <div className={'d-flex'}
                          style={{height: 'calc(100vh - 129px'}}

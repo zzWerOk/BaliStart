@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Col, Image, Row} from "react-bootstrap";
 import ModalPopUp from "../modal/ModalPopUp";
 import SpinnerSM from "../SpinnerSM";
@@ -36,7 +36,7 @@ const MapPointsListCell = (props) => {
 
     const onItemEditHandlerCell = (item, newImage) => {
         setCurrItem(item)
-        if(newImage){
+        if (newImage) {
             setItemImageLogo(item.image_logo + '?' + Date.now())
         }
         onItemEditHandler(item)
@@ -47,27 +47,23 @@ const MapPointsListCell = (props) => {
     } else {
 
         return (
-            <div
+            <div className={'py-2'}
                 style={{cursor: 'pointer'}}
             >
 
-                <Row onClick={() => {
-                    onClickHandler()
-                }}
-                     style={{
-                         display: "flex",
-                         marginBottom: '10px',
-                         minHeight: '220px',
-                         backgroundColor: currItem.isSaved ? 'white' : 'rgba(204,204,204,0.59)',
-                     }}>
-                    <Col md={4} style={{border: '1px solid rgba(40, 44, 52, 0.66)'}}>
+                <div className={'d-flex'}
+                     onClick={() => {
+                         onClickHandler()
+                     }}
+                >
+                    <Col style={{border: '1px solid rgba(40, 44, 52, 0.66)'}}>
                         <div className={'align-items-center justify-content-center'}
                              style={{
                                  height: '250px',
-                                 // display: 'inline-block',
                                  overflow: 'hidden',
                                  position: 'relative',
                                  margin: 0,
+                                 backgroundColor: currItem.isSaved ? 'white' : 'rgba(204,204,204,0.59)',
                              }}>
                             <Image
                                 style={{
@@ -124,7 +120,7 @@ const MapPointsListCell = (props) => {
                             </div>
                         </Row>
                     </Col>
-                </Row>
+                </div>
 
                 <ModalPopUp
                     show={showModal}

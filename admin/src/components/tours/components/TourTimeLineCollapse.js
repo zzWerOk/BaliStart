@@ -26,7 +26,7 @@ const TourTimeLineCollapse = (props) => {
 
 
     return (
-        <li className="timeline-item mb-5" key={index} onClick={toggleShow}>
+        <li className="timeline-item mb-1" key={index} onClick={toggleShow}>
 
             <span className="timeline-icon">
                 {index + 1}

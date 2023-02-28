@@ -109,8 +109,6 @@ const TopicsList = (props) => {
             }
         }
 
-        // setSelectedTagId(newCategory.id)
-
         newCategory.id === -1
             ?
             setSelectedTagName('')
@@ -158,12 +156,10 @@ const TopicsList = (props) => {
                                     return item.id === -99
                                         ?
                                         <Dropdown.Divider
-                                            // key={item.id}
                                             key={index}
                                         />
                                         :
                                         <Dropdown.Item
-                                            // key={item.id}
                                             key={index}
                                             onClick={() => {
                                                 addNewTagHandler(item.id)
@@ -226,7 +222,6 @@ const TopicsList = (props) => {
                 </nav>
 
                 {itemsList.map(item =>
-                    // <TopicListsCell
                     <ItemsListsCell
                         key={item.id}
                         item={item}
@@ -236,9 +231,9 @@ const TopicsList = (props) => {
                     />
                 )}
 
-                <Row>
+                <Row className={'d-flex justify-content-center pt-4'}>
                     <Button
-                        className={'btn btn-primary btn-lg w-75 btn-block'}
+                        className={'btn btn-primary btn-lg btn-block col-6'}
                         onClick={createNewTopic}
                     >New topic</Button>
                 </Row>
