@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState} from 'react';
+import TopicDetailLineComponent from "../../topics/components/TopicDetailLineComponent";
 
-const TopicLineComponent = (props) => {
+const BaliLineComponent = (props) => {
     const {item, dataItemEditHandler} = props
 
     const [textStyle, setTextStyle] = useState('')
@@ -24,11 +25,20 @@ const TopicLineComponent = (props) => {
         return (
             <div>
                 <div className={'col-12'}>
+
+                    <TopicDetailLineComponent key={textStyle}
+                                              element={{style: textStyle}}
+                                              style={{
+                                                  transition: '0.1s ease all',
+                                                  MozTransition: '0.1s ease all',
+                                                  WebkitTransition: '0.1s ease all',
+                                              }}
+                    />
+
                     <select className="form-select"
                         // disabled={!!isSaving}
                             aria-label="Line select"
-                            // value={item.style}
-                            value={textStyle}
+                            value={item.style}
                             onChange={e => handleStyle(e.target.value)}
                     >
                         <option disabled>Выбери тип связи</option>
@@ -45,4 +55,4 @@ const TopicLineComponent = (props) => {
     }
 };
 
-export default TopicLineComponent;
+export default BaliLineComponent;

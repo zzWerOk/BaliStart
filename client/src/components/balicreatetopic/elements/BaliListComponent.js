@@ -1,19 +1,27 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
-import DragIcon from "../../../assets/drag-handle_1.svg";
+import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
+import DragIcon from '../../../assets/svg/drag-handle.svg';
 
-const TopicListComponent = (props) => {
-    const {item, dataItemEditHandler} = props
+const BaliListComponent = (props) => {
+    const {item, isSaving, dataItemEditHandler} = props
 
-    const [items, setItems] = useState('[""]')
     const [listName, setListName] = useState('')
+    const [items, setItems] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         setListName(item.name)
-        setItems(item.items)
+        setItemsArr(JSON.parse(item.items))
         setLoading(false)
     }, [])
+
+    const setItemsArr = (itemsArr) => {
+        const newItemsArr = []
+        itemsArr.map(function (item, index) {
+            newItemsArr.push({text: item, id: index})
+        })
+        setItems(newItemsArr)
+    }
 
     const handleName = (value) => {
         item.name = value
@@ -22,25 +30,29 @@ const TopicListComponent = (props) => {
     }
 
     const itemsEditHandler = (text, index) => {
-        let itemsArr = JSON.parse(items)
-        itemsArr[index] = text
-        setItems(JSON.stringify(itemsArr))
-        item.items = JSON.stringify(itemsArr)
+        let newArr = JSON.parse(item.items)
+        newArr[index] = text
+        setItemsArr(newArr)
+
+        item.items = JSON.stringify(newArr)
         dataItemEditHandler(item)
     }
 
     const newItemAddHandler = () => {
-        let itemsArr = JSON.parse(items)
+        let itemsArr = JSON.parse(item.items)
+
         itemsArr.push("")
-        setItems(JSON.stringify(itemsArr))
+        setItemsArr(itemsArr)
+
         item.items = JSON.stringify(itemsArr)
         dataItemEditHandler(item)
     }
 
     const itemDeleteHandler = (index) => {
-        let itemsArr = JSON.parse(items)
+        let itemsArr = JSON.parse(item.items)
         itemsArr.splice(index, 1)
-        setItems(JSON.stringify(itemsArr))
+        setItemsArr(itemsArr)
+
         item.items = JSON.stringify(itemsArr)
         dataItemEditHandler(item)
     }
@@ -51,11 +63,11 @@ const TopicListComponent = (props) => {
 
         if (dstIndex !== null) {
             if (dstIndex !== undefined) {
-                let imagesArr = JSON.parse(item.items)
-                imagesArr.splice(dstIndex, 0, imagesArr.splice(srcIndex, 1)[0])
+                let itemsArr = JSON.parse(item.items)
+                itemsArr.splice(dstIndex, 0, itemsArr.splice(srcIndex, 1)[0])
 
-                item.items = JSON.stringify(imagesArr)
-                setItems(JSON.stringify(imagesArr))
+                item.items = JSON.stringify(itemsArr)
+                setItemsArr(itemsArr)
 
                 dataItemEditHandler(item)
             }
@@ -64,20 +76,17 @@ const TopicListComponent = (props) => {
 
     if (loading) {
     } else {
-
         return (
             <div>
-                <div className="form-outline">
-                    <input
-                        type="listName"
-                        id="listName"
-                        className="form-control"
-                        placeholder='List name'
-                        value={listName}
-                        onChange={e => handleName(e.target.value)}
+                <div className="form-group input-material">
+                    <input type="text"
+                           className="form-control"
+                           id="name-field"
+                           value={listName}
+                           onChange={e => handleName(e.target.value)}
                     />
+                    <label htmlFor="name-field">Title</label>
                 </div>
-
                 <DragDropContext
                     onDragEnd={onDragEnd}
                 >
@@ -90,12 +99,12 @@ const TopicListComponent = (props) => {
                                 >
 
                                     {
-                                        JSON.parse(items).map(function (listItem, index) {
-                                            return <div key={index + ' ' + listItem}>
+                                        items.map(function (listItem, index) {
+                                            return <div key={listItem.id}>
                                                 <Draggable draggableId={"draggable-" + index} index={index}>
                                                     {(provided, snapshot) => (
                                                         <div
-                                                            className={'d-flex'}
+                                                            className={'d-flex col-12'}
                                                             ref={provided.innerRef}
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
@@ -110,37 +119,28 @@ const TopicListComponent = (props) => {
                                                                 src={DragIcon}
                                                                 alt="React Logo"
                                                                 width={24}
-                                                                style={{padding: 5}}
+                                                                style={{width: '15px', backgroundColor: "white", margin: '10px', opacity: '55%'}}
                                                             />
 
-                                                            <input
-                                                                type="commentText"
-                                                                id="commentText"
-                                                                className="form-control"
-                                                                placeholder='List item'
-                                                                value={listItem}
-                                                                // disabled={!!isSaving}
-                                                                onChange={e => itemsEditHandler(e.target.value, index)}
-                                                            />
+
+                                                            <div className="form-group input-material my-1 col">
+                                                                <input type="text"
+                                                                       className="form-control"
+                                                                       id="listItem-field"
+                                                                       value={listItem.text}
+                                                                       onChange={e => itemsEditHandler(e.target.value, index)}
+                                                                />
+                                                                <label htmlFor="listItem-field">List item</label>
+                                                            </div>
 
                                                             <button
                                                                 type="button"
-                                                                className="btn btn-outline-danger"
+                                                                className="btn-close p-2"
                                                                 onClick={() => {
                                                                     itemDeleteHandler(index)
                                                                 }}
                                                             >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                                                     height="16"
-                                                                     fill="currentColor"
-                                                                     className="bi bi-x"
-                                                                     viewBox="0 0 16 16">
-                                                                    <path
-                                                                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                                                </svg>
                                                             </button>
-                                                            {/*</div>*/}
-
 
                                                         </div>
                                                     )}
@@ -165,6 +165,10 @@ const TopicListComponent = (props) => {
                     className="btn btn-info"
                     onClick={newItemAddHandler}
                     style={{
+                        paddingTop: '10px',
+                        paddingBottom: '10px',
+                        paddingLeft: '15px',
+                        paddingRight: '15px',
                         marginTop: '10px',
                     }}
                 >
@@ -181,4 +185,4 @@ const TopicListComponent = (props) => {
     }
 };
 
-export default TopicListComponent;
+export default BaliListComponent;

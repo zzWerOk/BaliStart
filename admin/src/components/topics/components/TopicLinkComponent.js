@@ -5,7 +5,6 @@ import DragIcon from '../../../assets/drag-handle_1.svg';
 const TopicLinkComponent = (props) => {
     const {item, dataItemEditHandler} = props
 
-    // const [isSaving, stIsSaving] = useState(false)
     const [linkName, setLinkName] = useState('')
     const [links, setLinks] = useState('[{"type":"","link":""}]')
     const [loading, setLoading] = useState(true)
@@ -142,7 +141,7 @@ const TopicLinkComponent = (props) => {
 
                                                                         <select className="form-select"
                                                                             // disabled={!!isSaving}
-                                                                                aria-label="Default select example"
+                                                                                aria-label="Link select"
                                                                                 value={listItem.type}
                                                                                 onChange={e => handleSelect(e.target.value, index)}
                                                                         >

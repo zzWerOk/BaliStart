@@ -24,7 +24,6 @@ const TopicItemCard = (props) => {
     return (
         <div
             key={index}
-            // className={`card border-dark w-100 d-flex justify-content-between {${isMovedItem ? 'moved-item' : ''}}`}
             className={
                 `card 
                 border-dark 

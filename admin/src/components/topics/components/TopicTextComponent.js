@@ -26,7 +26,6 @@ const TopicTextComponent = (props) => {
     }
 
     if (loading) {
-        // return <SpinnerSM/>
     } else {
 
         return (

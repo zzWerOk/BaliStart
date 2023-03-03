@@ -8,6 +8,7 @@ import {
     TOUR_ROUTE,
     TOURS_ROUTE,
     MAPPOINT_ROUTE,
+    CREATE_TOPIC_ROUTE,
 } from "./utils/consts";
 import Main from "./pages/Main";
 import Category from "./pages/Category";
@@ -18,30 +19,7 @@ import Categories from "./pages/Categories";
 import ToursPage from "./pages/ToursPage";
 import TourDetails from "./pages/TourDetails";
 import MapPointsPage from "./pages/MapPointsPage";
-
-export const adminRoutes = [
-    // {
-    //     path: ADMIN_ROUTE,
-    //     Component: Admin
-    // },
-    // {
-    //     path: USER_ROUTE + '/:id',
-    //     Component: UserPage
-    // },
-    // {
-    //     path: GUIDE_ROUTE + '/:id',
-    //     Component: GuidePage
-    // },
-    // {
-    //     path: TOPICS_ROUTE,
-    //     Component: TopicsPage
-    // },
-    {
-        path: MAIN_ROUTE,
-        Component: Main
-    },
-
-]
+import CreateTopicPage from "./pages/CreateTopicPage";
 
 export const publicRoutes = [
     {
@@ -80,40 +58,8 @@ export const publicRoutes = [
         path: MAPPOINT_ROUTE,
         Component: MapPointsPage
     },
-]
-
-export const authUserRoutes = [
     {
-        path: MAIN_ROUTE,
-        Component: Main
+        path: CREATE_TOPIC_ROUTE,
+        Component: CreateTopicPage
     },
-    // {
-    //     path: AUTH_ROUTE,
-    //     Component: Auth
-    // },
-    // {
-    //     path: GUIDE_ROUTE,
-    //     Component: GuidePage
-    // },
-    // {
-    //     path: LOGIN_ROUTE,
-    //     Component: Login
-    // },
-    // {
-    //     path: MAPPOINT_ROUTE,
-    //     Component: MapPointPage
-    // },
-    // {
-    //     path: REGISTRATION_ROUTE,
-    //     Component: Registration
-    // },
-    // {
-    //     path: TOURS_ROUTE,
-    //     Component: ToursPage
-    // },
-    // {
-    //     path: USER_ROUTE,
-    //     Component: UserPage
-    // },
-
 ]

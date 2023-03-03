@@ -1,4 +1,5 @@
 import sideBarItem from '../classes/sideBarItem'
+import React from "react";
 
 export const delay = ms => new Promise(res => setTimeout(res, ms))
 
@@ -8,8 +9,12 @@ export const epochToDate = epoch => {
     const year = date.getFullYear();
     let month = date.getMonth() + 1;
     let day = date.getDate();
-    if(month < 10){month = "0" + month}
-    if(day < 10){day = "0" + day}
+    if (month < 10) {
+        month = "0" + month
+    }
+    if (day < 10) {
+        day = "0" + day
+    }
 
     return (day + "." + month + "." + year);
 }
@@ -23,20 +28,30 @@ export const epochToDateWithTime_seconds = epoch => {
     let hours = date.getHours();
     let minutes = date.getMinutes();
     let seconds = date.getSeconds();
-    if(month < 10){month = "0" + month}
-    if(day < 10){day = "0" + day}
-    if(hours < 10){hours = "0" + hours}
-    if(minutes < 10){minutes = "0" + minutes}
-    if(seconds < 10){seconds = "0" + seconds}
+    if (month < 10) {
+        month = "0" + month
+    }
+    if (day < 10) {
+        day = "0" + day
+    }
+    if (hours < 10) {
+        hours = "0" + hours
+    }
+    if (minutes < 10) {
+        minutes = "0" + minutes
+    }
+    if (seconds < 10) {
+        seconds = "0" + seconds
+    }
 
     return (day + "." + month + "." + year + " " + hours + ":" + minutes + ":" + seconds);
 }
 
 export const epochToDateWithTime = epoch => {
 
-    if(epoch < 9999999999){
+    if (epoch < 9999999999) {
         epoch = epoch * 1000
-    }else{
+    } else {
         epoch = epoch * 1
     }
 
@@ -47,10 +62,18 @@ export const epochToDateWithTime = epoch => {
     let day = date.getDate();
     let hours = date.getHours();
     let minutes = date.getMinutes();
-    if(month < 10){month = "0" + month}
-    if(day < 10){day = "0" + day}
-    if(hours < 10){hours = "0" + hours}
-    if(minutes < 10){minutes = "0" + minutes}
+    if (month < 10) {
+        month = "0" + month
+    }
+    if (day < 10) {
+        day = "0" + day
+    }
+    if (hours < 10) {
+        hours = "0" + hours
+    }
+    if (minutes < 10) {
+        minutes = "0" + minutes
+    }
 
     return (day + "." + month + "." + year + " " + hours + ":" + minutes);
 }
@@ -77,27 +100,28 @@ export const MAPPOINT_ROUTE = '/poi'
 export const AUTH_ROUTE = '/auth'
 export const TOPICS_ROUTE = '/topics'
 export const TOPIC_ROUTE = '/topic/:id'
+export const CREATE_TOPIC_ROUTE = '/newTopic'
 
 export const SIDEBAR_ISADMIN = [
-    new sideBarItem('MAIN',MAIN_ROUTE),
-    new sideBarItem('Admin',ADMIN_ROUTE),
-    new sideBarItem('User',USER_ROUTE),
-    new sideBarItem('Guide',GUIDE_ROUTE),
-    new sideBarItem('Topics',TOPICS_ROUTE),
-    new sideBarItem('Tours',TOURS_ROUTE),
-    new sideBarItem('Map Point',MAPPOINT_ROUTE),
+    new sideBarItem('MAIN', MAIN_ROUTE),
+    new sideBarItem('Admin', ADMIN_ROUTE),
+    new sideBarItem('User', USER_ROUTE),
+    new sideBarItem('Guide', GUIDE_ROUTE),
+    new sideBarItem('Topics', TOPICS_ROUTE),
+    new sideBarItem('Tours', TOURS_ROUTE),
+    new sideBarItem('Map Point', MAPPOINT_ROUTE),
     // new sideBarItem('Login',AUTH_ROUTE),
 ]
 
 export const SIDEBAR_ISAUTHUSER = [
-    new sideBarItem('MAIN',MAIN_ROUTE),
-    new sideBarItem('Tours',TOURS_ROUTE),
-    new sideBarItem('Map Point',MAPPOINT_ROUTE),
+    new sideBarItem('MAIN', MAIN_ROUTE),
+    new sideBarItem('Tours', TOURS_ROUTE),
+    new sideBarItem('Map Point', MAPPOINT_ROUTE),
 ]
 
 export const SIDEBAR_NOTLOGGED = [
-    new sideBarItem('Login',AUTH_ROUTE),
-    new sideBarItem('Register',REGISTRATION_ROUTE)
+    new sideBarItem('Login', AUTH_ROUTE),
+    new sideBarItem('Register', REGISTRATION_ROUTE)
 ]
 
 export const getTourDuration = (duration) => {
@@ -107,10 +131,10 @@ export const getTourDuration = (duration) => {
         if (durationArr.length > 1) {
             if (durationArr[1] === 'd' || durationArr[1] === '2') {
                 durationIsDaysText = ' day'
-            }else{
+            } else {
                 durationIsDaysText = ' hour'
             }
-            if(durationArr[0] + '' !== '' + 1) {
+            if (durationArr[0] + '' !== '' + 1) {
                 durationIsDaysText = durationIsDaysText + 's'
             }
             return durationArr[0] + durationIsDaysText
@@ -204,10 +228,162 @@ export const sortMapPoints = () => {
     return sortCodes
 }
 
+export const getNewTopicElement = (type) => {
 
+    switch (type) {
+        case "text":
+            return {"type": type, "name": "", "text": ""}
+        case "comment":
+            return {"type": type, "name": "", "text": ""}
+        case "list":
+            return {"type": type, "name": "", "items": '[]'}
+        case "link":
+            return {"type": type, "name": "", "items": '[{"type":"in","link":""}]'}
+        case "email":
+            return {"type": type, "name": "", "email": ""}
+        case "phone":
+            return {"type": type, "name": "", "items": '[{"type":"","phone":""}]'}
+        case "images":
+            return {"type": type, "name": "", "items": '[]'}
+        case "googleMapUrl":
+            return {"type": type, "name": "", "url": ""}
+        case "line":
+            return {"type": type, "style": "solid"}
+        default:
+            return null
 
-// module.exports = {
-//     tourLanguages,
-//     getTourActivityLevel,
-//     getTourDuration,
-// }
+    }
+
+}
+
+export const getNewTopicElementTitleByType = (type) => {
+    for (let i = 0; i < addNewElementItems.length; i++) {
+        if (addNewElementItems[i].type === type) {
+            return addNewElementItems[i].name
+        }
+    }
+}
+
+export const addNewElementItems = [
+    {
+        id: 0,
+        name: 'Text card',
+        type: 'text',
+    },
+    {
+        id: 1,
+        name: 'Commend card',
+        type: 'comment',
+    },
+    {
+        id: 2,
+        name: 'List card',
+        type: 'list',
+    },
+    {
+        id: 3,
+        name: 'Link card',
+        type: 'link',
+    },
+    {
+        id: 4,
+        name: 'Email card',
+        type: 'email',
+    },
+    {
+        id: 5,
+        name: 'Phones card',
+        type: 'phone',
+    },
+    {
+        id: 6,
+        name: 'Images card',
+        type: 'images',
+    },
+    {
+        id: 7,
+        name: 'Google Map Url card',
+        type: 'googleMapUrl',
+    },
+    {
+        id: 8,
+        name: 'Line',
+        type: 'line',
+    },
+]
+
+export const getNewTopicLinksTitleByType = (type) => {
+    for (let i = 0; i < addNewLinksElement.length; i++) {
+        if (addNewLinksElement[i].code === type) {
+            return addNewLinksElement[i].name
+        }
+
+    }
+}
+
+export const addNewLinksElement = [
+    {
+        id: 0,
+        name: 'Facebook',
+        code: 'fb',
+    },
+    {
+        id: 1,
+        name: 'Google',
+        code: 'gg',
+    },
+    {
+        id: 2,
+        name: 'VK',
+        code: 'vk',
+    },
+    {
+        id: 3,
+        name: 'Telegram',
+        code: 'tg',
+    },
+    {
+        id: 4,
+        name: 'Internet',
+        code: 'in',
+    },
+
+]
+
+export const getNewTopicPhonesTitleByType = (type) => {
+    for (let i = 0; i < addNewPhonesElement.length; i++) {
+        if (addNewPhonesElement[i].code === type) {
+            return addNewPhonesElement[i].name
+        }
+
+    }
+}
+
+export const addNewPhonesElement = [
+    {
+        id: 0,
+        name: 'WhatsApp',
+        code: 'wa',
+    },
+    {
+        id: 1,
+        name: 'Viber',
+        code: 'tg',
+    },
+    {
+        id: 2,
+        name: 'Telegram',
+        code: 'tg',
+    },
+    {
+        id: 3,
+        name: 'Phone call + sms',
+        code: 'ph',
+    },
+    {
+        id: 4,
+        name: 'Any',
+        code: 'al',
+    },
+
+]

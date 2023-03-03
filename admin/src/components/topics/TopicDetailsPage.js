@@ -793,7 +793,6 @@ const TopicDetailsPage = observer((props) => {
                     itemData.map(function (item, index) {
                         let itemKey = index
 
-                        // console.log('currTopic.dataJSON ', item)
                         if (item.hasOwnProperty('type')) {
                             let child = null
                             item.index = index

@@ -124,7 +124,7 @@ const TopicDetails = () => {
             <div
             >
                 <div
-                     style={{marginTop: '20px', flex: '1'}}
+                    style={{marginTop: '20px', flex: '1'}}
                 >
                     <FeedTopBar
                         isBackBtn={true}
@@ -206,7 +206,7 @@ const TopicDetails = () => {
                          style={{height: 'calc(100vh - 129px'}}
                     >
                         <Col
-                             style={{overflowX: 'hidden', overflowY: 'auto'}}
+                            style={{overflowX: 'hidden', overflowY: 'auto'}}
                         >
                             <Row className={classes.topic_row_top}>
                                 <div className={'d-flex justify-content-between'}>
@@ -246,11 +246,11 @@ const TopicDetails = () => {
                                 }}
                             >
                                 <Row className={`${classes.topic_row} text-muted`} style={{paddingTop: '20px'}}>
-                                    <h1 className={'display-4 font-italic'}  style={{color: `white`,}}>
+                                    <h1 className={'display-4 font-italic'} style={{color: `white`,}}>
                                         {topic.name}
                                     </h1>
                                 </Row>
-                                <Row className={`${classes.topic_row} text-muted`}  style={{paddingBottom: '20px'}}>
+                                <Row className={`${classes.topic_row} text-muted`} style={{paddingBottom: '20px'}}>
                                     <p className={'lead my-3'} style={{color: `white`,}}>
                                         {topic.description}
                                     </p>

@@ -122,7 +122,7 @@ const GuideLinkComponent = (props) => {
                                                                 >
                                                                     <div className={'col'}>
                                                                         <select className="form-select"
-                                                                                aria-label="Default select example"
+                                                                                aria-label="Guide select"
                                                                                 value={listItem.type}
                                                                                 onChange={e => handleSelect(e.target.value, index)}
                                                                                 disabled={!!saving}

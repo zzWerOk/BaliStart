@@ -61,7 +61,7 @@ const UserListCell = (currUser) => {
         /**
          Изменение роли пользователя API
          **/
-        delay(0).then(r => {
+        delay(0).then(() => {
             setRoleAPI(selectedUser.id, selectedNewRole).then(data => {
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
@@ -130,7 +130,7 @@ const UserListCell = (currUser) => {
                 <div className={`col-3 ${classes.cell}`}>
                     <select className="form-select"
                             disabled={!!loading_setRole}
-                            aria-label="Default select example"
+                            aria-label="User select"
                             value={selectedUserRole}
                             onChange={e => handleRoleSelect(e.target.value)}
                     >
