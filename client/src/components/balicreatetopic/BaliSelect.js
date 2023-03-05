@@ -1,18 +1,25 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import './BaliTextArea.css'
 
 const BaliSelect = (props) => {
-    const {items = [],
+    const {
+        items = [],
         selectedItemCode,
         onItemSelectHandler,
-        labelText} = props
+        labelText,
+        isError,
+    } = props
 
-    const [loading, setLoading] = useState(true)
+    const refSelect = useRef(null);
 
     useEffect(() => {
-        setLoading(true)
 
-        setLoading(false)
+        if (refSelect !== null && refSelect !== undefined && selectedItemCode) {
+            if (refSelect.current !== null && refSelect.current !== undefined) {
+                refSelect.current.setAttribute('value', selectedItemCode);
+            }
+        }
+
     }, [])
 
     const handleChange = (event) => {
@@ -20,44 +27,40 @@ const BaliSelect = (props) => {
         onItemSelectHandler(event.target.value)
     };
 
-    if (loading) {
-
-    } else {
-        return (
-            <div>
-                <div className="form-group input-material">
-                    <select className="form-control"
-                            id="selection"
-                            onChange={handleChange}
-                            required
-                            value={selectedItemCode}
-                    >
-                        {
-                            items.map(function (item, index) {
-                                return <option
-                                    key={item.code + " " + index}
-                                    value={item.code}
-                                    // selected={selectedItemCode === item.code}
-                                >
-                                    {
-                                        item.name
-                                    }
-                                </option>
-                            })
-                        }
-
-                    </select>
+    return (
+        <div>
+            <div className="form-group input-material">
+                <select className={`form-control ${isError ? 'invalid' : ''}`}
+                    id="selection"
+                        onChange={handleChange}
+                        required
+                        value={selectedItemCode}
+                        ref={refSelect}
+                >
                     {
-                        labelText
-                            ?
-                            <label htmlFor="selection">{labelText}</label>
-                            :
-                            null
+                        items.map(function (item, index) {
+                            return <option
+                                key={item.code + " " + index}
+                                value={item.code}
+                            >
+                                {
+                                    item.name
+                                }
+                            </option>
+                        })
                     }
-                </div>
+
+                </select>
+                {
+                    labelText
+                        ?
+                        <label htmlFor="selection">{labelText}</label>
+                        :
+                        null
+                }
             </div>
-        );
-    }
+        </div>
+    );
 };
 
 export default BaliSelect;

@@ -35,7 +35,7 @@ const BaliLineComponent = (props) => {
                                               }}
                     />
 
-                    <select className="form-select"
+                    <select className="form-select baliSelect"
                         // disabled={!!isSaving}
                             aria-label="Line select"
                             value={item.style}

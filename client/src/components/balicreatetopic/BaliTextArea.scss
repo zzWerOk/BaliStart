@@ -112,7 +112,7 @@ $inactive-color: $gray-400;
 
 }
 
-select:focus {
+.baliSelect:focus {
   border: 2px solid $primary !important;
   box-shadow: 0 0 0 $primary inset, 0 0 0 $primary !important;
   outline: 0 none!important;

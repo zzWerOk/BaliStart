@@ -13,6 +13,7 @@ const FeedTopBar = (props) => {
         setSearchHandler,
         isBackBtn,
         backBtnTitle,
+        backBtnHandler,
         rightSideBarElements,
         setSort,
         isLoading,
@@ -72,7 +73,11 @@ const FeedTopBar = (props) => {
                         ?
                         <a className={`btn btn-link ${classes.back_btn}`}
                            onClick={() => {
-                               history.goBack()
+                               if(backBtnHandler){
+                                   backBtnHandler()
+                               }else {
+                                   history.goBack()
+                               }
                            }}
                         >
 

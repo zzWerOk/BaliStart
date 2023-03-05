@@ -3,7 +3,7 @@ import './BaliTextArea.css'
 
 const BaliInput = (props) => {
 
-    const {labelText, text, onTextChangeHandler, required, type='text'} = props
+    const {labelText, text, onTextChangeHandler, required, type='text', isError} = props
 
     const [loading, setLoading] = useState(true)
     const [elementText, setElementText] = useState('')
@@ -20,9 +20,9 @@ const BaliInput = (props) => {
 
     } else {
         return (
-            <div className="form-group input-material">
+            <div className="form-group input-material ">
                 <input type={type}
-                       className="form-control"
+                       className={`form-control ${isError ? 'invalid' : ''}`}
                        id="name-field"
                        value={elementText || ''}
                        onChange={e => {

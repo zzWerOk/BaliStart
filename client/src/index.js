@@ -8,6 +8,7 @@ import TopicsCategoryStore from "./store/TopicsCategoryStore";
 import TopicCommentsStore from "./store/TopicCommentsStore";
 import ToursCategoryStore from "./store/ToursCategoryStore";
 import ToursTypeStore from "./store/ToursTypeStore";
+import RightSideBarStore from "./store/RightSideBarStore";
 
 export const Context = createContext(null)
 
@@ -19,6 +20,7 @@ root.render(
         topicCommentsStore: new TopicCommentsStore(),
         toursCategoryStore: new ToursCategoryStore(),
         toursTypeStore: new ToursTypeStore(),
+        rightSideBarStore: new RightSideBarStore(),
     }}>
         <BrowserRouter>
             <App/>

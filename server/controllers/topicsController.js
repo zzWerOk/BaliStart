@@ -6,21 +6,25 @@ const {Op} = require("sequelize");
 const {createNewFile, reWrightFile, readFile, removeFile, getFreeFileName, getDirName} = require("../utils/consts");
 
 const removeTopicsCountFromCategories = (removeArr) => {
-    if (removeArr) {
-        removeArr.map(topicCatId => {
-            const topicCategoryItem = TopicsCategory.findOne({where: {id: topicCatId}})
-            if (topicCategoryItem) {
-                const topicsCount = topicCategoryItem.topics_count - 1 || 0
-                TopicsCategory.update({
-                    topics_count: topicsCount,
-                }, {where: {id: topicCatId}})
-                if (topicCategoryItem.topics_count > 0) {
-                    topicCategoryItem.topics_count = topicsCount;
-                    topicCategoryItem.save();
+    try {
+        if (removeArr) {
+            removeArr.map(topicCatId => {
+                const topicCategoryItem = TopicsCategory.findOne({where: {id: topicCatId}})
+                if (topicCategoryItem) {
+                    const topicsCount = topicCategoryItem.topics_count - 1 || 0
+                    TopicsCategory.update({
+                        topics_count: topicsCount,
+                    }, {where: {id: topicCatId}})
+                    if (topicCategoryItem.topics_count > 0) {
+                        topicCategoryItem.topics_count = topicsCount;
+                        topicCategoryItem.save();
+                    }
                 }
-            }
 
-        })
+            })
+        }
+    }catch (e) {
+        console.log(e.message)
     }
 }
 
@@ -818,7 +822,6 @@ class TopicsController {
                 } catch (e) {
                 }
                 const candidate = await Topics.findOne({where: {id}})
-
                 if (candidate) {
 
                     try {
@@ -840,12 +843,15 @@ class TopicsController {
                     })
 
                     /** Remove data of topic count from categories **/
-                    const tagsArr = JSON.parse(candidate.tag)
-                    await removeTopicsCountFromCategories(tagsArr)
+                    try {
+                        const tagsArr = JSON.parse(candidate.tag)
+                        await removeTopicsCountFromCategories(tagsArr)
+                    }catch (e){}
 
                     /** Remove image_logo of topic from DB **/
-                    await Files.destroy({where: {table_name: 'Topics', file_name: candidate.file_name}})
-
+                    try {
+                        await Files.destroy({where: {table_name: 'Topics', file_name: candidate.file_name}})
+                    } catch (e) {}
                     /** Collect all images of topic data (topic.data type="images") **/
                     const topicDataImages = await Files.findAll({
                         where: {

@@ -4,14 +4,21 @@ import classes from "./SideBar.module.css"
 import {ListGroup, ListGroupItem} from "react-bootstrap";
 import {Link} from "react-router-dom";
 
-const SideBar = observer(() => {
-
+const SideBarL = observer((props) => {
+    const {title} = props
 
     return (
-        <nav id="sidebar">
-            <div>
-                <h3>Bootstrap Sidebar</h3>
-            </div>
+        <nav id="sidebar" className={'py-2'}>
+
+            {
+                title
+                    ?
+                    <div>
+                        <h3>{title}</h3>
+                    </div>
+                    :
+                    null
+            }
 
             <ListGroup>
 
@@ -94,4 +101,4 @@ const SideBar = observer(() => {
     );
 });
 
-export default SideBar;
+export default SideBarL;

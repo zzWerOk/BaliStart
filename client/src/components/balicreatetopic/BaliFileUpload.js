@@ -9,9 +9,9 @@ const BaliFileUpload = (props) => {
     useEffect(() => {
 
         if (image) {
-            setItemImage(process.env.REACT_APP_API_URL + '/static/' + image + '?' + Date.now())
+            setItemImage(process.env.REACT_APP_API_URL + '/static/' + image)
         } else {
-            setItemImage(process.env.REACT_APP_API_URL + '/static/nophoto_s.jpg?' + Date.now())
+            setItemImage(process.env.REACT_APP_API_URL + '/static/nophoto_s.jpg?')
         }
 
     }, [])
@@ -21,18 +21,7 @@ const BaliFileUpload = (props) => {
         const objectUrl = URL.createObjectURL(fileName)
         setItemImage(objectUrl)
 
-        onFileChooseHandler(fileName)
-
-        // if (fileName) {
-        //     setNewImageLogo(true)
-        // } else {
-        //     setNewImageLogo(false)
-        // }
-
-        // currTopic.image_logo_file = fileName
-        // currTopic.isSaved = false
-        // onItemEditHandler(currTopic.getAsJson())
-
+        onFileChooseHandler(fileName, objectUrl)
     }
 
     return (

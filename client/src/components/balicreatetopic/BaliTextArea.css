@@ -73,7 +73,7 @@
     position: absolute;
     top: 107%; }
 
-select:focus {
+.baliSelect:focus {
   border: 2px solid #332d2d !important;
   box-shadow: 0 0 0 #332d2d inset, 0 0 0 #332d2d !important;
   outline: 0 none !important; }

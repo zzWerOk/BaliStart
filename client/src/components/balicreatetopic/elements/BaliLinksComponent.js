@@ -131,7 +131,7 @@ const BaliLinksComponent = (props) => {
                                                                     style={{padding: 5}}
                                                                 />
 
-                                                                <select className="form-select col"
+                                                                <select className="form-select col baliSelect"
                                                                     // disabled={!!isSaving}
                                                                         aria-label="Link select"
                                                                         value={listItem.type}

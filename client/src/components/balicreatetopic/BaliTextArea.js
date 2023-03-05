@@ -1,18 +1,31 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './BaliTextArea.css'
 
 const BaliTextArea = (props) => {
-    const {labelText, text, onTextChangeHandler} = props
+    const {labelText, text, onTextChangeHandler, isError} = props
 
-    const [loading, setLoading] = useState(true)
+    // const [loading, setLoading] = useState(true)
     const [elementText, setElementText] = useState('')
 
+    const refTextArea = useRef(null);
+
     useEffect(() => {
-        setLoading(true)
+
+        if (refTextArea !== null && refTextArea !== undefined && text) {
+            if (refTextArea.current !== null && refTextArea.current !== undefined) {
+                refTextArea.current.setAttribute('value', text);
+            }
+        }
+
+    }, [])
+
+
+    useEffect(() => {
+        // setLoading(true)
 
         setElementText(text)
 
-        setLoading(false)
+        // setLoading(false)
     }, [])
 
     const handleChange = (event) => {
@@ -22,21 +35,22 @@ const BaliTextArea = (props) => {
         onTextChangeHandler(event.target.value)
     };
 
-    if (loading) {
-
-    } else {
+    // if (loading) {
+    //
+    // } else {
         return (
             <div>
 
                 <div className="form-group input-material">
 
                     <textarea
-                        className="form-control"
+                        className={`form-control ${isError ? 'invalid' : ''}`}
                         id="textarea-field"
                         rows="3"
                         required
                         onChange={handleChange}
                         value={elementText}
+                        ref={refTextArea}
                         // onChange={e => {
                         //     setElementText(e.target.value)
                         // }}
@@ -52,7 +66,7 @@ const BaliTextArea = (props) => {
 
             </div>
         );
-    }
+    // }
 };
 
 export default BaliTextArea;

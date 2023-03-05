@@ -37,10 +37,10 @@ const TopicDetailImagesComponent = (props) => {
         return imageUrlPopUp
     }
 
-    const setImageUrl = async (imageUrl) => {
-        await setImageUrlPopUp(imageUrl)
-        await setShowModal(true)
-    }
+    // const setImageUrl = async (imageUrl) => {
+    //     await setImageUrlPopUp(imageUrl)
+    //     await setShowModal(true)
+    // }
 
 
     if (loading) {
@@ -76,6 +76,12 @@ const TopicDetailImagesComponent = (props) => {
                 >
                     {
                         images.map(function (item, index) {
+                            let itemImage
+                            if(item.includes('blob:http://')){
+                                itemImage = item
+                            }else{
+                                itemImage = `${process.env.REACT_APP_API_URL}` + "/static/" + item + '?' + Date.now()
+                            }
                             return <Carousel.Item
                                 key={index}
                                 onClick={() => {
@@ -83,8 +89,8 @@ const TopicDetailImagesComponent = (props) => {
                                 }}
                             >
                                 <img className="d-block w-100"
-                                     src={`${process.env.REACT_APP_API_URL}` + "/static/" + item + '?' + Date.now()}
-                                     alt="First slide"/>
+                                     src={itemImage}
+                                     alt={"Topic slide " + (index + 1)}/>
                             </Carousel.Item>
 
                         })

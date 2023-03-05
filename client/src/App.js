@@ -4,16 +4,17 @@ import {useContext, useEffect, useState} from "react";
 import AppRouter from "./components/AppRouter";
 import {Col, Row} from "react-bootstrap";
 import NavBar from "./components/NavBar";
-import SideBar from "./components/SideBar";
+import SideBarR from "./components/SideBarR";
 import {delay} from "./utils/consts";
 import {check, getMyName} from "./http/userAPI";
 import {Context} from "./index";
+import SideBarL from "./components/SideBarL";
 
 
 const App = observer(() => {
 
     const [loading, setLoading] = useState(true)
-    const {user} = useContext(Context)
+    const {user, rightSideBarStore} = useContext(Context)
 
     useEffect(() => {
         delay(0).then(() => {
@@ -53,7 +54,7 @@ const App = observer(() => {
                     style={{marginLeft: 0, marginRight: 0,}}
                 >
                     <Col>
-                        <SideBar/>
+                        <SideBarL/>
                     </Col>
                     <Col
 
@@ -63,7 +64,7 @@ const App = observer(() => {
                         <AppRouter/>
                     </Col>
                     <Col>
-                        <SideBar/>
+                        <SideBarR title={rightSideBarStore.barTitle}/>
                     </Col>
                 </Row>
             </main>

@@ -1,4 +1,3 @@
-import {makeAutoObservable} from "mobx";
 
 export default class TopicCL {
 
@@ -190,7 +189,12 @@ export default class TopicCL {
     }
 
     get tagJSON() {
-        return JSON.parse(this._tag)
+        if(this._tag !== null && this._tag !== undefined) {
+            try {
+                return JSON.parse(this._tag)
+            }catch (e) {}
+        }
+        return []
     }
 
     get image_logo() {
