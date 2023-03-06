@@ -23,7 +23,6 @@ import BaliLineComponent from "../components/balicreatetopic/elements/BaliLineCo
 import TopicDetails from "./TopicDetails";
 import {changeTopicAPI, getTopicData, saveTopicAPI} from "../http/topicsAPI";
 
-// let newTopic = {id: -1, data: []}
 class NewTopicCl {
     constructor() {
 
@@ -43,10 +42,12 @@ class NewTopicCl {
         localStorage.setItem('createNewTopic', '')
     }
 
-    loadFromCache() {
+    loadFromCache(topicID = '') {
         let dataJson
+        let dataText
         try {
-            dataJson = JSON.parse(localStorage.getItem("createNewTopic"))
+            dataText = localStorage.getItem("createNewTopic" + topicID)
+            dataJson = JSON.parse(dataText)
         } catch (e) {
         }
         this._id = dataJson._id || -1
@@ -55,13 +56,18 @@ class NewTopicCl {
         this._tag = dataJson._tag || '[]'
         this._image_logo = dataJson._image_logo || ''
         this._created_date = dataJson._created_date || ''
-        this._data = dataJson._data || []
+        if (dataJson._data !== '') {
+            this._data = dataJson._data || []
+        } else {
+            this._data = []
+        }
         this._isSaved = dataJson._isSaved || true
         this._created_by_user_name = dataJson._created_by_user_name || ''
+        return dataText
     }
 
-    isCache() {
-        const localCache = localStorage.getItem("createNewTopic")
+    isCache(topicID = '') {
+        const localCache = localStorage.getItem("createNewTopic" + topicID)
         return !!(localCache && localCache !== '');
     }
 
@@ -69,10 +75,14 @@ class NewTopicCl {
         return this._id;
     }
 
+    _setLocalStorage() {
+        localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
+    }
 
     set id(value) {
         this._id = value;
-        localStorage.setItem('createNewTopic', JSON.stringify(this))
+        this._setLocalStorage()
+        // localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
     }
 
     get name() {
@@ -81,7 +91,8 @@ class NewTopicCl {
 
     set name(value) {
         this._name = value;
-        localStorage.setItem('createNewTopic', JSON.stringify(this))
+        this._setLocalStorage()
+        // localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
     }
 
 
@@ -91,7 +102,8 @@ class NewTopicCl {
 
     set description(value) {
         this._description = value;
-        localStorage.setItem('createNewTopic', JSON.stringify(this))
+        this._setLocalStorage()
+        // localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
     }
 
     get categories() {
@@ -106,7 +118,8 @@ class NewTopicCl {
             }
         } catch (e) {
         }
-        localStorage.setItem('createNewTopic', JSON.stringify(this))
+        this._setLocalStorage()
+        // localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
     }
 
     get image() {
@@ -115,7 +128,8 @@ class NewTopicCl {
 
     set image(value) {
         this._image_logo = value;
-        localStorage.setItem('createNewTopic', JSON.stringify(this))
+        this._setLocalStorage()
+        // localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
     }
 
     get created_date() {
@@ -124,7 +138,8 @@ class NewTopicCl {
 
     set created_date(value) {
         this._created_date = value;
-        localStorage.setItem('createNewTopic', JSON.stringify(this))
+        this._setLocalStorage()
+        // localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
     }
 
     get data() {
@@ -133,7 +148,8 @@ class NewTopicCl {
 
     set data(value) {
         this._data = value;
-        localStorage.setItem('createNewTopic', JSON.stringify(this))
+        this._setLocalStorage()
+        // localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
     }
 
     get isSaved() {
@@ -142,7 +158,8 @@ class NewTopicCl {
 
     set isSaved(value) {
         this._isSaved = value;
-        localStorage.setItem('createNewTopic', JSON.stringify(this))
+        this._setLocalStorage()
+        // localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
     }
 
     get created_by_user_name() {
@@ -151,24 +168,26 @@ class NewTopicCl {
 
     set created_by_user_name(value) {
         this._created_by_user_name = value;
-        localStorage.setItem('createNewTopic', JSON.stringify(this))
+        this._setLocalStorage()
+        // localStorage.setItem('createNewTopic' + (this._id === -1 ? '' : this._id), JSON.stringify(this))
     }
 }
 
 let newTopic = new NewTopicCl()
+let savedTopicToCheck = ''
 const CreateTopicPage = (props) => {
-    const {categoryId} = props
+    // const {categoryId, topicID} = props
 
     const {topicsCategoryStore, rightSideBarStore, user} = useContext(Context)
 
     // const [newTopic, setNewTopic] = useState({id: -1, data: []})
-
 
     const [isSaving, setIsSaving] = useState(false)
     const [saveError, setSaveError] = useState(false)
     const [saveAlert, setSaveAlert] = useState(false)
 
     const [loading, setLoading] = useState(true)
+    const [loadingData, setLoadingData] = useState(false)
     const [loadingCat, setLoadingCat] = useState(true)
     const [categoriesItems, setCategoriesItems] = useState([])
 
@@ -179,7 +198,9 @@ const CreateTopicPage = (props) => {
     const [newTopicSelectedCategoryLabelText, setNewTopicSelectedCategoryLabelText] = useState('Select topic category')
     const [newTopicImage, setNewTopicImage] = useState('')
     const [imagesAdd, setImagesAdd] = useState({})
+
     const [savedTopic, setSavedTopic] = useState('')
+    const [isTopicChanged, setIsTopicChanged] = useState(false)
 
     const [newTopicNameError, setNewTopicNameError] = useState(false)
     const [newTopicDescriptionError, setNewTopicDescriptionError] = useState(false)
@@ -199,32 +220,61 @@ const CreateTopicPage = (props) => {
         // rightSideBarStore.barTitle = 'Side bar'
         rightSideBarStore.addBR()
         rightSideBarStore.addBtn('Preview', `btn btn-info ${(isPreview || isSaving) ? 'disabled' : ''}`, openPreview)
-        rightSideBarStore.addBtn('Save', `btn ${saveError ? 'btn-danger' : 'btn-secondary'}  ${(!isPreview || isSaving) ? 'disabled' : ''}`, saveHandler)
+        rightSideBarStore.addBtn('Save', `btn ${saveError ? 'btn-danger' : (isTopicChanged ? 'btn-primary' : 'btn-secondary')}  ${(!isPreview || isSaving) ? 'disabled' : ''}`, saveHandler)
         rightSideBarStore.addSnippet('Saved!', ``, `alert-success ${saveAlert ? '' : 'd-none'}`)
         // rightSideBarStore.addBR()
         // rightSideBarStore.addBtn('Delete', `btn btn-danger ${(isSaving) ? 'disabled' : ''} btn-rounded`, logAction)
 
-    }, [isPreview, saveError, saveAlert])
+    }, [isPreview, saveError, saveAlert, isTopicChanged])
 
     useEffect(() => {
         setLoading(true)
 
-        if (newTopic.isCache()) {
-            setIsHasCache_doLoading(true)
+        // console.log(props.location.state)
+
+        let topicId = ''
+        /** Проверить, был ли передан ID топика **/
+        if (props.location.state.hasOwnProperty('topicID')) {
+            topicId = props.location.state.topicID
+        }
+        /** Проверить, был ли передан ID категории **/
+        if (props.location.state.hasOwnProperty('categoryId')) {
+            applyTopicSelectedCategoryIdChangeHandler(props.location.state.categoryId)
         }
 
+        /** Если есть значения topicId, то загружаем данные топика **/
+        if (topicId !== '' && parseInt(topicId) !== -1) {
+            setLoadingData(true)
+            getTopicDataHandler(topicId).then()// start
+        }
+        /** **/
+        else
+            /** Если есть кэш топика по ID, то предложить загрузить данные **/
+        if (newTopic.isCache(topicId)) {
+            if (newTopicName === '' && newTopicDescription === '' && newTopicDataElements.length === 0) {
+                setIsHasCache_doLoading(true)
+            } else {
+                loadFromCache(topicId)
+                // setIsHasCache_doLoading(false)
+            }
+        }
+        /** **/
+
+        /** Если список категорий не загружен, загрузить его.. **/
         if (!topicsCategoryStore.loaded) {
             const sortCode = localStorage.getItem("sort_code_Categories") || 'alpha'
             getCategoriesData(sortCode, '')
+            setLoading(false)
         } else {
-            setCatItems()
+            setCatItems()// start
             setLoading(false)
         }
+        /** **/
 
     }, [])
 
     const setCatItems = () => {
-        setLoadingCat(true)
+        // setLoadingCat(true)
         const currCatArr = topicsCategoryStore.getSavedCategoriesList()
         const newCatItems = [{name: '', code: ''}]
         if (currCatArr) {
@@ -247,8 +297,8 @@ const CreateTopicPage = (props) => {
         }).catch(() => {
             topicsCategoryStore.saveCategoriesList([])
         }).finally(() => {
-            setCatItems()
-            setLoading(false)
+            setCatItems()// getAll
+            // setLoading(false)
         })
 
     }
@@ -259,6 +309,7 @@ const CreateTopicPage = (props) => {
         newTopic.name = text
         setIsHasCache_doLoading(false)
 
+        checkIfChanged(JSON.stringify(newTopic))
     }
 
     const newTopicDescriptionChangeHandler = (text) => {
@@ -268,9 +319,27 @@ const CreateTopicPage = (props) => {
         newTopic.description = text
         setIsHasCache_doLoading(false)
 
+        checkIfChanged(JSON.stringify(newTopic))
     }
 
     const newTopicSelectedCategoryIdChangeHandler = (catId) => {
+
+        // console.log(catId)
+
+        // if (catId !== '-1' || catId !== '') {
+        //     setNewTopicSelectedCategoryLabelText('Topic category')
+        // } else {
+        //     setNewTopicSelectedCategoryLabelText('Select topic category')
+        // }
+        // setNewTopicSelectedCategoryId(catId)
+        // setNewTopicSelectedCategoryIdError(false)
+        applyTopicSelectedCategoryIdChangeHandler(catId)
+        newTopic.categories = JSON.stringify([catId])
+        setIsHasCache_doLoading(false)
+        checkIfChanged(JSON.stringify(newTopic))
+    }
+
+    const applyTopicSelectedCategoryIdChangeHandler = (catId) => {
         if (catId !== '-1' || catId !== '') {
             setNewTopicSelectedCategoryLabelText('Topic category')
         } else {
@@ -278,9 +347,10 @@ const CreateTopicPage = (props) => {
         }
         setNewTopicSelectedCategoryId(catId)
         setNewTopicSelectedCategoryIdError(false)
-        newTopic.categories = JSON.stringify([catId])
-        setIsHasCache_doLoading(false)
 
+        // newTopic.categories = JSON.stringify([catId])
+        // setIsHasCache_doLoading(false)
+        // checkIfChanged(JSON.stringify(newTopic))
     }
 
     const newTopicImageChangeHandler = (imageFile, imageUrl) => {
@@ -288,6 +358,7 @@ const CreateTopicPage = (props) => {
         newTopic.imageFile = imageFile
         setIsHasCache_doLoading(false)
 
+        checkIfChanged(JSON.stringify(newTopic))
     }
 
     const baliAddNewElementHandler = (elementCode) => {
@@ -306,17 +377,25 @@ const CreateTopicPage = (props) => {
         setNewTopicDataElements(currElementsArr)
         newTopic.data = currElementsArr
         setIsHasCache_doLoading(false)
+
+        checkIfChanged(JSON.stringify(newTopic))
     }
 
     const dataItemEditHandler = (item) => {
         if (item.hasOwnProperty('index')) {
             let dataArr = JSON.parse(JSON.stringify(newTopicDataElements))
             const itemIndex = item.index
+            // if ((dataArr.length - 1) < itemIndex) {
+            //     dataArr.push({})
+            // }
             dataArr[itemIndex] = item
+
             setNewTopicDataElements(dataArr)
 
             newTopic.data = dataArr
             setIsHasCache_doLoading(false)
+
+            checkIfChanged(JSON.stringify(newTopic))
         }
     }
 
@@ -329,35 +408,39 @@ const CreateTopicPage = (props) => {
             }
             let currList = currImagesList[imageListIndex]
 
-            let isThere = false
-            Object.keys(currList).forEach(function (key) {
-                let currFile = currList[key]
-                if (currFile.name === fileName.name &&
-                    currFile.lastModified === fileName.lastModified &&
-                    currFile.size === fileName.size &&
-                    currFile.type === fileName.type) {
-                    isThere = true
-                }
-            });
+            // let isThere = false
+            // Object.keys(currList).forEach(function (key) {
+            //     let currFile = currList[key]
+            //     if (currFile.name === fileName.name &&
+            //         currFile.lastModified === fileName.lastModified &&
+            //         currFile.size === fileName.size &&
+            //         currFile.type === fileName.type) {
+            //         isThere = true
+            //     }
+            // });
 
-            if (!isThere) {
-                currList[Object.keys(currList).length] = fileName
-                currImagesList[imageListIndex] = currList
-                setImagesAdd(currImagesList)
+            // if (!isThere) {
+            currList[Object.keys(currList).length] = fileName
+            currImagesList[imageListIndex] = currList
+            setImagesAdd(currImagesList)
 
 
-                const objectUrl = URL.createObjectURL(fileName)
+            const objectUrl = URL.createObjectURL(fileName)
 
-                const images = JSON.parse(newTopic.data[imageListIndex].items)
-                images.push(objectUrl)
-                let topicData = newTopic.data
-                topicData[imageListIndex].items = JSON.stringify(images)
-                // newTopic.data[imageListIndex].items = JSON.stringify(images)
-                newTopic.data = topicData
+            const images = JSON.parse(newTopic.data[imageListIndex].items)
+            images.push(objectUrl)
+            let topicData = newTopic.data
+            topicData[imageListIndex].items = JSON.stringify(images)
+            // newTopic.data[imageListIndex].items = JSON.stringify(images)
+            newTopic.data = topicData
 
-                setIsHasCache_doLoading(false)
-            }
-            return !isThere
+            setIsHasCache_doLoading(false)
+            // }
+            // return !isThere
+
+            checkIfChanged(JSON.stringify(newTopic))
+
+            return true
         }
     }
 
@@ -381,13 +464,13 @@ const CreateTopicPage = (props) => {
         delete images[imageIndex]
 
         topicData[imageListIndex].items = JSON.stringify(images)
-        // newTopic.data[imageListIndex].items = JSON.stringify(images)
         newTopic.data = topicData
 
 
         currImagesList[imageListIndex] = newCurrList
         setImagesAdd(currImagesList)
 
+        checkIfChanged(JSON.stringify(newTopic))
     }
 
     const onDragEnd = useCallback((params) => {
@@ -401,6 +484,7 @@ const CreateTopicPage = (props) => {
 
                 setNewTopicDataElements(elementsArr)
                 newTopic.data = elementsArr
+                checkIfChanged(JSON.stringify(newTopic))
             }
         }
     }, [newTopicDataElements]);
@@ -417,6 +501,38 @@ const CreateTopicPage = (props) => {
         setNewTopicDataElements(filtered)
         newTopic.data = filtered
         setIsHasCache_doLoading(false)
+
+        checkIfChanged(JSON.stringify(newTopic))
+    }
+
+    const changeItemTypeByIndex = (newType, index) => {
+
+        const currElementsArr = JSON.parse(JSON.stringify(newTopicDataElements))
+
+        let newElement = null
+
+        for (let i = 0; i < addNewElementItems.length; i++) {
+            const currElement = addNewElementItems[i]
+            if (newType === currElement.type) {
+                newElement = getNewTopicElement(currElement.type)
+                break
+            }
+        }
+
+        if (newElement !== null) {
+            const prevElement = JSON.parse(JSON.stringify(currElementsArr[index]))
+            if (prevElement.hasOwnProperty('name') && newElement.hasOwnProperty('name')) {
+                newElement.name = prevElement.name
+            }
+            currElementsArr[index] = newElement
+
+            setNewTopicDataElements(currElementsArr)
+            newTopic.data = currElementsArr
+            setIsHasCache_doLoading(false)
+        }
+
+        checkIfChanged(JSON.stringify(newTopic))
+
     }
 
     const isDragDisableHandler = (value) => {
@@ -474,6 +590,7 @@ const CreateTopicPage = (props) => {
         newTopicJson.description = newTopic.description
         newTopicJson.image = newTopic.image
         newTopicJson.imageFile = newTopic.imageFile
+
         newTopicJson.userName = user.name
         newTopicJson.data = newTopic.data
 
@@ -483,16 +600,45 @@ const CreateTopicPage = (props) => {
     }
 
 
-    const getTopicDataHandler = (id) => {
+    const checkIfChanged = (currTopicToCheck) => {
+        if (currTopicToCheck !== savedTopicToCheck) {
+            setIsTopicChanged(true)
+        } else {
+            setIsTopicChanged(false)
+        }
+
+    }
+
+    const getTopicDataHandler = async (id) => {
         setIsSaving(true)
         if (id > -1) {
-            getTopicData(id).then(data => {
-                if (data.hasOwnProperty('status')) {
-                    if (data.status === 'ok') {
-                    }
-                }
+            await getTopicData(id).then(data => {
+
+                newTopic.id = id
+
+                newTopicNameChangeHandler(JSON.parse(data).name)
+                newTopicDescriptionChangeHandler(JSON.parse(data).description)
+                newTopicSelectedCategoryIdChangeHandler(JSON.parse(JSON.parse(data).categories)[0] + '')
+                newTopicImageChangeHandler('', JSON.parse(data).image)
+                setNewTopicImage(JSON.parse(data).image + '?' + Date.now())
+
+                newTopic.userName = JSON.parse(data).userName
+                setNewTopicId(id)
+
+                setNewTopicDataElements(JSON.parse(data).data)
+                newTopic.data = JSON.parse(data).data
+
+                // JSON.parse(data).data.map(item => {
+                //     console.log(item)
+                //     dataItemEditHandler(item)
+                // })
+
             }).finally(() => {
+                savedTopicToCheck = JSON.stringify(newTopic)
+                checkIfChanged(JSON.stringify(newTopic))
+
                 setIsSaving(false)
+                setLoadingData(false)
             })
         } else {
             setIsSaving(false)
@@ -525,7 +671,6 @@ const CreateTopicPage = (props) => {
                 newTopic.imageFile,
                 imagesAdd,
             ).then(data => {
-                console.log('save ', data)
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
                         newTopic.id = data.id
@@ -533,16 +678,14 @@ const CreateTopicPage = (props) => {
                         setSaveError(false)
                         setSaveOkAlert()
 
-                        // newTopic.clearData()
+                        newTopic.imageFile = null
 
-                        if (data.hasOwnProperty('image_logo')) {
-                            newTopic.image = data.image_logo
-                            newTopic.imageFile = null
-                            setNewTopicImage(data.image_logo + '?' + Date.now())
-
-
-                        }
-                        getTopicDataHandler(data.id)
+                        // if (data.hasOwnProperty('image_logo')) {
+                        //     newTopic.image = data.image_logo
+                        //     newTopic.imageFile = null
+                        //     setNewTopicImage(data.image_logo + '?' + Date.now())
+                        // }
+                        getTopicDataHandler(data.id).then()// save
                     } else {
                         setSaveError(true)
                         setSaveAlert(false)
@@ -555,7 +698,7 @@ const CreateTopicPage = (props) => {
                 setSaveError(true)
                 setSaveAlert(false)
             }).finally(() => {
-                setIsSaving(false)
+                // setIsSaving(false)
             })
         } else {
             changeTopicAPI(
@@ -563,26 +706,26 @@ const CreateTopicPage = (props) => {
                 newTopic.name,
                 newTopic.description,
                 newTopic.categories,
-                newTopic.image_logo,
+                newTopic.image,
                 user.id, //newTopic.created_by_user_id,
                 Date.now(), //newTopic.created_date,
                 JSON.stringify(newTopic.data), //newTopic.data,
                 newTopic.imageFile,
                 imagesAdd,
             ).then(data => {
-                console.log('changed ', data)
                 if (data.hasOwnProperty('status')) {
                     if (data.status === 'ok') {
                         setSaveError(false)
                         setSaveOkAlert()
-                        // newTopic.clearData()
 
-                        if (data.hasOwnProperty('image_logo')) {
-                            newTopic.image = data.image_logo
-                            newTopic.imageFile = null
-                            setNewTopicImage(data.image_logo + '?' + Date.now())
-                        }
-                        getTopicDataHandler(data.id)
+                        newTopic.imageFile = null
+
+                        // if (data.hasOwnProperty('image_logo')) {
+                        //     newTopic.image = data.image_logo
+                        //     newTopic.imageFile = null
+                        //     setNewTopicImage(data.image_logo + '?' + Date.now())
+                        // }
+                        getTopicDataHandler(newTopic.id).then()// change
                     } else {
                         setSaveError(true)
                         setSaveAlert(false)
@@ -595,14 +738,14 @@ const CreateTopicPage = (props) => {
                 setSaveError(true)
                 setSaveAlert(false)
             }).finally(() => {
-                setIsSaving(false)
+                // setIsSaving(false)
             })
         }
     }
 
-    const loadFromCache = () => {
+    const loadFromCache = (topicID = '') => {
 
-        newTopic.loadFromCache()
+        savedTopicToCheck = newTopic.loadFromCache(topicID)
         setNewTopicId(newTopic.id)
         setNewTopicName(newTopic.name)
 
@@ -616,12 +759,14 @@ const CreateTopicPage = (props) => {
         }
 
         setNewTopicImage(newTopic.image)
-        setNewTopicDataElements(newTopic.data)
 
+        newTopic.data.map(item => {
+            dataItemEditHandler(item)
+        })
         setIsHasCache_doLoading(false)
     }
 
-    if (loading || loadingCat) {
+    if (loading || loadingCat || loadingData) {
     } else {
 
         return (
@@ -653,7 +798,7 @@ const CreateTopicPage = (props) => {
                                 <Row className={'px-5 py-3'}>
                                     <Button
                                         onClick={() => {
-                                            loadFromCache()
+                                            loadFromCache(newTopic.id === -1 ? '' : newTopic.id)
                                         }}
                                     >
                                         Load cache?
@@ -726,7 +871,7 @@ const CreateTopicPage = (props) => {
                                                     {
                                                         newTopicDataElements.map(function (item, index) {
                                                             if (item.hasOwnProperty('type')) {
-                                                                const itemKey = item.type + index
+                                                                const itemKey = item.type + index + "" + isSaving
 
                                                                 let child = null
                                                                 item.index = index
@@ -781,6 +926,7 @@ const CreateTopicPage = (props) => {
                                                                     }
                                                                     case 'images': {
                                                                         child = <BaliImagesComponent
+                                                                            key={isSaving}
                                                                             item={item}
                                                                             index={index}
                                                                             isSaving={isSaving}
@@ -835,6 +981,7 @@ const CreateTopicPage = (props) => {
                                                                                         child={child}
                                                                                         isDragDisableHandler={isDragDisableHandler}
                                                                                         itemDeleteHandler={deleteDataItemByIndex}
+                                                                                        changeItemTypeByIndex={changeItemTypeByIndex}
                                                                                     />
                                                                                 </div>
 

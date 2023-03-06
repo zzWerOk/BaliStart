@@ -25,7 +25,14 @@ export const getAll = async (categoryId, tagSearch, sortCode) => {
 }
 
 export const getTopicData = async (id, user_id = -1) => {
-    const {data} = await $host.get(apiUrl + '/topicdata', {params: {id, user_id}}).catch((e) => {
+    const {data} = await $authHost.get(apiUrl + '/topicdata', {params: {id, user_id}}).catch((e) => {
+        console.log('error ', e.response.data)
+    })
+    return data
+}
+
+export const getTopicEditable = async (id) => {
+    const {data} = await $authHost.get(apiUrl + '/canedit', {params: {id}}).catch((e) => {
         console.log('error ', e.response.data)
     })
     return data

@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import SpinnerSm from "../components/SpinnerSM";
 import Categories from "./Categories";
-import BaliInput from "../components/balicreatetopic/BaliInput";
 
 const Main = () => {
 
@@ -19,7 +18,7 @@ const Main = () => {
 
         return (
             <div>
-                <BaliInput labelText={'Name'}/>
+                {/*<BaliInput labelText={'Name'}/>*/}
                 <Categories/>
             </div>
         );

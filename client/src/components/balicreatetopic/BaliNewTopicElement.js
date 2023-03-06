@@ -2,7 +2,7 @@ import React from 'react';
 import {Dropdown, DropdownButton} from "react-bootstrap";
 
 const BaliNewTopicElement = (props) => {
-    const {title, index, dropDownItems, child, isDragDisableHandler, itemDeleteHandler} = props
+    const {title, index, dropDownItems, child, isDragDisableHandler, itemDeleteHandler, changeItemTypeByIndex} = props
     return (
         <div
             className={
@@ -16,7 +16,6 @@ const BaliNewTopicElement = (props) => {
 
             <div className="col-12 "
             >
-
                 <DropdownButton
                     id="dropdown-button"
                     variant="secondary"
@@ -28,7 +27,7 @@ const BaliNewTopicElement = (props) => {
                         return <Dropdown.Item
                             key={item.id}
                             onClick={() => {
-                                // handleChange(item.type)
+                                changeItemTypeByIndex(item.type, index)
                             }}
                         >{item.name}</Dropdown.Item>
                     })}

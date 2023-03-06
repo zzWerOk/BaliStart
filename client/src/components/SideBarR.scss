@@ -1,0 +1,13 @@
+$bali-btn-color: #282c34;
+
+
+.btn-bali{
+  background-color: $bali-btn-color !important;
+  box-shadow: 0 2px 3px 0 $bali-btn-color,
+  0 2px 2px 0 rgba(40, 44, 52, 0.75) !important;
+}
+
+.btn-bali:active, .btn-bali:focus, .btn-bali:hover {
+  box-shadow: 0 3px 8px 0 $bali-btn-color,
+  0 3px 10px 0 rgba(40, 44, 52, 0.75) !important;
+}

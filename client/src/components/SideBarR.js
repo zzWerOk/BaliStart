@@ -2,6 +2,7 @@ import React, {useContext} from 'react';
 import {observer} from "mobx-react-lite";
 import {Button, ListGroup} from "react-bootstrap";
 import {Context} from "../index";
+import './SideBarR.css'
 
 const SideBarR = observer((props) => {
     const {title} = props
@@ -39,11 +40,11 @@ const SideBarR = observer((props) => {
                                 {item.name}
                             </Button>
                         } else if (item.type.split(' ')[0] === 'br') {
-                            return <br key={item.id + '' + index}/>
+                            return <br key={item.id + '' + index} />
                         } else if (item.type.split(' ')[0] === 'snippet') {
                             return (
                                 <div key={item.id + '' + index}
-                                     className={`alert py-2 ${item.type} d-flex justify-content-center`}
+                                     className={`alert py-2 ${item.type} d-flex justify-content-center `}
                                      style={{
                                          transition: '0.1s ease all',
                                          MozTransition: '0.1s ease all',

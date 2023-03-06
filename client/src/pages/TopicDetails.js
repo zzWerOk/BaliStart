@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useParams} from "react-router-dom";
-import {delay, epochToDateWithTime, NOPAGE_ROUTE} from "../utils/consts";
-import {getTopicData} from "../http/topicsAPI";
+import {delay, EDIT_TOPIC_ROUTE, epochToDateWithTime, NOPAGE_ROUTE} from "../utils/consts";
+import {getTopicData, getTopicEditable} from "../http/topicsAPI";
 import {Context} from "../index";
 import {Col, Row} from "react-bootstrap";
 import classes from './TopicDetails.module.css'
@@ -25,7 +25,7 @@ const TopicDetails = (props) => {
     let {id: topicIDUrl} = useParams();
     const history = useHistory()
 
-    const {user, topicsCategoryStore} = useContext(Context)
+    const {user, topicsCategoryStore, rightSideBarStore} = useContext(Context)
 
     const [loading, setLoading] = useState(true)
     const [topic, setTopic] = useState({})
@@ -33,13 +33,27 @@ const TopicDetails = (props) => {
     const [topicCategories, setTopicCategories] = useState([])
     const [topicImage, setTopicImage] = useState('')
 
+    const [isEditable, setIsEditable] = useState(false)
+
+    useEffect(() => {
+
+        rightSideBarStore.clear()
+        // rightSideBarStore.barTitle = 'Side bar'
+        rightSideBarStore.addBR()
+        // if (isEditable) {
+            rightSideBarStore.addBtn('Edit topic', `${!isEditable ? 'disabled' : ''} ${!isEditable ? 'd-none' : ''} btn btn-bali `, openEditTopic)
+        // }
+
+    }, [isEditable])
+
     useEffect(() => {
         setLoading(true)
 
-        // topicIDUrl = -1
-
         if (!savedTopic) {
             delay(0).then(() => {
+
+                user.onLogoutHandler = () => {isUserLogout()}
+                user.onLoginHandler = () => {isUserLogin()}
 
                 getTopicData(topicIDUrl, user.id).then(data => {
                     let dataJson
@@ -52,23 +66,32 @@ const TopicDetails = (props) => {
 
                     if (dataJson.hasOwnProperty('status')) {
                         if (dataJson.status === 'error') {
-                            if (dataJson.message === 'topic not found') {
+                            if (dataJson.message.toLowerCase() === 'topic not found') {
                                 history.push(NOPAGE_ROUTE)
                             }
                         }
                     } else if (dataJson.hasOwnProperty('name')) {
-                        // console.log(dataJson)
-                        // console.log(dataJson.data)
+                        setIsEditable(dataJson.editable || false)
+
+                        // console.log(dataJson.editable)
+                        // if (dataJson.editable) {
+                        //     rightSideBarStore.addBtn('Edit topic', `${!isEditable ? 'disabled' : ''} ${!isEditable ? 'd-none' : ''} btn btn-bali `, openEditTopic)
+                        // }
 
                         setTopicData(dataJson.data)
                         delete dataJson.data
                         setTopic(dataJson)
+
 
                         setTopicImage(process.env.REACT_APP_API_URL + '/static/' + dataJson.image + '?' + Date.now())
 
                         try {
                             getTopicsCategoriesList(dataJson.categories)
                         } catch (e) {
+                        }
+                    } else if (dataJson.hasOwnProperty('message')) {
+                        if (dataJson.message === 'topic not found') {
+                            history.push(NOPAGE_ROUTE)
                         }
                     }
 
@@ -99,21 +122,54 @@ const TopicDetails = (props) => {
 
     }, [])
 
-    const getTopicsCategoriesList = (categories) => {
-        const currCategories = topicsCategoryStore.getSavedCategoriesList()
-        const currTopicCategories = JSON.parse(categories)
-        let fullCategories = []
+    const isUserLogout = () => {
+        // console.log('logout')
+        setIsEditable(false)
+    }
 
-        currTopicCategories.map(category => {
-            for (let i = 0; i < currCategories.length; i++) {
-                if (category + '' === currCategories[i].id + '') {
-                    fullCategories.push(currCategories[i])
-                    break
+    const isUserLogin = () => {
+        // console.log('login')
+
+        getTopicEditable(topicIDUrl).then(data => {
+            setIsEditable(false)
+            if(data.hasOwnProperty('status')){
+                if(data.status === 'ok'){
+                    setIsEditable(true)
                 }
             }
+        }).finally(() => {
         })
-        setTopicCategories(fullCategories)
 
+
+    }
+
+    const openEditTopic = () => {
+        if (isEditable) {
+            history.push({
+                pathname: EDIT_TOPIC_ROUTE,
+                state: {topicID: topicIDUrl}
+            });
+        }
+    }
+
+    const getTopicsCategoriesList = (categories) => {
+        try {
+            const currCategories = topicsCategoryStore.getSavedCategoriesList()
+            const currTopicCategories = JSON.parse(categories)
+            let fullCategories = []
+
+            currTopicCategories.map(category => {
+                for (let i = 0; i < currCategories.length; i++) {
+                    if (category + '' === currCategories[i].id + '') {
+                        fullCategories.push(currCategories[i])
+                        break
+                    }
+                }
+            })
+            setTopicCategories(fullCategories)
+        } catch (e) {
+            console.log(e.message)
+        }
     }
 
     const getTopicDetailsElement = (element, index) => {
@@ -279,12 +335,6 @@ const TopicDetails = (props) => {
                                     backgroundImage: `url(${topicImage})`,
                                     height: '250px'
                                 }}>
-
-                                {/*style={{*/}
-                                {/*        background: `linear-gradient(rgba(0, 0, 0, 0.5),rgba(0, 0, 0, 0.5)), url(${topicImage})`,*/}
-                                {/*        backgroundSize: 'cover',*/}
-                                {/*        minHeight: '250px',*/}
-                                {/*    }}*/}
 
                                 <Row className={`${classes.topic_row} text-muted`} style={{paddingTop: '20px'}}>
                                     <h1 className={'display-4 font-italic'} style={{color: `white`,}}>

@@ -8,7 +8,7 @@ import {
     TOUR_ROUTE,
     TOURS_ROUTE,
     MAPPOINT_ROUTE,
-    CREATE_TOPIC_ROUTE,
+    CREATE_TOPIC_ROUTE, EDIT_TOPIC_ROUTE,
 } from "./utils/consts";
 import Main from "./pages/Main";
 import Category from "./pages/Category";
@@ -60,6 +60,10 @@ export const publicRoutes = [
     },
     {
         path: CREATE_TOPIC_ROUTE,
+        Component: CreateTopicPage
+    },
+    {
+        path: EDIT_TOPIC_ROUTE,
         Component: CreateTopicPage
     },
 ]

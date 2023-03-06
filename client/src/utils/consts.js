@@ -101,6 +101,7 @@ export const AUTH_ROUTE = '/auth'
 export const TOPICS_ROUTE = '/topics'
 export const TOPIC_ROUTE = '/topic/:id'
 export const CREATE_TOPIC_ROUTE = '/newTopic'
+export const EDIT_TOPIC_ROUTE = '/editTopic'
 
 export const SIDEBAR_ISADMIN = [
     new sideBarItem('MAIN', MAIN_ROUTE),

@@ -23,7 +23,7 @@ const removeTopicsCountFromCategories = (removeArr) => {
 
             })
         }
-    }catch (e) {
+    } catch (e) {
         console.log(e.message)
     }
 }
@@ -434,8 +434,44 @@ class TopicsController {
         return next(ApiError.forbidden("Ошибка изменения..."))
     }
 
+    async getTopicCanEdit(req, res, next) {
+        const {id} = req.query
+        const currUser = req.user
+
+        try {
+            if (Number.isInteger(parseInt(id))) {
+
+                if (!id) {
+                    return next(ApiError.badRequest("Ошибка параметра"))
+                } else {
+                    const candidate = await Topics.findOne({where: {id}})
+
+                    if (candidate) {
+                        try {
+                            if (currUser !== null && currUser !== undefined) {
+                                if (currUser.id === candidate.created_by_user_id) {
+                                    return res.json({status: 'ok'})
+                                }
+                            }
+                        } catch (e) {
+                        }
+                    }
+                    return res.json({status: 'no'})
+
+                }
+            } else {
+                return res.json({status: 'error', message: 'topic not found'})
+            }
+        } catch (e) {
+            return next(ApiError.internal(e.message))
+        }
+    }
+
     async getTopicData(req, res, next) {
         const {id, user_id = -1} = req.query
+        const currUser = req.user
+
+
         try {
             if (Number.isInteger(parseInt(id))) {
 
@@ -452,7 +488,7 @@ class TopicsController {
                                     let topicFileData = JSON.parse(readFileResult.data)
                                     let topicData = {}
 
-                                    const currUser = await User.findOne({
+                                    const topicUser = await User.findOne({
                                         attributes: {exclude: ['password']},
                                         where: {id: candidate.created_by_user_id}
                                     })
@@ -462,6 +498,12 @@ class TopicsController {
                                             topic_id: candidate.id,
                                         },
                                     })
+
+                                    if (currUser !== null && currUser !== undefined) {
+                                        if (currUser.id === candidate.created_by_user_id) {
+                                            topicData.editable = true
+                                        }
+                                    }
 
                                     topicData.image = candidate.image_logo
 
@@ -478,7 +520,7 @@ class TopicsController {
                                     // deleted_by_user_id: {type: DataTypes.INTEGER},
                                     // deleted_date: {type: DataTypes.BIGINT},
                                     // topicData.image = candidate.file_name
-                                    topicData.userName = currUser.name
+                                    topicData.userName = topicUser.name
 
                                     if (candidate.created_by_user_id === user_id) {
                                         topicFileData.editable = true
@@ -492,7 +534,8 @@ class TopicsController {
                         }
                         return next(ApiError.internal("Ошибка чтения данных файла"))
                     }
-                    return next(ApiError.internal("Topic not found"))
+                    return res.json({status: 'error', message: 'Topic not found'})
+                    // return next(ApiError.internal("Topic not found"))
 
                 }
             } else {
@@ -846,12 +889,14 @@ class TopicsController {
                     try {
                         const tagsArr = JSON.parse(candidate.tag)
                         await removeTopicsCountFromCategories(tagsArr)
-                    }catch (e){}
+                    } catch (e) {
+                    }
 
                     /** Remove image_logo of topic from DB **/
                     try {
                         await Files.destroy({where: {table_name: 'Topics', file_name: candidate.file_name}})
-                    } catch (e) {}
+                    } catch (e) {
+                    }
                     /** Collect all images of topic data (topic.data type="images") **/
                     const topicDataImages = await Files.findAll({
                         where: {

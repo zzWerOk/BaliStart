@@ -15,13 +15,11 @@ const BaliImagesComponent = (props) => {
     } = props
 
     const [imagesName, setImagesName] = useState('')
-    const [images, setImages] = useState('[]')
     const [imagesBlob, setImagesBlob] = useState('[]')
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         setImagesName(item.name)
-        setImages(item.items)
 
         setImagesBlob(item.items)
 
@@ -35,36 +33,31 @@ const BaliImagesComponent = (props) => {
     }
 
     const itemDeleteHandler = (imageIndex) => {
-        let itemsArr = JSON.parse(images)
         let imagesBlobArr = JSON.parse(imagesBlob)
 
-        itemsArr.splice(imageIndex, 1)
         imagesBlobArr.splice(imageIndex, 1)
-        setImages(JSON.stringify(itemsArr))
         setImagesBlob(JSON.stringify(imagesBlobArr))
 
         item.items = JSON.stringify(imagesBlobArr)
 
         onFilesDeleteHandler(index, imageIndex)
-
-        // dataItemEditHandler(item)
     }
 
     const onFileChooseHandler = (fileName) => {
 
-        let filesArr = JSON.parse(images)
+        // let filesArr = JSON.parse(images)
         let imagesBlobArr = JSON.parse(imagesBlob)
 
         for (let i = 0; i < fileName.length; i++) {
             let file = fileName[i]
             if (onFilesAddHandler(file, index)) {
-                filesArr.push(file.name)
+                // filesArr.push(file.name)
                 const blob = URL.createObjectURL(file)
                 imagesBlobArr.push(blob)
             }
         }
 
-        setImages(JSON.stringify(filesArr))
+        // setImages(JSON.stringify(filesArr))
         setImagesBlob(JSON.stringify(imagesBlobArr))
 
         item.items = JSON.stringify(imagesBlobArr)
@@ -72,26 +65,29 @@ const BaliImagesComponent = (props) => {
     }
 
     const onDragEnd = useCallback((params) => {
-        const srcIndex = params.source.index
-        const dstIndex = params.destination?.index
+        try {
+            const srcIndex = params.source.index
+            const dstIndex = params.destination?.index
 
-        if (dstIndex !== null) {
-            if (dstIndex !== undefined) {
-                let imagesArr = JSON.parse(images)
-                let imagesBlobArr = JSON.parse(imagesBlob)
+            if (dstIndex !== null) {
+                if (dstIndex !== undefined) {
+                    // let imagesArr = JSON.parse(images)
+                    let imagesBlobArr = JSON.parse(imagesBlob)
 
-                imagesArr.splice(dstIndex, 0, imagesArr.splice(srcIndex, 1)[0])
-                imagesBlobArr.splice(dstIndex, 0, imagesBlobArr.splice(srcIndex, 1)[0])
+                    // imagesArr.splice(dstIndex, 0, imagesArr.splice(srcIndex, 1)[0])
+                    imagesBlobArr.splice(dstIndex, 0, imagesBlobArr.splice(srcIndex, 1)[0])
 
-                setImages(JSON.stringify(imagesArr))
-                setImagesBlob(JSON.stringify(imagesBlobArr))
+                    // setImages(JSON.stringify(imagesArr))
+                    setImagesBlob(JSON.stringify(imagesBlobArr))
 
-                item.items = JSON.stringify(imagesBlobArr)
+                    item.items = JSON.stringify(imagesBlobArr)
 
-                dataItemEditHandler(item)
+                    dataItemEditHandler(item)
+                }
             }
+        } catch (e) {
         }
-    }, [images, imagesBlob]);
+    }, [imagesBlob]);
 
     if (loading) {
         // return <SpinnerSM/>
@@ -139,7 +135,7 @@ const BaliImagesComponent = (props) => {
                                                 }
 
                                                 return (
-                                                    <div key={image + index}>
+                                                    <div key={image + index + '' + isSaving}>
                                                         <Draggable draggableId={"draggable-" + index} index={index}>
                                                             {(provided) => (
                                                                 <div

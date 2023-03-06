@@ -9,8 +9,13 @@ export default class UserStore {
         this._email = ''
         this._name = ''
         this._user = {}
+
+        this._onLogoutHandler = null
+        this._onLoginHandler = null
+
         makeAutoObservable(this)
     }
+
 
     setIsAuthUser(isAuthUser) {
         this._isAuth = isAuthUser
@@ -67,6 +72,11 @@ export default class UserStore {
                 this.name = user.name
             }
 
+            if(this._onLoginHandler){
+                this._onLoginHandler()
+            }
+
+
             this.setIsAuthUser(true)
 
         }
@@ -97,6 +107,28 @@ export default class UserStore {
         this._isAuth = false
         this._user = {}
         localStorage.setItem("token", '')
+
+        if(this._onLogoutHandler){
+            this._onLogoutHandler()
+        }
+
     }
 
+
+    // get onLogoutHandler() {
+    //     return this._onLogoutHandler;
+    // }
+
+    set onLogoutHandler(value) {
+        this._onLogoutHandler = value;
+    }
+
+
+    // get onLoginHandler() {
+    //     return this._onLoginHandler;
+    // }
+
+    set onLoginHandler(value) {
+        this._onLoginHandler = value;
+    }
 };

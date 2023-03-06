@@ -1,12 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {sortTopics} from "../utils/consts";
+import React, {useContext, useEffect, useState} from 'react';
+import {CREATE_TOPIC_ROUTE, sortTopics} from "../utils/consts";
 import {getAll} from "../http/topicsAPI";
 import SpinnerSm from "../components/SpinnerSM";
 import FeedTopBar from "../components/mainpage/FeedTopBar";
 import FeedTopic from "../components/mainpage/feed/Feed_topic";
+import {Context} from "../index";
+import {useHistory} from "react-router-dom";
 
 const TopicsPage = (props) => {
     const {id} = props
+    const {rightSideBarStore} = useContext(Context)
+
+    const history = useHistory()
 
     const [loading, setLoading] = useState(true)
     const [topicsList, setTopicsList] = useState([])
@@ -16,6 +21,16 @@ const TopicsPage = (props) => {
     const [isLoadingSorted, setIsLoadingSorted] = useState(true)
     const [sortCode, setSortCode] = useState('alpha')
     const [searchKey, setSearchKey] = useState('')
+
+
+    useEffect(() => {
+
+        rightSideBarStore.clear()
+        // rightSideBarStore.barTitle = 'Side bar'
+        rightSideBarStore.addBR()
+        rightSideBarStore.addBtn('Create new', 'btn btn-bali ', () => {openCreateNewTopic(id)})
+
+    }, [])
 
     useEffect(() => {
         setLoading(true)
@@ -29,6 +44,19 @@ const TopicsPage = (props) => {
         getTopicsData(id, sortCode, searchKey)
 
     }, [])
+
+
+    const openCreateNewTopic = (id) => {
+        // history.push(CREATE_TOPIC_ROUTE)
+
+        // console.log(id)
+        history.push({
+            pathname: CREATE_TOPIC_ROUTE,
+            state: {categoryId: id}
+        });
+
+
+    }
 
     const getTopicsData = (categoryId, selectedSortCode, searchKey) => {
         setIsLoadingSorted(true)
