@@ -20,7 +20,7 @@ const BaliInput = (props) => {
 
     } else {
         return (
-            <div className="form-group input-material ">
+            <div className="form-group input-material col-12">
                 <input type={type}
                        className={`form-control ${isError ? 'invalid' : ''}`}
                        id="name-field"

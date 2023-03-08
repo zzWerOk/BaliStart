@@ -9,6 +9,7 @@ import {delay} from "./utils/consts";
 import {check, getMyName} from "./http/userAPI";
 import {Context} from "./index";
 import SideBarL from "./components/SideBarL";
+import FabButton from "./components/FabButton";
 
 
 const App = observer(() => {
@@ -19,13 +20,12 @@ const App = observer(() => {
     useEffect(() => {
         delay(0).then(() => {
             check().then(data => {
-                user.setUser(data)
 
-                getMyName().then((item) => {
+                getMyName().then((userData) => {
                     user.setUser(data)
-                    if (item.hasOwnProperty('status')) {
-                        if (item.status === 'ok') {
-                            user.name = item.message
+                    if (userData.hasOwnProperty('status')) {
+                        if (userData.status === 'ok') {
+                            user.setUserData(userData.data)
                         }
                     }
                 }).catch(() => {
@@ -62,6 +62,7 @@ const App = observer(() => {
                         style={{padding: 0, backgroundColor: 'white'}}
                     >
                         <AppRouter/>
+                        <FabButton/>
                     </Col>
                     <Col>
                         <SideBarR title={rightSideBarStore.barTitle}/>

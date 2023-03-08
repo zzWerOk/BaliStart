@@ -32,16 +32,22 @@ const LoginPage = (props) => {
                 return
             }
 
-            getMyName().then((item) => {
+            getMyName().then((userData) => {
                 user.setUser(response)
-                if (item.hasOwnProperty('status')) {
-                    if (item.status === 'ok') {
-                        user.name = item.message
+                if (userData.hasOwnProperty('status')) {
+                    if (userData.status === 'ok') {
+                        user.setUserData(userData.data)
+                        // const userData = userData.data
+                        // user.name = userData.name
+                        // user.avatar_img = userData.avatar_img
                     }
                 }
                 setIsError('')
-                onAuthFinish()
-            }).catch(() => {
+                if(onAuthFinish) {
+                    onAuthFinish()
+                }
+            }).catch((e) => {
+                console.log(e)
                 setIsError('Error')
             })
 
@@ -70,7 +76,6 @@ const LoginPage = (props) => {
                     return
                 }
 
-                console.log(response)
                 setIsError('')
                 user.setUser(response)
                 onAuthFinish()

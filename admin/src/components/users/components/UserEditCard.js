@@ -342,7 +342,6 @@ const UserEditCard = (props) => {
 
                                                 <div className="btn-group"
                                                      role="group"
-                                                     aria-label="Basic checkbox toggle button group"
                                                 >
                                                     <input type="checkbox"
                                                            className={`btn-check`}

@@ -9,7 +9,7 @@ const errorHandler = require('./middleware/ErrorHandlingMiddleWare')
 const fileUpload = require('express-fileupload')
 const path = require("path");
 
-const { createProxyMiddleware } = require('http-proxy-middleware');
+// const { createProxyMiddleware } = require('http-proxy-middleware');
 
 
 const PORT = process.env.PORT || 5000

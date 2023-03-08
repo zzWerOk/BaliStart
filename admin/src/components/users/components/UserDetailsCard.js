@@ -22,7 +22,7 @@ const UserDetailsCard = (props) => {
         if (currUser.hasOwnProperty('avatar_img') && currUser.avatar_img !== '') {
             setUserImage(process.env.REACT_APP_API_URL + '/static/' + currUser.avatar_img + '?' + Date.now())
         } else {
-            setUserImage(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar.png' + '?' + Date.now())
+            setUserImage(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar.png')
         }
 
         setLoading(false)
@@ -35,10 +35,9 @@ const UserDetailsCard = (props) => {
             <div key={currUser.id + ' ' + index}
                  className={`${userClicked === currUser.id ? 'col-xl-12' : 'col-xl-4'} mb-4 `}
             >
-                <div className={` rounded py-3 px-4 ${isHover ? 'shadow' : 'shadow-sm'} 
-             
-            ${selectedUserEdited ? 'clicked' : null} 
-            ${userClicked === currUser.id ? 'd-flex justify-content-start' : null}`}
+                <div className={` rounded py-3 px-4 ${isHover ? 'shadow' : 'shadow-sm'}              
+                    ${selectedUserEdited ? 'clicked' : null} 
+                    ${userClicked === currUser.id ? 'd-flex justify-content-start' : null}`}
                      onMouseEnter={handleMouseEnter}
                      onMouseLeave={handleMouseLeave}
                      onClick={() => {

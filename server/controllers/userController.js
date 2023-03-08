@@ -5,11 +5,11 @@ const jwt = require('jsonwebtoken')
 const {createNewFile, readFile} = require("../utils/consts");
 const path = require("path");
 
-const generateJWT = (id, email, isAdmin, isGuide) => {
+const generateJWT = (id, email, isAdmin, isGuide, isAgent) => {
     return jwt.sign(
-        {id, email, isAdmin, isGuide},
+        {id, email, isAdmin, isGuide, isAgent},
         process.env.SECRET_KEY,
-        {expiresIn: '48h'}
+        {expiresIn: '128h'}
     )
 
 
@@ -27,7 +27,7 @@ class UserController {
                     const hashPassword = await bcrypt.hash(password, 5)
                     const user = await User.create({name: name, email: email, password: hashPassword})
 
-                    const token = generateJWT(user.id, email, user.is_admin, false)
+                    const token = generateJWT(user.id, email, user.is_admin, false, false)
 
                     /**
                      Обновление таблиц
@@ -50,59 +50,65 @@ class UserController {
     }
 
     async setRole(req, res) {
-        const {id, role} = req.body
+        try {
+            const {id, role} = req.body
 
-        if (id && role) {
-            const candidate = await User.findOne({where: {id}})
+            if (id && role) {
+                const candidate = await User.findOne({where: {id}})
 
-            if (!candidate) {
-                return res.json({error: "Пользователь не найден"})
-                // return next(ApiError.badRequest("Пользователь не найден"))
+                if (!candidate) {
+                    return res.json({error: "Пользователь не найден"})
+                    // return next(ApiError.badRequest("Пользователь не найден"))
+                }
+
+                switch (role) {
+                    case 'Admin':
+                        await User.update({
+                                is_admin: true,
+                                is_guide: false,
+                            }, {
+                                where: {id: candidate.id},
+                            }
+                        );
+                        break
+                    case 'Guide':
+                        await User.update({
+                                is_admin: false,
+                                is_guide: true,
+                            }, {
+                                where: {id: candidate.id},
+                            }
+                        );
+                        break
+                    default:
+                        await User.update({
+                                is_admin: false,
+                                is_guide: false,
+                            }, {
+                                where: {id: candidate.id},
+                            }
+                        );
+                        break
+                }
+
+                /**
+                 Обновление таблиц
+                 **/
+                try {
+                    await TableUpdates.upsert({table_name: 'User', date: Date.now()})
+                } catch (e) {
+                }
+
+                return res.json({status: 'ok'})
+            } else {
+                return res.json({error: "Необходимо указать все данные пользователя..."})
+                // return next(ApiError.forbidden("Необходимо указать все данные пользователя..."))
             }
+        } catch (e) {
 
-            switch (role) {
-                case 'Admin':
-                    await User.update({
-                            is_admin: true,
-                            is_guide: false,
-                        }, {
-                            where: {id: candidate.id},
-                        }
-                    );
-                    break
-                case 'Guide':
-                    await User.update({
-                            is_admin: false,
-                            is_guide: true,
-                        }, {
-                            where: {id: candidate.id},
-                        }
-                    );
-                    break
-                default:
-                    await User.update({
-                            is_admin: false,
-                            is_guide: false,
-                        }, {
-                            where: {id: candidate.id},
-                        }
-                    );
-                    break
-            }
-
-            /**
-             Обновление таблиц
-             **/
-            try {
-                await TableUpdates.upsert({table_name: 'User', date: Date.now()})
-            } catch (e) {
-            }
-
-            return res.json({status: 'ok'})
-        } else {
-            return res.json({error: "Необходимо указать все данные пользователя..."})
-            // return next(ApiError.forbidden("Необходимо указать все данные пользователя..."))
         }
+        return res.json({status: "error"})
+
     }
 
     async changeAdmin(req, res) {
@@ -195,101 +201,40 @@ class UserController {
     }
 
     async login(req, res) {
-        const {email, password} = req.body
-
-        if (email && password) {
-            const candidate = await User.findOne({where: {email}})
-
-            if (!candidate) {
-                return res.json({error: "Пользователь не найден"})
-                // return next(ApiError.badRequest("Пользователь не найден"))
-            }
-
-            const comparePasswords = await bcrypt.compareSync(password, candidate.password)
-
-            if (!comparePasswords) {
-                return res.json({error: "Указан не верный пароль"})
-                // return next(ApiError.badRequest("Указан не верный пароль"))
-            }
-
-            const isGuide = await Guide.findOne({where: {userId: candidate.id}})
-
-            const token = generateJWT(candidate.id, email, candidate.is_admin, !!isGuide)
-
-            await User.update(
-                {
-                    date_last_login: Date.now(),
-                },
-                {
-                    where: {id: candidate.id},
-                }
-            );
-            /**
-             Обновление таблиц
-             **/
-            try {
-                await TableUpdates.upsert({table_name: 'User', date: Date.now()})
-            } catch (e) {
-            }
-
-            return res.json(token)
-        } else {
-            return res.json({error: "Необходимо указать все данные пользователя..."})
-            // return next(ApiError.forbidden("Необходимо указать все данные пользователя..."))
-        }
-    }
-
-    async getMyName(req, res) {
-
-        const currUser = req.user
-
-        if (currUser) {
-            const candidate = await User.findOne({where: {email: req.user.email}})
-
-            return res.json({status: "ok", message: candidate.name})
-        }
-
-        return res.json({status: "error"})
-    }
-
-    async auth(req, res, next) {
-        const candidate = await User.findOne({where: {email: req.user.email}})
-        if (!candidate) {
-            return next(ApiError.badRequest("Пользователь не найден"))
-        }
-        const isGuide = await Guide.findOne({where: {userId: req.user.id}})
-        // const token = generateJWT(req.user.id, req.user.email, req.user.is_admin, !!isGuide)
-        const token = generateJWT(candidate.id, candidate.email, candidate.is_admin, !!isGuide)
-
-        await User.update({date_last_login: Date.now(),}, {where: {id: candidate.id},});
-        /**
-         Обновление таблиц
-         **/
         try {
-            await TableUpdates.upsert({table_name: 'User', date: Date.now()})
-        } catch (e) {
-        }
+            const {email, password} = req.body
 
-        return res.json(token)
+            if (email && password) {
+                const candidate = await User.findOne({
+                    where: {
+                        email,
+                        is_active: true
+                    }
+                })
 
-        // return res.json(generateJWT(req.user.id, req.user.email, req.user.is_admin, !!isGuide))
-    }
+                if (!candidate) {
+                    return res.json({error: "Пользователь не найден"})
+                    // return next(ApiError.badRequest("Пользователь не найден"))
+                }
 
+                const comparePasswords = await bcrypt.compareSync(password, candidate.password)
 
-    async setActive(req, res, next) {
-        const {id, active} = req.body
+                if (!comparePasswords) {
+                    return res.json({error: "Указан не верный пароль"})
+                    // return next(ApiError.badRequest("Указан не верный пароль"))
+                }
 
-        if (!id) {
-            return next(ApiError.badRequest("Ошибка параметра"))
-        } else {
-            const currUser = await User.findOne({where: {id: id}})
-            if (currUser) {
+                // const isGuide = await Guide.findOne({where: {userId: candidate.id}})
+                // const token = generateJWT(candidate.id, email, candidate.is_admin, !!isGuide)
+
+                const token = generateJWT(candidate.id, email, candidate.is_admin, candidate.is_guide, candidate.is_agent)
+
                 await User.update(
                     {
-                        is_active: active,
+                        date_last_login: Date.now(),
                     },
                     {
-                        where: {id: currUser.id},
+                        where: {id: candidate.id},
                     }
                 );
                 /**
@@ -300,21 +245,124 @@ class UserController {
                 } catch (e) {
                 }
 
-                return res.json({status: 'ok'})
-                // return res.json("status: 'ok'")
+                return res.json(token)
+            } else {
+                return res.json({error: "Необходимо указать все данные пользователя..."})
+                // return next(ApiError.forbidden("Необходимо указать все данные пользователя..."))
             }
-            return next(ApiError.badRequest("Ошибка установки параметра"))
+        } catch (e) {
+
         }
+        return res.json({status: "error"})
+    }
+
+    async getMyName(req, res) {
+        try {
+            const currUser = req.user
+
+            if (currUser) {
+                const candidate = await User.findOne({
+                    where: {
+                        email: currUser.email,
+                        is_active: true
+                    }
+                })
+
+                if (candidate) {
+                    return res.json({status: "ok", data: {name: candidate.name, avatar_img: candidate.avatar_img}})
+                }else{
+                    return res.json({status: "error", message: 'No user found'})
+                }
+            }
+        } catch (e) {
+            return res.json({status: "error", message: e.message})
+        }
+        return res.json({status: "error"})
+    }
+
+    async auth(req, res, next) {
+        try {
+            const candidate = await User.findOne({
+                where: {
+                    email: req.user.email,
+                    is_active: true
+                }
+            })
+            if (!candidate) {
+                return next(ApiError.badRequest("Пользователь не найден"))
+            }
+            // const isGuide = await Guide.findOne({where: {userId: req.user.id}})
+            // const token = generateJWT(candidate.id, candidate.email, candidate.is_admin, !!isGuide)
+            const token = generateJWT(candidate.id, candidate.email, candidate.is_admin, candidate.is_guide, candidate.is_agent)
+
+            await User.update({date_last_login: Date.now(),}, {where: {id: candidate.id},});
+            /**
+             Обновление таблиц
+             **/
+            try {
+                await TableUpdates.upsert({table_name: 'User', date: Date.now()})
+            } catch (e) {
+            }
+
+            return res.json(token)
+        } catch (e) {
+
+        }
+        return res.json({status: "error"})
+
+        // return res.json(generateJWT(req.user.id, req.user.email, req.user.is_admin, !!isGuide))
+    }
+
+
+    async setActive(req, res, next) {
+        try {
+            const {id, active} = req.body
+
+            if (!id) {
+                return next(ApiError.badRequest("Ошибка параметра"))
+            } else {
+                const currUser = await User.findOne({where: {id: id}})
+                if (currUser) {
+                    await User.update(
+                        {
+                            is_active: active,
+                        },
+                        {
+                            where: {id: currUser.id},
+                        }
+                    );
+                    /**
+                     Обновление таблиц
+                     **/
+                    try {
+                        await TableUpdates.upsert({table_name: 'User', date: Date.now()})
+                    } catch (e) {
+                    }
+
+                    return res.json({status: 'ok'})
+                    // return res.json("status: 'ok'")
+                }
+                return next(ApiError.badRequest("Ошибка установки параметра"))
+            }
+        } catch (e) {
+
+        }
+        return res.json({status: "error"})
     }
 
     async isActive(req, res, next) {
-        const {id} = req.params
-        if (!id) {
-            return next(ApiError.badRequest("Ошибка параметра"))
-        } else {
-            const currUser = await User.findOne({where: {id: id}})
-            return res.json(currUser.is_active)
+        try {
+            const {id} = req.params
+            if (!id) {
+                return next(ApiError.badRequest("Ошибка параметра"))
+            } else {
+                const currUser = await User.findOne({where: {id: id}})
+                return res.json(currUser.is_active)
+            }
+        } catch (e) {
+
         }
+        return res.json({status: "error"})
     }
 
     async getById(req, res, next) {
@@ -344,86 +392,108 @@ class UserController {
     }
 
     async getAll(req, res) {
-        const usersList = await User.findAndCountAll({
+        try {
+            const usersList = await User.findAndCountAll({
+                    attributes: {exclude: ['password']},
+                    // limit: 10,
+                    order: [
+                        ['id', 'ASC'],
+                        // ['name', 'DESC'],
+                    ]
+                }
+            )
+            return res.json(usersList)
+        } catch (e) {
+
+        }
+        return res.json({status: "error"})
+    }
+
+    async getAllGuides(req, res) {
+        try {
+            const usersList = await User.findAndCountAll({
                 attributes: {exclude: ['password']},
-                // limit: 10,
+                where: {is_guide: true},
                 order: [
                     ['id', 'ASC'],
                     // ['name', 'DESC'],
                 ]
+                // limit: 10,
+            })
+
+            const guidesArr = []
+            for (let i = 0; i < usersList.count; i++) {
+                let currUser = JSON.parse(JSON.stringify(usersList.rows[i]))
+                const currGuide = await Guide.findOne({where: {user_id: currUser.id}})
+                if (currGuide) {
+                    currUser.avatar_img = currGuide.avatar_img
+
+                }
+                guidesArr.push(currUser)
             }
-        )
-        return res.json(usersList)
-    }
 
-    async getAllGuides(req, res) {
-        const usersList = await User.findAndCountAll({
-            attributes: {exclude: ['password']},
-            where: {is_guide: true},
-            order: [
-                ['id', 'ASC'],
-                // ['name', 'DESC'],
-            ]
-            // limit: 10,
-        })
+            // return res.json(usersList)
+            return res.json({count: usersList.count, rows: guidesArr})
+        } catch (e) {
 
-        const guidesArr = []
-        for (let i = 0; i < usersList.count; i++) {
-            let currUser = JSON.parse(JSON.stringify(usersList.rows[i]))
-            const currGuide = await Guide.findOne({where: {user_id: currUser.id}})
-            if(currGuide){
-                currUser.avatar_img = currGuide.avatar_img
-
-            }
-            guidesArr.push(currUser)
         }
-
-        // return res.json(usersList)
-        return res.json({count: usersList.count, rows: guidesArr})
+        return res.json({status: "error"})
     }
 
     async getAllAgents(req, res) {
-        const usersList = await User.findAndCountAll({
-            attributes: {exclude: ['password']},
-            where: {is_agent: true},
-            order: [
-                ['id', 'ASC'],
-                // ['name', 'DESC'],
-            ]
-            // limit: 10,
-        })
+        try {
+            const usersList = await User.findAndCountAll({
+                attributes: {exclude: ['password']},
+                where: {is_agent: true},
+                order: [
+                    ['id', 'ASC'],
+                    // ['name', 'DESC'],
+                ]
+                // limit: 10,
+            })
 
-        const agentsArr = []
-        for (let i = 0; i < usersList.count; i++) {
-            let currUser = JSON.parse(JSON.stringify(usersList.rows[i]))
-            const currAgent = await Agent.findOne({where: {user_id: currUser.id}})
-            if(currAgent){
-                currUser.avatar_img = currAgent.avatar_img
+            const agentsArr = []
+            for (let i = 0; i < usersList.count; i++) {
+                let currUser = JSON.parse(JSON.stringify(usersList.rows[i]))
+                const currAgent = await Agent.findOne({where: {user_id: currUser.id}})
+                if (currAgent) {
+                    currUser.avatar_img = currAgent.avatar_img
 
+                }
+                agentsArr.push(currUser)
             }
-            agentsArr.push(currUser)
-        }
 
-        // return res.json(usersList)
-        return res.json({count: usersList.count, rows: agentsArr})
+            // return res.json(usersList)
+            return res.json({count: usersList.count, rows: agentsArr})
+        } catch (e) {
+
+        }
+        return res.json({status: "error"})
+
     }
 
     async deleteUser(req, res, next) {
-        const {id} = req.query
-        if (!id) {
-            return next(ApiError.badRequest("Ошибка параметра"))
-        } else {
-            /**
-             Обновление таблиц
-             **/
-            try {
-                await TableUpdates.upsert({table_name: 'User', date: Date.now()})
-            } catch (e) {
-            }
+        try {
+            const {id} = req.query
+            if (!id) {
+                return next(ApiError.badRequest("Ошибка параметра"))
+            } else {
+                /**
+                 Обновление таблиц
+                 **/
+                try {
+                    await TableUpdates.upsert({table_name: 'User', date: Date.now()})
+                } catch (e) {
+                }
 
-            const count = await User.destroy({where: {id: id}})
-            return res.json(`Удалено записей: ${count}`)
+                const count = await User.destroy({where: {id: id}})
+                return res.json(`Удалено записей: ${count}`)
+            }
+        } catch (e) {
+
         }
+        return res.json({status: "error"})
+
     }
 
 }

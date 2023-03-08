@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
-import {Button, Container, Nav, Navbar} from "react-bootstrap";
-import {ADMIN_ROUTE, AUTH_ROUTE, MAIN_ROUTE} from "../utils/consts";
-import {NavLink, useHistory} from "react-router-dom";
+import {Button, Nav} from "react-bootstrap";
+import {AUTH_ROUTE, MAIN_ROUTE} from "../utils/consts";
+import {useHistory} from "react-router-dom";
 import {Context} from "../index";
 import {observer} from "mobx-react-lite";
 import classes from './NavBar.module.css'

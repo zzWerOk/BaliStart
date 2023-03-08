@@ -11,4 +11,6 @@ router.get('/getAll',authMiddleWare,guideController.getAll)
 router.get('/getById/:id',authMiddleWare,guideController.getById)
 router.delete('/delete',checkIsAdmin,guideController.deleteAgent)
 
+router.get('/getAgentById',authMiddleWare,guideController.getAgentById)
+
 module.exports = router

@@ -5,10 +5,14 @@ export default class UserStore {
     constructor() {
         this._isAdmin = false
         this._isGuide = false
+        this._isAgent = false
         this._isAuth = false
         this._email = ''
         this._name = ''
+        this._avatar_img = ''
         this._user = {}
+        this._guide = {}
+        this._agent = {}
 
         this._onLogoutHandler = null
         this._onLoginHandler = null
@@ -16,6 +20,14 @@ export default class UserStore {
         makeAutoObservable(this)
     }
 
+
+    get avatar_img() {
+        return this._avatar_img;
+    }
+
+    set avatar_img(value) {
+        this._avatar_img = value;
+    }
 
     setIsAuthUser(isAuthUser) {
         this._isAuth = isAuthUser
@@ -34,6 +46,13 @@ export default class UserStore {
         this._isGuide = value;
     }
 
+    get isAgent() {
+        return this._isAgent;
+    }
+
+    set isAgent(value) {
+        this._isAgent = value;
+    }
 
     get email() {
         return this._email;
@@ -51,6 +70,22 @@ export default class UserStore {
         this._name = value;
     }
 
+    setUserData(userData) {
+        if (userData.hasOwnProperty('name')) {
+            this.name = userData.name
+        }
+        if (userData.hasOwnProperty('avatar_img')) {
+            this.avatar_img = userData.avatar_img
+        }
+
+        this.setIsAuthUser(true)
+
+        if(this._onLoginHandler){
+            this._onLoginHandler()
+        }
+
+    }
+
     setUser(user) {
 
         if (user.hasOwnProperty('id') && user.hasOwnProperty('email')) {
@@ -64,6 +99,10 @@ export default class UserStore {
                 this.isGuide = user.isGuide
             }
 
+            if (user.hasOwnProperty('isAgent')) {
+                this.isAgent = user.isAgent
+            }
+
             if (user.hasOwnProperty('email')) {
                 this.email = user.email
             }
@@ -72,13 +111,11 @@ export default class UserStore {
                 this.name = user.name
             }
 
-            if(this._onLoginHandler){
-                this._onLoginHandler()
-            }
-
-
-            this.setIsAuthUser(true)
-
+            // this.setIsAuthUser(true)
+            //
+            // if(this._onLoginHandler){
+            //     this._onLoginHandler()
+            // }
         }
     }
 
@@ -99,6 +136,23 @@ export default class UserStore {
 
     get user() {
         return this._user
+    }
+
+
+    get guide() {
+        return this._guide;
+    }
+
+    set guide(value) {
+        this._guide = value;
+    }
+
+    get agent() {
+        return this._agent;
+    }
+
+    set agent(value) {
+        this._agent = value;
     }
 
     logout() {

@@ -5,15 +5,29 @@ import DragIcon from "../../../assets/svg/drag-handle.svg";
 import {addNewPhonesElement} from "../../../utils/consts";
 
 const BaliPhoneComponent = (props) => {
-    const {item, dataItemEditHandler} = props
+    const {item, dataItemEditHandler, noName} = props
 
     const [phoneName, setPhoneName] = useState('')
     const [phones, setPhones] = useState('[{"type":"","phone":""}]')
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        setPhoneName(item.name)
-        setPhones(item.items)
+        if (item) {
+            if (item.name) {
+                setPhoneName(item.name)
+            } else {
+                setPhoneName('')
+            }
+            if (item.items) {
+                setPhones(item.items)
+            } else {
+                setPhones('[]')
+            }
+        } else {
+            setPhoneName('')
+            setPhones('[]')
+        }
+
         setLoading(false)
     }, [])
 
@@ -47,7 +61,7 @@ const BaliPhoneComponent = (props) => {
 
     const newItemAddHandler = () => {
         let itemsArr = JSON.parse(phones)
-        itemsArr.push({"type": "", "phone": ""})
+        itemsArr.push({"type": "al", "phone": ""})
         setPhones(JSON.stringify(itemsArr))
 
         item.items = JSON.stringify(itemsArr)
@@ -64,38 +78,50 @@ const BaliPhoneComponent = (props) => {
     }
 
     const onDragEnd = useCallback((params) => {
-        const srcIndex = params.source.index
-        const dstIndex = params.destination?.index
+        try {
+            const srcIndex = params.source.index
+            const dstIndex = params.destination?.index
 
-        if (dstIndex !== null) {
-            if (dstIndex !== undefined) {
-                let imagesArr = JSON.parse(item.items)
-                imagesArr.splice(dstIndex, 0, imagesArr.splice(srcIndex, 1)[0])
+            if (dstIndex !== null) {
+                if (dstIndex !== undefined) {
+                    let itemsArr = JSON.parse(item.items)
+                    itemsArr.splice(dstIndex, 0, itemsArr.splice(srcIndex, 1)[0])
 
-                item.items = JSON.stringify(imagesArr)
-                setPhones(JSON.stringify(imagesArr))
+                    item.items = JSON.stringify(itemsArr)
+                    setPhones(JSON.stringify(itemsArr))
 
-                dataItemEditHandler(item)
+                    dataItemEditHandler(item)
+                }
             }
+        }catch (e) {
+            console.log(e.message)
         }
-    }, []);
+    }, [item]);
 
     if (loading) {
     } else {
 
         return (
-            <div
-            >
+            <div className={'d-flex flex-column align-items-center col-12'}>
 
-                <BaliInput labelText={'Phones title'}
-                           text={phoneName}
-                           onTextChangeHandler={handleName}
-                           required={false}
-                />
+                {
+                    !noName
+                        ?
+                        <BaliInput labelText={'Phones title'}
+                                   text={phoneName}
+                                   onTextChangeHandler={handleName}
+                                   required={false}
+                        />
+                        :
+                        null
+                }
+
                 <DragDropContext
                     onDragEnd={onDragEnd}
                 >
-                    <div>
+                    <div
+                        className={'col-12'}
+                    >
                         <Droppable droppableId="droppable-phones" type="PHONES">
                             {(provided, _) => (
                                 <div
@@ -105,75 +131,78 @@ const BaliPhoneComponent = (props) => {
 
                                     {
                                         JSON.parse(phones).map(function (listItem, index) {
-                                            return <div key={index + ' ' + listItem}>
-                                                <Draggable draggableId={"draggable-" + index} index={index}>
-                                                    {(provided, snapshot) => (
-                                                        <div
-                                                            className={'d-flex py-2'}
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-                                                            style={{
-                                                                ...provided.draggableProps.style,
-                                                                padding: snapshot.isDragging ? '0 10px 0 10px' : '0 0 0 0',
-                                                                transition: '0.1s ease all',
-                                                                MozTransition: '0.1s ease all',
-                                                                WebkitTransition: '0.1s ease all',
-                                                            }}
+                                            if(listItem) {
+                                                return <div key={listItem.type + '' + '' + index}>
+                                                    <Draggable draggableId={"draggable-" + index} index={index}>
+                                                        {(provided, snapshot) => (
+                                                            <div
+                                                                className={'d-flex py-2'}
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                style={{
+                                                                    ...provided.draggableProps.style,
+                                                                    padding: snapshot.isDragging ? '0 10px 0 10px' : '0 0 0 0',
+                                                                    transition: '0.1s ease all',
+                                                                    MozTransition: '0.1s ease all',
+                                                                    WebkitTransition: '0.1s ease all',
+                                                                }}
 
-                                                        >
+                                                            >
 
-                                                            <div key={index} className={'d-flex col-12 d-flex'}>
-                                                                <img
-                                                                    src={DragIcon}
-                                                                    alt="drag"
-                                                                    width={24}
-                                                                    style={{padding: 5}}
-                                                                />
-
-                                                                <select className="form-select col baliSelect"
-                                                                    // disabled={!!isSaving}
-                                                                        aria-label="Phone select"
-                                                                        value={listItem.type}
-                                                                        onChange={e => handleSelect(e.target.value, index)}
-                                                                >
-                                                                    {
-                                                                        addNewPhonesElement.map(item => {
-                                                                            return <option
-                                                                                key={item.id}
-                                                                                value={item.code}
-                                                                            >{item.name}</option>
-                                                                        })
-                                                                    }
-                                                                </select>
-
-                                                                <div
-                                                                    className={'col-7 form-group input-material my-0'}>
-                                                                    <input type="tel"
-                                                                           className="form-control"
-                                                                           id="name-field"
-                                                                           value={listItem.link}
-                                                                           onChange={e => itemPhonesEdit(e.target.value, index)}
+                                                                <div key={index} className={'d-flex col-12 d-flex'}>
+                                                                    <img
+                                                                        src={DragIcon}
+                                                                        alt="drag"
+                                                                        width={24}
+                                                                        style={{padding: 5}}
                                                                     />
 
+                                                                    <select className="form-select col baliSelect"
+                                                                        // disabled={!!isSaving}
+                                                                            aria-label="Phone select"
+                                                                            value={listItem.type}
+                                                                            onChange={e => handleSelect(e.target.value, index)}
+                                                                    >
+                                                                        {
+                                                                            addNewPhonesElement.map(item => {
+                                                                                return <option
+                                                                                    key={item.id}
+                                                                                    value={item.code}
+                                                                                >{item.name}</option>
+                                                                            })
+                                                                        }
+                                                                    </select>
+
+                                                                    <div
+                                                                        className={'col-7 form-group input-material my-0'}>
+                                                                        <input
+                                                                            // key={listItem.type + '' + listItem.phone}
+                                                                            type="tel"
+                                                                            className="form-control"
+                                                                            id="name-field"
+                                                                            value={listItem.phone}
+                                                                            onChange={e => itemPhonesEdit(e.target.value, index)}
+                                                                        />
+
+                                                                    </div>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn-close p-2"
+                                                                        onClick={() => {
+                                                                            itemDeleteHandler(index)
+                                                                        }}
+                                                                    >
+                                                                    </button>
+
                                                                 </div>
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn-close p-2"
-                                                                    onClick={() => {
-                                                                        itemDeleteHandler(index)
-                                                                    }}
-                                                                >
-                                                                </button>
 
                                                             </div>
+                                                        )}
 
-                                                        </div>
-                                                    )}
-
-                                                </Draggable>
-                                            </div>
-
+                                                    </Draggable>
+                                                </div>
+                                            }
                                         })
                                     }
 

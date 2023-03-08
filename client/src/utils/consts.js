@@ -1,5 +1,6 @@
 import sideBarItem from '../classes/sideBarItem'
 import React from "react";
+const moment = require('moment');
 
 export const delay = ms => new Promise(res => setTimeout(res, ms))
 
@@ -78,6 +79,11 @@ export const epochToDateWithTime = epoch => {
     return (day + "." + month + "." + year + " " + hours + ":" + minutes);
 }
 
+export const epochToDate_guide = epoch => {
+    const m = moment(epoch * 1000);
+
+    return m.format('yyyy-MM-D')
+}
 
 export const dateToEpoch = (date) => {
     return new Date(date).getTime() / 1000 || 0
@@ -369,7 +375,7 @@ export const addNewPhonesElement = [
     {
         id: 1,
         name: 'Viber',
-        code: 'tg',
+        code: 'vb',
     },
     {
         id: 2,

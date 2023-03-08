@@ -128,8 +128,6 @@ const TopicDetails = (props) => {
     }
 
     const isUserLogin = () => {
-        // console.log('login')
-
         getTopicEditable(topicIDUrl).then(data => {
             setIsEditable(false)
             if(data.hasOwnProperty('status')){
@@ -139,8 +137,6 @@ const TopicDetails = (props) => {
             }
         }).finally(() => {
         })
-
-
     }
 
     const openEditTopic = () => {

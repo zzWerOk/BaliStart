@@ -6,15 +6,28 @@ import '../BaliTextArea.css'
 import BaliInput from "../BaliInput";
 
 const BaliLinksComponent = (props) => {
-    const {item, dataItemEditHandler} = props
+    const {item, dataItemEditHandler, noName} = props
 
     const [linkName, setLinkName] = useState('')
     const [links, setLinks] = useState('[{"type":"","link":""}]')
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        setLinkName(item.name)
-        setLinks(item.items)
+        if(item) {
+            if (item.name) {
+                setLinkName(item.name)
+            } else {
+                setLinkName('')
+            }
+            if (item.items) {
+                setLinks(item.items)
+            } else {
+                setLinks('[]')
+            }
+        }else{
+            setLinkName('')
+            setLinks('[]')
+        }
         setLoading(false)
     }, [])
 
@@ -58,44 +71,57 @@ const BaliLinksComponent = (props) => {
     const itemDeleteHandler = (index) => {
         let itemsArr = JSON.parse(links)
         itemsArr.splice(index, 1)
-        setLinks(JSON.stringify(itemsArr))
 
+        setLinks(JSON.stringify(itemsArr))
         item.items = JSON.stringify(itemsArr)
+
         dataItemEditHandler(item)
     }
 
     const onDragEnd = useCallback((params) => {
-        const srcIndex = params.source.index
-        const dstIndex = params.destination?.index
+        try {
+            const srcIndex = params.source.index
+            const dstIndex = params.destination?.index
 
-        if (dstIndex !== null) {
-            if (dstIndex !== undefined) {
-                let imagesArr = JSON.parse(item.items)
-                imagesArr.splice(dstIndex, 0, imagesArr.splice(srcIndex, 1)[0])
+            if (dstIndex !== null) {
+                if (dstIndex !== undefined) {
+                    console.log(item)
+                    let itemsArr = JSON.parse(item.items)
+                    itemsArr.splice(dstIndex, 0, itemsArr.splice(srcIndex, 1)[0])
 
-                item.items = JSON.stringify(imagesArr)
-                setLinks(JSON.stringify(imagesArr))
+                    item.items = JSON.stringify(itemsArr)
+                    setLinks(JSON.stringify(itemsArr))
 
-                dataItemEditHandler(item)
+                    dataItemEditHandler(item)
+                }
             }
+        }catch (e) {
+            console.log(e.message)
         }
-    }, []);
+    }, [item]);
 
     if (loading) {
     } else {
 
         return (
-            <div
-            >
-
+            <div className={'d-flex flex-column align-items-center col-12'}>
+                {
+                    !noName
+                    ?
                 <BaliInput labelText={'Link name'}
                            text={linkName}
                            onTextChangeHandler={handleName}
                 />
+                        :
+                        null
+                }
+
                 <DragDropContext
                     onDragEnd={onDragEnd}
                 >
-                    <div>
+                    <div
+                        className={'col-12'}
+                    >
                         <Droppable droppableId="droppable-images" type="PERSON">
                             {(provided, _) => (
                                 <div
@@ -105,73 +131,74 @@ const BaliLinksComponent = (props) => {
 
                                     {
                                         JSON.parse(links).map(function (listItem, index) {
-                                            return <div key={index + ' ' + listItem}>
-                                                <Draggable draggableId={"draggable-" + index} index={index}>
-                                                    {(provided, snapshot) => (
-                                                        <div
-                                                            className={'d-flex py-2'}
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-                                                            style={{
-                                                                ...provided.draggableProps.style,
-                                                                padding: snapshot.isDragging ? '0 10px 0 10px' : '0 0 0 0',
-                                                                transition: '0.1s ease all',
-                                                                MozTransition: '0.1s ease all',
-                                                                WebkitTransition: '0.1s ease all',
-                                                            }}
+                                            if(listItem) {
+                                                return <div key={index + ' ' + listItem.type + "" + listItem}>
+                                                    <Draggable draggableId={"draggable-" + index} index={index}>
+                                                        {(provided, snapshot) => (
+                                                            <div
+                                                                className={'d-flex py-2'}
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                style={{
+                                                                    ...provided.draggableProps.style,
+                                                                    padding: snapshot.isDragging ? '0 10px 0 10px' : '0 0 0 0',
+                                                                    transition: '0.1s ease all',
+                                                                    MozTransition: '0.1s ease all',
+                                                                    WebkitTransition: '0.1s ease all',
+                                                                }}
 
-                                                        >
+                                                            >
 
-                                                            <div key={index} className={'d-flex col-12 d-flex'}>
-                                                                <img
-                                                                    src={DragIcon}
-                                                                    alt="React Logo"
-                                                                    width={24}
-                                                                    style={{padding: 5}}
-                                                                />
-
-                                                                <select className="form-select col baliSelect"
-                                                                    // disabled={!!isSaving}
-                                                                        aria-label="Link select"
-                                                                        value={listItem.type}
-                                                                        onChange={e => handleSelect(e.target.value, index)}
-                                                                >
-                                                                    {addNewLinksElement.map(item => {
-                                                                        return <option
-                                                                            key={item.id}
-                                                                            value={item.code}
-                                                                        >{item.name}</option>
-                                                                    })}
-                                                                </select>
-
-                                                                <div
-                                                                    className={'col-7 form-group input-material my-0'}>
-                                                                    <input type="text"
-                                                                           className="form-control"
-                                                                           id="name-field"
-                                                                           value={listItem.link}
-                                                                           onChange={e => itemLinksEdit(e.target.value, index)}
+                                                                <div className={'d-flex col-12 d-flex'}>
+                                                                    <img
+                                                                        src={DragIcon}
+                                                                        alt="React Logo"
+                                                                        width={24}
+                                                                        style={{padding: 5}}
                                                                     />
 
+                                                                    <select className="form-select col baliSelect"
+                                                                        // disabled={!!isSaving}
+                                                                            aria-label="Link select"
+                                                                            value={listItem.type}
+                                                                            onChange={e => handleSelect(e.target.value, index)}
+                                                                    >
+                                                                        {addNewLinksElement.map(item => {
+                                                                            return <option
+                                                                                key={item.id}
+                                                                                value={item.code}
+                                                                            >{item.name}</option>
+                                                                        })}
+                                                                    </select>
+
+                                                                    <div
+                                                                        className={'col-7 form-group input-material my-0'}>
+                                                                        <input type="link"
+                                                                               className="form-control"
+                                                                               id="name-field"
+                                                                               value={listItem.link}
+                                                                               onChange={e => itemLinksEdit(e.target.value, index)}
+                                                                        />
+
+                                                                    </div>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn-close p-2"
+                                                                        onClick={() => {
+                                                                            itemDeleteHandler(index)
+                                                                        }}
+                                                                    >
+                                                                    </button>
+
                                                                 </div>
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn-close p-2"
-                                                                    onClick={() => {
-                                                                        itemDeleteHandler(index)
-                                                                    }}
-                                                                >
-                                                                </button>
 
                                                             </div>
+                                                        )}
 
-                                                        </div>
-                                                    )}
-
-                                                </Draggable>
-                                            </div>
-
+                                                    </Draggable>
+                                                </div>
+                                            }
                                         })
                                     }
 

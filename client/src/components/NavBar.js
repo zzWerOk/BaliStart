@@ -1,22 +1,31 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 
-import {Button, Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
-import {MAIN_ROUTE} from "../utils/consts";
+import {Button, Container, Nav, Navbar, NavDropdown, Overlay, Popover} from "react-bootstrap";
+import {MAIN_ROUTE, USER_ROUTE} from "../utils/consts";
 import {observer} from "mobx-react-lite";
 import classes from './NavBar.module.css'
 import ModalPopUp from "./ModalPopUp";
 import LoginPage from "../pages/LoginPage";
 import {Context} from "../index";
+import UserProfileBtn from "./user/UserProfileBtn";
+import {useHistory} from "react-router-dom";
 
 const NavBar = observer(() => {
     const {user} = useContext(Context)
 
+    const history = useHistory()
+
     const [showModal, setShowModal] = useState(false)
+
+    const [show, setShow] = useState(false);
+    const [target, setTarget] = useState(null);
+    const ref = useRef(null);
 
     const logOut = () => {
         user.logout()
+        overlayClose()
     }
 
 
@@ -29,6 +38,20 @@ const NavBar = observer(() => {
             onAuthFinish={onAuthFinish}
         />
     )
+
+    const handleClick = (event) => {
+        setShow(!show);
+        setTarget(event.target);
+    }
+
+    const overlayClose = () => {
+        setShow(!show);
+    }
+
+    const openProfile = () => {
+        history.push(USER_ROUTE)
+    }
+
 
     return (
         <div>
@@ -66,18 +89,71 @@ const NavBar = observer(() => {
 
                     {user.isAuth
                         ?
-                        <div style={{display: 'inline-flex'}}>
-                            <Nav.Item
-                                className={`d-flex justify-content-center align-items-center`}
-                                style={{marginRight: '15px'}}
+                        <div style={{
+                            display: 'inline-flex',
+                            width: '40px',
+                            height: '40px',
+                            marginRight: '25px',
+                        }}
+                             ref={ref}
+                        >
+
+                            <UserProfileBtn image={user.avatar_img}
+                                            onClickHandler={handleClick}
+
+                            />
+
+                            <Overlay
+                                show={show}
+                                target={target}
+                                placement="bottom"
+                                container={ref}
+                                containerPadding={20}
                             >
-                                {user.name}
-                            </Nav.Item>
-                            <Nav.Item className={'d-flex justify-content-center align-items-center'}>
-                                <Button variant="outline-primary" onClick={() => {
-                                    logOut()
-                                }}>Logout</Button>
-                            </Nav.Item>
+                                <Popover id="popover-contained">
+                                    <Popover.Header className={'d-flex justify-content-between'}
+                                                    style={{backgroundColor: '#e3e3e3'}}
+                                    >
+                                        <div>
+                                            {user.name}
+                                        </div>
+                                        <div>
+                                            <button
+                                                type="button"
+                                                className="btn-close"
+                                                onClick={() => {
+                                                    overlayClose()
+                                                }}
+                                            >
+                                            </button>
+                                        </div>
+                                    </Popover.Header>
+                                    <Popover.Body>
+
+                                        <div className={'d-flex flex-column justify-content-center'}>
+
+                                            <div className={'p-3 d-flex justify-content-center'}>
+                                                <Button variant="info"
+                                                        onClick={() => {
+                                                            openProfile()
+                                                        }}>
+                                                    Open profile
+                                                </Button>
+                                            </div>
+
+                                            <div className={'p-3 d-flex justify-content-center'}>
+                                                <Button variant="outline-secondary"
+                                                        onClick={() => {
+                                                            logOut()
+                                                        }}>
+                                                    Logout
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </Popover.Body>
+                                </Popover>
+                            </Overlay>
+
                         </div>
                         :
                         <Button variant="outline-primary" onClick={() => {
