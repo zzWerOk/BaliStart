@@ -37,7 +37,7 @@ const MainPageFeed = (props) => {
             <div style={{marginTop: '20px'}}>
                 <FeedTopBar
                     itemsTypeChangeHandler={itemsTypeChangeHandler}
-                    itemsType={itemsType}
+                    // itemsType={itemsType}
                     isSearch={true}
                     setSearchHandler={setSearchHandler}
                     setSort={setSortHandler}

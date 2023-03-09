@@ -6,10 +6,11 @@ import FeedTopBar from "../components/mainpage/FeedTopBar";
 import FeedTopic from "../components/mainpage/feed/Feed_topic";
 import {Context} from "../index";
 import {useHistory} from "react-router-dom";
+import {getAllCategories} from "../http/topicsCategoryAPI";
 
 const TopicsPage = (props) => {
     const {id} = props
-    const {rightSideBarStore} = useContext(Context)
+    const {rightSideBarStore, topicsCategoryStore} = useContext(Context)
 
     const history = useHistory()
 
@@ -22,17 +23,26 @@ const TopicsPage = (props) => {
     const [sortCode, setSortCode] = useState('alpha')
     const [searchKey, setSearchKey] = useState('')
 
+    const [pageTitle, setPageTitle] = useState('')
+
+    useEffect(() => {
+        document.title = pageTitle;
+    }, [pageTitle]);
 
     useEffect(() => {
 
         rightSideBarStore.clear()
-        // rightSideBarStore.barTitle = 'Side bar'
         rightSideBarStore.addBR()
-        rightSideBarStore.addBtn('Create new', 'btn btn-bali ', () => {openCreateNewTopic(id)})
+        rightSideBarStore.addBtn('Create new', 'btn btn-bali ', () => {
+            openCreateNewTopic(id)
+        })
 
     }, [])
 
     useEffect(() => {
+
+        setPageTitle('Topics')
+
         setLoading(true)
 
         setCategoryId(id)
@@ -43,8 +53,39 @@ const TopicsPage = (props) => {
 
         getTopicsData(id, sortCode, searchKey)
 
+        if (!topicsCategoryStore.loaded && id) {
+            const catSortCode = localStorage.getItem("sort_code_Categories") || 'alpha'
+            getCategoriesData(catSortCode, '')
+        } else if(topicsCategoryStore.loaded && id) {
+            setPageTitleText()
+        }
+
     }, [])
 
+    const setPageTitleText = () => {
+
+        if (topicsCategoryStore.loaded && id) {
+            const catName = topicsCategoryStore.getItemName_byId(id)
+            if(catName !== '') {
+                setPageTitle(catName)
+            }
+        }
+    }
+
+    const getCategoriesData = (sortCode, search) => {
+        getAllCategories(sortCode, search).then(data => {
+
+            console.log(data)
+
+            topicsCategoryStore.saveCategoriesList(JSON.parse(JSON.stringify(data.rows)))
+        }).catch(() => {
+            topicsCategoryStore.saveCategoriesList([])
+        }).finally(() => {
+            setLoading(false)
+            setPageTitleText()
+        })
+
+    }
 
     const openCreateNewTopic = (id) => {
         // history.push(CREATE_TOPIC_ROUTE)

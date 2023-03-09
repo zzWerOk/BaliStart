@@ -66,7 +66,7 @@ const TourMpCard = (props) => {
                         </h3>
                     </div>
                     <div className="row">
-                        <div className="col-sm-5 d-flex align-items-center">
+                        <div className="col-xs-4 col-sm-4 col-lg-5 d-flex align-items-center">
                             <img className="d-block w-100 rounded shadow p-2 bg-white"
                                  style={{marginLeft: '-15px'}}
                                  src={itemImage}

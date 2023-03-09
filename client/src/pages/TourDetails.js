@@ -34,6 +34,8 @@ const TourDetails = () => {
 
     const [tourGuideClicked, setTourGuideClicked] = useState(-1)
 
+    const [pageTitle, setPageTitle] = useState('')
+
     const clickTourGuide = (guideId) => {
 
         if (guideId === tourGuideClicked) {
@@ -42,6 +44,10 @@ const TourDetails = () => {
             setTourGuideClicked(guideId)
         }
     }
+
+    useEffect(() => {
+        document.title = pageTitle;
+    }, [pageTitle]);
 
     useEffect(() => {
 
@@ -65,6 +71,8 @@ const TourDetails = () => {
                             delete dataJson.data.data
                         }
                         setCurrTour(dataJson.data)
+
+                        setPageTitle(dataJson.data.name)
 
                         setTourGuides(dataJson.data.selected_guides)
 

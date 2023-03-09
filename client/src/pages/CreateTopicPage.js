@@ -4,7 +4,7 @@ import {Button, Col, Row} from "react-bootstrap";
 import BaliInput from "../components/balicreatetopic/BaliInput";
 import BaliTextArea from "../components/balicreatetopic/BaliTextArea";
 import {Context} from "../index";
-import {getAll} from "../http/topicsCategoryAPI";
+import {getAllCategories} from "../http/topicsCategoryAPI";
 import BaliSelect from "../components/balicreatetopic/BaliSelect";
 import BaliFileUpload from "../components/balicreatetopic/BaliFileUpload";
 import BaliAddNewElementBtn from "../components/balicreatetopic/BaliAddNewElementBtn";
@@ -292,7 +292,7 @@ const CreateTopicPage = (props) => {
     }
 
     const getCategoriesData = (sortCode, search) => {
-        getAll(sortCode, search).then(data => {
+        getAllCategories(sortCode, search).then(data => {
             topicsCategoryStore.saveCategoriesList(JSON.parse(JSON.stringify(data.rows)))
         }).catch(() => {
             topicsCategoryStore.saveCategoriesList([])

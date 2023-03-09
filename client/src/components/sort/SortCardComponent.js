@@ -34,7 +34,7 @@ const SortCardComponent = (props) => {
     } else {
         return (
             <div className={'d-flex justify-content-center'}>
-                <div className={'col-4 d-flex flex-column'}>
+                <div className={'col-md-4 col-sm-9 d-flex flex-column'}>
 
                     {
                         sortItems.map(function (item, index) {

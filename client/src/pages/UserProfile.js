@@ -44,6 +44,11 @@ const UserProfile = () => {
     const [isGuideSavingError, setIsGuideSavingError] = useState('');
     const [isAgentSavingError, setIsAgentSavingError] = useState('');
 
+    const [pageTitle, setPageTitle] = useState('')
+
+    useEffect(() => {
+        document.title = pageTitle;
+    }, [pageTitle]);
 
     useEffect(() => {
 
@@ -61,6 +66,8 @@ const UserProfile = () => {
             setLoading(false)
             setShow(false)
         }
+
+        setPageTitle('User profile')
 
     }, [])
 
@@ -106,7 +113,7 @@ const UserProfile = () => {
                 if (user.avatar_img) {
                     setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + user.avatar_img + '?' + Date.now())
                 } else {
-                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar.png')
+                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/guide_avatar.png')
                 }
 
                 setLoading(false)
@@ -140,7 +147,7 @@ const UserProfile = () => {
                 if (user.avatar_img) {
                     setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + user.avatar_img + '?' + Date.now())
                 } else {
-                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar.png')
+                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/guide_avatar.png')
                 }
 
                 setLoading(false)
@@ -274,7 +281,6 @@ const UserProfile = () => {
                     }
 
                     setGuideSaveForCheck(JSON.stringify(user.guide))
-                    // checkGuideIsChanged()
                     setIsGuideChanged(false)
                 } else {
                     if (data.hasOwnProperty('message')) {
@@ -356,33 +362,39 @@ const UserProfile = () => {
                         <div className="row d-flex justify-content-center align-items-center h-100">
                             <div className="col col-xl-9">
                                 <div className="card  mb-5">
-                                    <div className="rounded-top text-white d-flex flex-row"
+                                    <div className="rounded-top text-white d-flex justify-content-between"
                                          style={{backgroundColor: '#332d2d', height: '200px'}}>
-                                        <div className="ms-4 mt-5 d-flex flex-column" style={{width: '150px'}}>
+                                        <div className="ms-4 d-flex flex-column flex-column-reverse"
+                                             style={{width: '140px'}}>
+                                            {/*<div className="ms-4 me-4 mt-5 d-flex flex-column" >*/}
                                             <img
                                                 src={avatar_img} alt="Guide avatar"
-                                                className="rounded-circle img-thumbnail shadow-sm mt-4 mb-2"
+                                                className="rounded-circle img-thumbnail shadow-sm"
                                                 style={{
-                                                    minWidth: '150px',
-                                                    minHeight: '150px',
-                                                    maxWidth: '150px',
-                                                    maxHeight: '150px',
-                                                    width: '150px',
-                                                    height: '150px',
+                                                    display: 'block',
+                                                    maxWidth: '80%',
+                                                    height: 'auto',
+                                                    position: 'relative',
+                                                    top: '25px',
+                                                    // minWidth: '150px',
+                                                    // minHeight: '150px',
+                                                    // maxWidth: '150px',
+                                                    // maxHeight: '150px',
                                                     objectFit: 'cover',
                                                     zIndex: '1'
                                                 }}/>
                                         </div>
-                                        <div className="ms-3" style={{marginTop: '130px'}}>
+                                        {/*<div className="ms-3" style={{marginTop: '110px'}}>*/}
+                                        <div className="ms-2 mb-2 d-flex flex-column flex-column-reverse">
                                             <h5>{user.name}</h5>
-                                            {/*<p>{user.email}</p>*/}
                                         </div>
-                                        <div className="ms-5" style={{marginTop: '130px'}}>
-                                            <h5>Registration date</h5>
+                                        {/*<div className="ms-5" style={{marginTop: '110px'}}>*/}
+                                        <div className="ms-2 d-flex flex-column flex-column-reverse text-end me-4">
                                             <p>01.01.2023</p>
+                                            <h5>Registration date</h5>
                                         </div>
                                     </div>
-                                    <div className="d-flex justify-content-between p-4 text-black"
+                                    <div className="d-flex justify-content-between py-4 text-black"
                                          style={{backgroundColor: '#f8f9fa'}}>
                                         <div className="d-flex justify-content-start text-center py-1">
                                             <div className="px-4">

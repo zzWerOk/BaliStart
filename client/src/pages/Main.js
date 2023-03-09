@@ -6,8 +6,16 @@ const Main = () => {
 
     const [loading, setLoading] = useState(true)
 
+    const [pageTitle, setPageTitle] = useState('')
+
+    useEffect(() => {
+        document.title = pageTitle;
+    }, [pageTitle]);
+
     useEffect(() => {
         setLoading(true)
+
+        setPageTitle('Main')
 
         setLoading(false)
     }, [])
@@ -19,7 +27,7 @@ const Main = () => {
         return (
             <div>
                 {/*<BaliInput labelText={'Name'}/>*/}
-                <Categories/>
+                <Categories presetPageTitle={'Main'}/>
             </div>
         );
     }

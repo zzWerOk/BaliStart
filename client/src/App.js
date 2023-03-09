@@ -53,18 +53,18 @@ const App = observer(() => {
                     className={'Main-Field'}
                     style={{marginLeft: 0, marginRight: 0,}}
                 >
-                    <Col>
+                    <Col className={'d-none d-md-block col-sm-3'}>
                         <SideBarL/>
                     </Col>
                     <Col
-
-                        md={7}
+                        // md={7}
+                        className={'col-md-9 col-lg-7 col-sm-12'}
                         style={{padding: 0, backgroundColor: 'white'}}
                     >
                         <AppRouter/>
                         <FabButton/>
                     </Col>
-                    <Col>
+                    <Col className={'d-none d-lg-block'}>
                         <SideBarR title={rightSideBarStore.barTitle}/>
                     </Col>
                 </Row>

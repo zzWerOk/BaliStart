@@ -9,6 +9,7 @@ import TopicCommentsStore from "./store/TopicCommentsStore";
 import ToursCategoryStore from "./store/ToursCategoryStore";
 import ToursTypeStore from "./store/ToursTypeStore";
 import RightSideBarStore from "./store/RightSideBarStore";
+import LeftSideBarStore from "./store/LeftSideBarStore";
 
 export const Context = createContext(null)
 
@@ -20,6 +21,7 @@ root.render(
         topicCommentsStore: new TopicCommentsStore(),
         toursCategoryStore: new ToursCategoryStore(),
         toursTypeStore: new ToursTypeStore(),
+        leftSideBarStore: new LeftSideBarStore(),
         rightSideBarStore: new RightSideBarStore(),
     }}>
         <BrowserRouter>

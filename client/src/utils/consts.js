@@ -1,5 +1,5 @@
 import sideBarItem from '../classes/sideBarItem'
-import React from "react";
+// import React from "react";
 const moment = require('moment');
 
 export const delay = ms => new Promise(res => setTimeout(res, ms))
@@ -100,6 +100,7 @@ export const NOPAGE_ROUTE = '/404'
 export const CATEGORY_ROUTE = '/category/:id'
 export const CATEGORIES_ROUTE = '/categories'
 export const GUIDE_ROUTE = '/guide'
+export const GUIDES_ROUTE = '/guides'
 export const TOURS_ROUTE = '/tours'
 export const TOUR_ROUTE = '/tour/:id'
 export const MAPPOINT_ROUTE = '/poi'
@@ -152,8 +153,9 @@ export const getTourDuration = (duration) => {
 
 export const getTourActivityLevel = (activityLevel) => {
     switch (activityLevel) {
-        case '1':
-        case 1:
+        // case '1':
+        // case 1:
+        default:
             return 'Easy level'
         case '2':
         case 2:
@@ -173,22 +175,30 @@ export const getTourActivityLevel = (activityLevel) => {
 export const tourLanguages = (lang) => {
     const langArr = JSON.parse(lang)
     let langText = ''
-    langArr.map(item => {
-
+    return langArr.map(item => {
         switch (item) {
+            // case 'en':
             case 'ru':
-                langText = langText + 'Russian '
-                break
-            case 'en':
-                langText = langText + 'English '
-                break
+                return langText + 'Russian '
             case 'id':
-                langText = langText + 'Indonesian '
-                break
+                return langText + 'Indonesian '
+            default:
+                return langText + 'English '
         }
+        // switch (item) {
+        //     case 'ru':
+        //         langText = langText + 'Russian '
+        //         break
+        //     case 'en':
+        //         langText = langText + 'English '
+        //         break
+        //     case 'id':
+        //         langText = langText + 'Indonesian '
+        //         break
+        // }
+        // return langText
     })
 
-    return langText
 }
 
 export const sortCategories = () => {
@@ -392,5 +402,37 @@ export const addNewPhonesElement = [
         name: 'Any',
         code: 'al',
     },
+]
 
+export const leftSideBarElements = [
+    {
+        id: 0,
+        name: 'Main page',
+        link: MAIN_ROUTE,
+    },
+    {
+        id: 1,
+        name: 'Topics page',
+        link: TOPICS_ROUTE,
+    },
+    {
+        id: 2,
+        name: 'Categories page',
+        link: CATEGORIES_ROUTE,
+    },
+    {
+        id: 3,
+        name: 'Tours',
+        link: TOURS_ROUTE,
+    },
+    {
+        id: 4,
+        name: 'Points of interests',
+        link: MAPPOINT_ROUTE,
+    },
+    {
+        id: 5,
+        name: 'Guides page',
+        link: GUIDES_ROUTE,
+    },
 ]

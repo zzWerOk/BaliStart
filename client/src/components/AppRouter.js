@@ -15,6 +15,8 @@ const AppRouter = () => {
         })
     }, [])
 
+
+
     return (
         <div>
             <Switch>

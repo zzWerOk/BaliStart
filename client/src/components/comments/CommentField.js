@@ -49,7 +49,9 @@ const CommentField = (props) => {
     }
 
     return (
-        <div className="media-block">
+        <div className="media-block"
+             style={{marginLeft: '10px'}}
+        >
             <a className="media-left" href="#">
                 <img className="img-circle img-sm"
                      alt="Profile Picture"

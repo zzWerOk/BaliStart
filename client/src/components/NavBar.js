@@ -2,7 +2,7 @@ import React, {useContext, useRef, useState} from 'react';
 
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 
-import {Button, Container, Nav, Navbar, NavDropdown, Overlay, Popover} from "react-bootstrap";
+import {Button, Container, Nav, Navbar, Overlay, Popover} from "react-bootstrap";
 import {MAIN_ROUTE, USER_ROUTE} from "../utils/consts";
 import {observer} from "mobx-react-lite";
 import classes from './NavBar.module.css'
@@ -11,6 +11,8 @@ import LoginPage from "../pages/LoginPage";
 import {Context} from "../index";
 import UserProfileBtn from "./user/UserProfileBtn";
 import {useHistory} from "react-router-dom";
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import SideBarL from "./SideBarL";
 
 const NavBar = observer(() => {
     const {user} = useContext(Context)
@@ -18,6 +20,8 @@ const NavBar = observer(() => {
     const history = useHistory()
 
     const [showModal, setShowModal] = useState(false)
+
+    const [showSideBar, setShowSideBar] = useState(false);
 
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
@@ -50,42 +54,57 @@ const NavBar = observer(() => {
 
     const openProfile = () => {
         history.push(USER_ROUTE)
+        overlayClose()
     }
 
+    const closeLeftSideBar = () => {
+        setShowSideBar(false)
+    }
+
+    const showLeftSideBar = () => {
+        setShowSideBar(true)
+    }
 
     return (
         <div>
 
             <Navbar bg="light" expand="lg" className={'fixed-top z-depth-5'}>
                 <Container fluid>
+                    <Navbar.Toggle aria-controls="navbarScroll"
+                                   onClick={showLeftSideBar}
+                                   className={'d-md-none'}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                             className="bi bi-list" viewBox="0 0 16 16">
+                            <path fillRule="evenodd"
+                                  d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                    </Navbar.Toggle>
                     <Navbar.Brand href={MAIN_ROUTE}>Bali Start</Navbar.Brand>
                     <h1 className={classes.title}>
                     </h1>
 
-                    <Navbar.Toggle aria-controls="navbarScroll"/>
-                    <Navbar.Collapse id="navbarScroll">
-                        <Nav
-                            className="me-auto my-2 my-lg-0"
-                            style={{maxHeight: '100px'}}
-                            navbarScroll
-                        >
-                            <Nav.Link href="#action1">Home</Nav.Link>
-                            <Nav.Link href="#action2">Link</Nav.Link>
-                            <NavDropdown title="Link" id="navbarScrollingDropdown">
-                                <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-                                <NavDropdown.Item href="#action4">
-                                    Another action
-                                </NavDropdown.Item>
-                                <NavDropdown.Divider/>
-                                <NavDropdown.Item href="#action5">
-                                    Something else here
-                                </NavDropdown.Item>
-                            </NavDropdown>
-                            <Nav.Link href="#" disabled>
-                                Link
-                            </Nav.Link>
-                        </Nav>
-                    </Navbar.Collapse>
+                    <Navbar.Offcanvas
+                        show={showSideBar}
+                        onHide={closeLeftSideBar}
+                        id={`navbarScroll`}
+                        aria-labelledby={`navbarScrollTitle`}
+                        placement="start"
+                        role={'navigation'}
+                    >
+                        <Offcanvas.Header closeButton>
+                            <Offcanvas.Title id={`navbarScrollTitle`}>
+                                Bali start
+                            </Offcanvas.Title>
+                        </Offcanvas.Header>
+                        <Offcanvas.Body>
+
+                            <div className={'d-md-none'}>
+                                <SideBarL onItemClickHandler={closeLeftSideBar}/>
+                            </div>
+
+                        </Offcanvas.Body>
+                    </Navbar.Offcanvas>
 
                     {user.isAuth
                         ?
@@ -133,12 +152,12 @@ const NavBar = observer(() => {
                                         <div className={'d-flex flex-column justify-content-center'}>
 
                                             <div className={'p-3 d-flex justify-content-center'}>
-                                                <Button variant="info"
+                                                <Nav.Link variant="info"
                                                         onClick={() => {
                                                             openProfile()
                                                         }}>
                                                     Open profile
-                                                </Button>
+                                                </Nav.Link>
                                             </div>
 
                                             <div className={'p-3 d-flex justify-content-center'}>

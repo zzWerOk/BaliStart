@@ -17,7 +17,7 @@ export const setIsActiveAPI = async (id, active) => {
     return data
 }
 
-export const getAll = async (sortCode, searchKey) => {
+export const getAllCategories = async (sortCode, searchKey) => {
 
     const {data} = await $authHost.get(apiUrl+'/all',{ params: { sortCode , searchKey} })
     return data

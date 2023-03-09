@@ -175,11 +175,11 @@ const AddNewCommentComponent = (props) => {
 
     return (<div>
             <link href={"https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"} rel="stylesheet"/>
-            <div className="container bootdey">
+            <div className="container px-0 px-md-4">
                 <div className="col-md-12 bootstrap snippets">
                     <div className="panel">
-                        <div className="panel-body"
-                             style={{padding: '0 25px 0px'}}
+                        <div className="panel-body px-0 px-md-5 pt-0"
+                             // style={{padding: '0 25px 0px'}}
                         >
 
                         <textarea
@@ -222,9 +222,9 @@ const AddNewCommentComponent = (props) => {
 
                                                 <Button
                                                     type="button"
-                                                    className={`btn btn-sm `}
+                                                    className={`btn btn-sm ml-lg-4`}
                                                     variant={"outline-danger"}
-                                                    style={{marginLeft: '25px'}}
+                                                    // style={{marginLeft: '25px'}}
                                                     disabled={!!commentSending || !!isDeleting}
                                                     onClick={onShowDeleteBtnHandler}
                                                 >
@@ -235,9 +235,9 @@ const AddNewCommentComponent = (props) => {
                                                     showDeleteBtn
                                                         ?
                                                         <Button
-                                                            className="btn  btn-sm "
+                                                            className="btn btn-sm ml-1 mr-3"
                                                             variant={"outline-danger"}
-                                                            style={{marginLeft: '5px'}}
+                                                            // style={{marginLeft: '5px'}}
                                                             disabled={!!commentSending || !!isDeleting}
                                                             onClick={() => {
                                                                 deleteCommentHandler(topicId, topic_comment_id)

@@ -7,8 +7,6 @@ import SortCardComponent from "../sort/SortCardComponent";
 const FeedTopBar = (props) => {
 
     const {
-        itemsTypeChangeHandler,
-        itemsType,
         isSearch,
         setSearchHandler,
         isBackBtn,
@@ -60,7 +58,7 @@ const FeedTopBar = (props) => {
             }}
         >
             <div
-                className="me-auto my-5 my-lg-0 d-flex"
+                className="me-auto d-flex"
                 style={{
                     maxHeight: '100px',
                     boxShadow: '0!important',
@@ -71,7 +69,7 @@ const FeedTopBar = (props) => {
                 {
                     isBackBtn === true
                         ?
-                        <a className={`btn btn-link ${classes.back_btn}`}
+                        <a className={`btn btn-link px-0 px-md-3 ${classes.back_btn}`}
                            onClick={() => {
                                if(backBtnHandler){
                                    backBtnHandler()
@@ -99,30 +97,18 @@ const FeedTopBar = (props) => {
                         null
                 }
 
-                {
-                    itemsType
-                        ?
-                        <span
-                            className={`${classes.feed_top_bar_a} ${itemsType === 'categories' ? classes.selected_a : ''} `}
-                            onClick={() => {
-                                itemsTypeChangeHandler('categories')
-                            }}
-                        >Categories</span>
-                        :
-                        null
-                }
-                {
-                    itemsType
-                        ?
-                        <span
-                            className={`${classes.feed_top_bar_a} ${itemsType === 'lastPosts' ? classes.selected_a : ''} `}
-                            onClick={() => {
-                                itemsTypeChangeHandler('lastPosts')
-                            }}
-                        >Last posts</span>
-                        :
-                        null
-                }
+                {/*{*/}
+                {/*    // itemsType*/}
+                {/*    //     ?*/}
+                {/*        <span*/}
+                {/*            className={`${classes.feed_top_bar_a} ${itemsType === 'categories' ? classes.selected_a : ''} `}*/}
+                {/*            onClick={() => {*/}
+                {/*                itemsTypeChangeHandler('categories')*/}
+                {/*            }}*/}
+                {/*        >Categories</span>*/}
+                {/*    // :*/}
+                {/*    // null*/}
+                {/*}*/}
 
 
             </div>
@@ -130,7 +116,7 @@ const FeedTopBar = (props) => {
                 setSort
                     ?
                     <button
-                        className={`btn btn-outline-secondary ${classes.feed_top_bar_a} `}
+                        className={`btn btn-outline-secondary d-flex ${classes.feed_top_bar_a} `}
                         style={{marginRight: '10px', color: "white"}}
                         onClick={() => {
                             setShowModal(!showModal)
@@ -142,6 +128,7 @@ const FeedTopBar = (props) => {
                             selectedSortCode === 'alpha'
                                 ?
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                     style={{marginLeft: '5px'}}
                                      fill="currentColor" className="bi bi-sort-alpha-down" viewBox="0 0 16 16">
                                     <path fillRule="evenodd"
                                           d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371h-1.781zm1.57-.785L11 2.687h-.047l-.652 2.157h1.351z"/>
@@ -152,6 +139,7 @@ const FeedTopBar = (props) => {
                                 selectedSortCode === 'realpha'
                                     ?
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         style={{marginLeft: '5px'}}
                                          fill="currentColor" className="bi bi-sort-alpha-up"
                                          viewBox="0 0 16 16">
                                         <path fillRule="evenodd"
@@ -163,6 +151,7 @@ const FeedTopBar = (props) => {
                                     selectedSortCode === 'date'
                                         ?
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             style={{marginLeft: '5px'}}
                                              fill="currentColor" className="bi bi-sort-numeric-down"
                                              viewBox="0 0 16 16">
                                             <path
@@ -174,6 +163,7 @@ const FeedTopBar = (props) => {
                                         </svg>
                                         :
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             style={{marginLeft: '5px'}}
                                              fill="currentColor" className="bi bi-sort-numeric-up" viewBox="0 0 16 16">
                                             <path
                                                 d="M12.438 1.668V7H11.39V2.684h-.051l-1.211.859v-.969l1.262-.906h1.046z"/>

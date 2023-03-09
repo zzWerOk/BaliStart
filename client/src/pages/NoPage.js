@@ -1,6 +1,11 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 const NoPage = () => {
+
+
+    useEffect(() => {
+        document.title = 'Oops, 404';
+    }, []);
 
     return (
         <div>

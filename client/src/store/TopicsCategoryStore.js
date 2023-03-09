@@ -81,51 +81,6 @@ export default class TopicsCategoryStore {
         }
     }
 
-    deleteItem(id) {
-        if (id) {
-
-            const newItemPos = this.findPositionNewItem_byId(id)
-            const itemPos = this.findPositionItem_byId(id)
-
-            if(newItemPos > -1) {
-                this.newItemsArr.splice(newItemPos, 1)
-            }
-
-            if(itemPos > -1) {
-                this.itemsArr.splice(itemPos, 1)
-            }
-
-            return true
-        }
-    }
-
-    editItem(name, description='', is_for_tour=false, id) {
-        if (name) {
-
-            // const newItemPos = this.findPositionNewItem_byName(name)
-            const newItemPos = this.findPositionNewItem_byId(id)
-            // const itemPos = this.findPositionItem_byName(name)
-            const itemPos = this.findPositionItem_byId(id)
-
-            if(newItemPos > -1) {
-                let newItemsArr = this.newItemsArr
-                newItemsArr[newItemPos].category_name = name
-                newItemsArr[newItemPos].description = description
-                newItemsArr[newItemPos].is_for_tour = is_for_tour
-            }
-
-            if(itemPos > -1) {
-                let itemsArr = this.itemsArr
-                itemsArr[itemPos].category_name = name
-                itemsArr[itemPos].description = description
-                itemsArr[itemPos].is_for_tour = is_for_tour
-            }
-
-            return true
-        }
-        return false
-    }
-
     get newItemsArr() {
         if (this._newItemsArr === '') {
             return []
@@ -164,23 +119,15 @@ export default class TopicsCategoryStore {
         return -1
     }
 
-    findPositionNewItem_byId(id) {
-        for(let i = 0;i < this.newItemsArr.length;i++){
-            const currItem = this.newItemsArr[i]
-            if(currItem.id === id){
-                return i
-            }
-        }
-        return -1
-    }
-    findPositionItem_byId(id) {
+    getItemName_byId(id) {
+
         for(let i = 0;i < this.itemsArr.length;i++){
             const currItem = this.itemsArr[i]
-            if(currItem.id === id){
-                return i
+            if(currItem.id + "" === id + ""){
+                return currItem.category_name
             }
         }
-        return -1
+        return ''
     }
     findPositionItem_byName(name) {
         for(let i = 0;i < this.itemsArr.length;i++){

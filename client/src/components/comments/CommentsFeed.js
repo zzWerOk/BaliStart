@@ -112,24 +112,11 @@ const CommentsFeed = (props) => {
     }
 
     const getCommentComponent = (item, index) => {
-        // let repliesArr = []
-        // let item = currItem
-
-        // console.log(item)
-
-        // if (item.hasOwnProperty('replies')) {
-        //     item.replies.map(function (replItem, replIndex) {
-        //         if (replItem !== undefined) {
-        //             repliesArr.push(getCommentComponent(replItem, replIndex))
-        //         }
-        //     })
-        // }
 
         return <CommentField
             key={index}
             topicId={topicId}
             comment={item}
-            // replies={repliesArr}
             wrightComment={item.topic_comment_id === wrightCommentId}
             wrightCommentId={wrightCommentId}
             setWrightCommentHandler={setWrightCommentHandler}
@@ -147,13 +134,12 @@ const CommentsFeed = (props) => {
     } else {
 
         return (
-            <div className="panel">
-                <div className="panel-body">
-                    <div className={classes.topic_row_bottom}>
+            <div className="panel px-0 px-md-2">
+                <div className="panel-body px-3 px-md-4 pt-0">
+                    <div className={`classes.topic_row_bottom px-4`}>
                         <AddNewCommentComponent //addNewCommentHandler
                             topicId={topicId}
                             addNewCommentHandler={addNewCommentHandler}
-                            // isCommentSending={isCommentSending}
                         />
                     </div>
                     {
@@ -163,7 +149,6 @@ const CommentsFeed = (props) => {
                                 <div>
                                     <a className={`badge badge-secondary ${classes.badge_outlined} ${classes.comment_btn}`}
                                        onClick={() => {
-                                           // commentsSortHandler(commentsSort)
                                            sortComments(commentsSort)
                                        }}
                                        type="button"
@@ -173,14 +158,12 @@ const CommentsFeed = (props) => {
                                             commentsSort
                                                 ?
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    // fill="currentColor"
                                                      className="bi bi-sort-up-alt" viewBox="0 0 16 16">
                                                     <path
                                                         d="M3.5 13.5a.5.5 0 0 1-1 0V4.707L1.354 5.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 4.707V13.5zm4-9.5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"/>
                                                 </svg>
                                                 :
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    // fill="currentColor"
                                                      className="bi bi-sort-down-alt" viewBox="0 0 16 16">
                                                     <path
                                                         d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"/>

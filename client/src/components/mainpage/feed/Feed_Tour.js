@@ -69,7 +69,7 @@ const FeedTour = (props) => {
                             <li>{tourLanguages(item.languages)}</li>
                         </ul>
                     </div>
-                    <div className="description col-8">
+                    <div className="description col-md-8">
                         <h1 className="text-truncate">{item.name}</h1>
                         <h2 className="text-truncate">{tourCategories(item.tour_category)}</h2>
                         <p className="">{item.description}</p>

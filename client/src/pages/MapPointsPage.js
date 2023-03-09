@@ -15,7 +15,16 @@ const MapPointsPage = () => {
     const [sortCode, setSortCode] = useState('alpha')
     const [searchKey, setSearchKey] = useState('')
 
+    const [pageTitle, setPageTitle] = useState('')
+
     useEffect(() => {
+        document.title = pageTitle;
+    }, [pageTitle]);
+
+    useEffect(() => {
+
+        setPageTitle('Map points')
+
         setLoading(true)
 
         const sortCode = localStorage.getItem("sort_code_MapPoints") || 'alpha'

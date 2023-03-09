@@ -15,7 +15,8 @@ const FabButton = () => {
                 height: '3rem',
                 fontSize: '1.5rem',
                 lineHeight: '1.5rem',
-                zIndex: 1000
+                zIndex: 10,
+                padding: 0
             }}
         >
             <FaPlus />

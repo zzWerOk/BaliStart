@@ -1,12 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../index";
 import {delay, sortCategories} from "../utils/consts";
-import {getAll} from "../http/topicsCategoryAPI";
+import {getAllCategories} from "../http/topicsCategoryAPI";
 import SpinnerSm from "../components/SpinnerSM";
 import MainPageFeed from "../components/mainpage/MainPageFeed";
 
 const Categories = () => {
-    const {topicsCategoryStore} = useContext(Context)
+    const {topicsCategoryStore, presetPageTitle} = useContext(Context)
 
     const [items, setItems] = useState([])
     const [loading, setLoading] = useState(true)
@@ -14,7 +14,20 @@ const Categories = () => {
     const [sortCode, setSortCode] = useState('alpha')
     const [searchKey, setSearchKey] = useState('')
 
+    const [pageTitle, setPageTitle] = useState('')
+
     useEffect(() => {
+        if(!presetPageTitle) {
+            document.title = pageTitle;
+        }else{
+            document.title = presetPageTitle;
+        }
+    }, [pageTitle]);
+
+    useEffect(() => {
+
+        setPageTitle('Categories')
+
         setLoading(true)
 
         const sortCode = localStorage.getItem("sort_code_Categories") || 'alpha'
@@ -30,7 +43,7 @@ const Categories = () => {
 
     const getCategoriesData = (sortCode, search) => {
         setLoadingSorted(true)
-        getAll(sortCode, search).then(data => {
+        getAllCategories(sortCode, search).then(data => {
             /**
              Сохраняем список
              **/

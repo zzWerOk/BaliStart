@@ -24,7 +24,16 @@ const ToursPage = () => {
     const [sortCode, setSortCode] = useState('alpha')
     const [searchKey, setSearchKey] = useState('')
 
+    const [pageTitle, setPageTitle] = useState('')
+
     useEffect(() => {
+        document.title = pageTitle;
+    }, [pageTitle]);
+
+    useEffect(() => {
+
+        setPageTitle('Tours')
+
         setLoading(true)
 
         delay(0).then(() => {

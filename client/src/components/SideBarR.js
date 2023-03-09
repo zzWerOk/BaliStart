@@ -9,7 +9,6 @@ const SideBarR = observer((props) => {
 
     const {rightSideBarStore} = useContext(Context)
 
-
     return (
         <nav id="sidebar" className={'py-2'}>
 
