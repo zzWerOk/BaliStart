@@ -13,6 +13,8 @@
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
+    "eventsource": "^2.0.2",
+    "eventstore": "^1.15.5",
     "express": "^4.18.2",
     "express-fileupload": "^1.4.0",
     "http-proxy-middleware": "^2.0.6",
@@ -20,8 +22,11 @@
     "nodemon": "^2.0.20",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
+    "react-use-websocket": "^3.0.0",
     "sequelize": "^6.28.0",
+    "socket.io": "^4.6.1",
     "unique-filename": "^3.0.0",
-    "urid": "^1.1.0"
+    "urid": "^1.1.0",
+    "ws": "^8.12.1"
   }
 }

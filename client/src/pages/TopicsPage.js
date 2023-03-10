@@ -74,9 +74,6 @@ const TopicsPage = (props) => {
 
     const getCategoriesData = (sortCode, search) => {
         getAllCategories(sortCode, search).then(data => {
-
-            console.log(data)
-
             topicsCategoryStore.saveCategoriesList(JSON.parse(JSON.stringify(data.rows)))
         }).catch(() => {
             topicsCategoryStore.saveCategoriesList([])

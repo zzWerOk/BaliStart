@@ -130,12 +130,14 @@ const ElementLink = (props) => {
                 defaultShow={false} onHide={null} onToggle={null} popperConfig={{}}
             >
 
-                <div className="col-12 btn d-flex justify-content-between text-secondary"
+                <div className="col-12 btn d-flex justify-content-between text-secondary px-1 px-md-3"
                      {...bind()}
                      ref={target}
                 >
 
-                    {drawIconByType()}
+                    <div style={{marginRight: '5px'}}>
+                        {drawIconByType()}
+                    </div>
 
                     <a className="text-primary col-11 align-self-center text-truncate text-lowercase"
                        href={elementLink}

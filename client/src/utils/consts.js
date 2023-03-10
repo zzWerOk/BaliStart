@@ -177,7 +177,6 @@ export const tourLanguages = (lang) => {
     let langText = ''
     return langArr.map(item => {
         switch (item) {
-            // case 'en':
             case 'ru':
                 return langText + 'Russian '
             case 'id':
@@ -185,20 +184,7 @@ export const tourLanguages = (lang) => {
             default:
                 return langText + 'English '
         }
-        // switch (item) {
-        //     case 'ru':
-        //         langText = langText + 'Russian '
-        //         break
-        //     case 'en':
-        //         langText = langText + 'English '
-        //         break
-        //     case 'id':
-        //         langText = langText + 'Indonesian '
-        //         break
-        // }
-        // return langText
     })
-
 }
 
 export const sortCategories = () => {

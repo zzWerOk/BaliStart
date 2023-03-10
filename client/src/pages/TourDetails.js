@@ -240,7 +240,7 @@ const TourDetails = () => {
 
     const getMapPointsTimeLineItem = (item, index) => {
 
-        return <li key={item.id + ' ' + index} className={'timeline-item'}>
+        return <li key={item.id + ' ' + index} className={'timeline-item mx-3 mx-md-0'}>
             <span className="timeline-icon">
                 {index + 1}
             </span>
@@ -248,7 +248,6 @@ const TourDetails = () => {
             <div className="accordion-item">
                 <h2 className="accordion-header" id={"flush-heading" + item.id}>
                     <button
-                        // className="accordion-button collapsed"
                         className="btn-outline-secondary accordion-button collapsed"
                         type="button"
                         data-mdb-toggle="collapse"
@@ -357,6 +356,7 @@ const TourDetails = () => {
                             </div>
                         }
                     />
+
                     <div className={'d-flex'}
                          style={{height: 'calc(100vh - 129px'}}
                     >
@@ -380,7 +380,7 @@ const TourDetails = () => {
                                     </div>
                                 </div>
                             </Row>
-                            <Row className={classes.topic_row}>
+                            <Row className={`{classes.topic_row} mx-2`}>
                                 <div>
                                     {
                                         tourCategories.map(function (item, index) {
@@ -407,25 +407,25 @@ const TourDetails = () => {
                                     minHeight: '250px',
                                 }}
                             >
-                                <Row className={`${classes.topic_row} text-muted`} style={{paddingTop: '20px'}}>
+                                <Row className={`${classes.topic_row} text-muted mx-3`} style={{paddingTop: '20px'}}>
                                     <h1 className={'display-4 font-italic'} style={{color: `white`,}}>
                                         {currTour.name}
                                     </h1>
                                 </Row>
-                                <Row className={`${classes.topic_row} text-muted`} style={{paddingBottom: '20px'}}>
+                                <Row className={`${classes.topic_row} text-muted mx-3`} style={{paddingBottom: '20px'}}>
                                     <p className={'lead my-3'} style={{color: `white`,}}>
                                         {currTour.description}
                                     </p>
                                 </Row>
                             </div>
-                            <Row className={`${classes.topic_row} ${classes.topic_data}`}>
+                            <div className={`${classes.topic_row} mx-2 mx-md-4`}>
 
                                 {
                                     getTourDataElements(tourData)
                                 }
 
-                            </Row>
-                            <Row className={classes.topic_row}>
+                            </div>
+                            <Row className={`{classes.topic_row} px-2 px-md-4`}>
                                 {tourGuides.length > 0
                                     ?
                                     <ElementName name={'Guides'}/>

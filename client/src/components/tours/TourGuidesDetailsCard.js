@@ -52,7 +52,6 @@ const TourGuidesDetailsCard = (props) => {
         return (
             <div key={currGuide.id + ' ' + index}
                  className={`${tourGuideClicked === currGuide.id ? 'col-xl-12' : 'col-xl-4'} mb-4 `}
-                // className={`col-xl-4 mb-4`}
                  onClick={() => {
                      if (tourGuideClicked !== currGuide.id) {
                          clickTourGuide(currGuide.id)
@@ -60,10 +59,12 @@ const TourGuidesDetailsCard = (props) => {
                  }}
 
             >
-                <div className={` rounded py-3 px-4 ${isHover ? 'shadow' : 'shadow-sm'} 
-            
-            ${tourGuideClicked === currGuide.id ? 'd-flex justify-content-start' : null} 
-            `}
+                <div className={` rounded py-3 px-md-4 ${isHover ? 'shadow' : 'shadow-sm'}
+                                ${tourGuideClicked === currGuide.id ? 'd-flex justify-content-start' : null} `}
+                     style={{
+                         paddingRight: '15px',
+                         paddingLeft: '5px',
+                }}
                      onMouseEnter={handleMouseEnter}
                      onMouseLeave={handleMouseLeave}
                 >
@@ -83,12 +84,16 @@ const TourGuidesDetailsCard = (props) => {
                                 <img
                                     src={guideImage} alt="Guide avatar"
                                     width="100"
-                                    // className={`img-fluid rounded-circle mb-3 img-thumbnail shadow-sm`}
                                     className={`rounded-circle mb-3 img-thumbnail shadow-sm`}
                                     style={{
-                                        width: '100px',
-                                        height: '100px',
+                                        // display: "block",
+                                        // width: '100%',
+                                        maWidth: '20%',
+                                        height: 'auto',
                                         objectFit: 'cover',
+                                        // width: '100px',
+                                        // // height: '100px',
+                                        // objectFit: 'cover',
                                     }}/>
                                 <h5 className="mb-0">{currGuide.name}</h5><span
                                 className="small text-uppercase text-muted">&nbsp;{currGuide.about}&nbsp;</span>
@@ -118,7 +123,8 @@ const TourGuidesDetailsCard = (props) => {
                                                     <>
                                                         <div className={'row d-flex align-content-center'}>
                                                             <div className={'col-5'}>
-                                                                <ElementName name={'Guide experience (years)'}/>
+                                                                {/*<ElementName name={'Guide experience (years)'}/>*/}
+                                                                <span className="">{'Guide experience (years)'}</span>
                                                             </div>
                                                             <div className={'col-7'}>
                                                                 <ElementText text={currGuide.experience}/>
@@ -131,7 +137,8 @@ const TourGuidesDetailsCard = (props) => {
                                             }
                                             <div className={'row d-flex align-content-center'}>
                                                 <div className={'col-5'}>
-                                                    <ElementName name={'Guide email'}/>
+                                                    {/*<ElementName name={'Guide email'}/>*/}
+                                                    <span className="">{'Guide email'}</span>
                                                 </div>
                                                 <div className={'col-7'}>
                                                     <ElementEmail item={currGuide.email}/>
@@ -141,7 +148,8 @@ const TourGuidesDetailsCard = (props) => {
                                             <hr/>
                                             <div className={'row d-flex align-content-center'}>
                                                 <div className={'col-5'}>
-                                                    <ElementName name={'Languages'}/>
+                                                    {/*<ElementName name={'Languages'}/>*/}
+                                                    <span className="">{'Languages'}</span>
                                                 </div>
                                                 <div className={'col-7'}>
                                                     <ElementText text={getGuideLanguagesEl()}/>
@@ -150,7 +158,8 @@ const TourGuidesDetailsCard = (props) => {
                                             <hr/>
                                             <div className={'row d-flex align-content-center'}>
                                                 <div className={'col-5'}>
-                                                    <ElementName name={'Links'}/>
+                                                    {/*<ElementName name={'Links'}/>*/}
+                                                    <span className="">{'Links'}</span>
                                                 </div>
                                                 <div className={'col-7'}>
                                                     <TopicDetailLinkComponent fieldWidth={'full'} element={{
@@ -162,7 +171,8 @@ const TourGuidesDetailsCard = (props) => {
                                             <hr/>
                                             <div className={'row d-flex align-content-center'}>
                                                 <div className={'col-5'}>
-                                                    <ElementName name={'Contacts'}/>
+                                                    {/*<ElementName name={'Contacts'}/>*/}
+                                                    <span className="">{'Contacts'}</span>
                                                 </div>
                                                 <div className={'col-7'}>
                                                     <TopicDetailPhoneComponent fieldWidth={'full'} element={{
