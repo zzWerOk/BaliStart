@@ -154,6 +154,15 @@ const Files = sequelize.define('files', {
     md5: {type: DataTypes.STRING, allowNull: false},
 })
 
+const Messages = sequelize.define('messages', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    userIdFrom: {type: DataTypes.INTEGER},
+    userIdTo: {type: DataTypes.INTEGER},
+    message: {type: DataTypes.STRING, allowNull: false},
+    deleted: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
+    seen: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
+})
+
 User.hasOne(Guide)
 Guide.belongsTo(User)
 
@@ -173,4 +182,5 @@ module.exports = {
     ToursCategory,
     ToursType,
     TopicComments,
+    Messages,
 }

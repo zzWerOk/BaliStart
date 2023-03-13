@@ -12,54 +12,21 @@ import SideBarL from "./components/SideBarL";
 import FabButton from "./components/FabButton";
 
 
-
 const App = observer(() => {
 
     const [loading, setLoading] = useState(true)
     const {user, rightSideBarStore} = useContext(Context)
 
     const [messages, setMessages] = useState([]);
-    // const [ws, setWs] = useState(new WebSocket('ws://localhost:3050'));
     const [ws, setWs] = useState();
 
-    useEffect(() => {
-
-        if(ws) {
-
-            ws.onopen = () => {
-                console.log('WebSocket connection established');
-            };
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                console.log('MESSAGE! ', event.data)
-
-                if (data.type === 'MESSAGE_SENT') {
-                    setMessages((messages) => [...messages, data.payload]);
-                }
-            };
-
-            return () => {
-                ws.onclose = () => {
-                    console.log('WebSocket Disconnected');
-                    setWs(new WebSocket('ws://localhost:3050?' + localStorage.getItem('token')));
-                }
-            }
-            // return () => {
-            //     ws.close();
-            // };
-        }
-
-    }, []);
-
-
-    const sendMessage = (sender, recipient, text) => {
+    const sendMessage = (ws, sender, recipient, text) => {
         const message = {
             type: 'SEND_MESSAGE',
-            payload: { sender, recipient, text },
+            payload: {sender, recipient, text},
         };
 
-        if(ws) {
+        if (ws) {
             ws.send(JSON.stringify(message));
         }
 
@@ -83,14 +50,56 @@ const App = observer(() => {
             }).finally(() => {
                 setLoading(false)
 
-                setWs(new WebSocket('ws://localhost:3050?' + localStorage.getItem('token')))
-
-                sendMessage('111','22','text')
+                // setWs(new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token')))
+                connect()
 
             })
         })
     }, [])
 
+    const connect = () => {
+
+        // useEffect(() => {
+
+        const ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
+        setWs(ws)
+
+        if (ws) {
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established');
+                sendMessage(ws, '111', '22', 'text')
+
+
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('MESSAGE! ', event.data)
+
+                if (data.type === 'MESSAGE_SENT') {
+                    setMessages((messages) => [...messages, data.payload]);
+                }
+            };
+
+            // return () => {
+            //     ws.onclose = () => {
+            //         console.log('WebSocket Disconnected');
+            //         setWs(new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token')));
+            //     }
+            // }
+            return () => {
+                ws.close();
+            };
+        }
+
+
+
+
+
+        // }, [ws, messages]);
+
+    }
 
     if (loading) {
         return <></>
@@ -116,7 +125,7 @@ const App = observer(() => {
                         style={{padding: 0, backgroundColor: 'white'}}
                     >
                         <AppRouter/>
-                        <FabButton/>
+                        {/*<FabButton/>*/}
                     </Col>
                     <Col className={'d-none d-lg-block'}>
                         <SideBarR title={rightSideBarStore.barTitle}/>

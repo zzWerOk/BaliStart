@@ -1,0 +1,26 @@
+.chat-messages {
+  overflow-y: scroll; }
+
+.chat-message-left,
+.chat-message-right {
+  display: flex;
+  flex-shrink: 0; }
+
+.chat-message-left {
+  margin-right: auto; }
+
+.chat-message-right {
+  flex-direction: row-reverse;
+  margin-left: auto; }
+
+.chat-message-left .bg-light {
+  background-color: #e3e3e3 !important; }
+
+.chat-message-right .bg-light {
+  background-color: #d8e0ef !important; }
+
+.font-weight-bold {
+  font-weight: 700;
+  border-bottom: solid;
+  border-color: rgba(33, 33, 33, 0.2);
+  border-width: 1px; }

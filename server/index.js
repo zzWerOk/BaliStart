@@ -41,47 +41,9 @@ const start = async () => {
 }
 
 /** Client-Server messaging **/
-
-// const WebSocket = require('ws');
 const {connectWebSocketBali} = require("./websocket/messagesFuncs");
-// const MESSAGEPORT = process.env.MESSAGEPORT || 3050
-// const wss = new WebSocket.Server({port: MESSAGEPORT});
-
 connectWebSocketBali()
-
 /** **/
-
-// broadcastPipeline(wss.clients);
-// wss.on('connection', function connection(ws) {
-//
-//         const interval = individualPipeline(ws);
-//         ws.on("close", () => {
-//             console.log("closed", wss.clients.size);
-//             clearInterval(interval);
-//         });
-//
-//     ws.on('message', function incoming(data) {
-//
-//         console.log('')
-//         console.log('')
-//         console.log('')
-//         console.log('')
-//         console.log(wss.clients.size)
-//         console.log('')
-//         console.log('')
-//         console.log('')
-//         console.log('')
-//         console.log('')
-//
-//         wss.clients.forEach(function each(client) {
-//             if (client === ws && client.readyState === WebSocket.OPEN) {
-//                 client.send(JSON.stringify({status: 'ok'}));
-//             }
-//         });
-//     });
-//
-// });
-
 
 
 start()

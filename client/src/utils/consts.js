@@ -82,7 +82,43 @@ export const epochToDateWithTime = epoch => {
 export const epochToDate_guide = epoch => {
     const m = moment(epoch * 1000);
 
-    return m.format('yyyy-MM-D')
+    return m.format('DD-MM-yyyy')
+}
+
+export const epochToDate_userChatWithTime = epoch => {
+    const m = moment(epoch * 1000);
+    const currM = moment(Date.now());
+
+    const year = m.format('yyyy')
+    const month = m.format('MM')
+    const day = m.format('DD')
+    const time = m.format('hh:mm')
+
+    const currYear = currM.format('yyyy')
+    const currMonth = currM.format('MM')
+    const currDay = currM.format('DD')
+
+
+    let userChatDate
+
+    if(currDay === day && currMonth === month && currYear === year){
+        userChatDate = time
+    // }else if(currMonth === month && currYear === year){
+    //     userChatDate = day + ' ' + time
+    }else if(currYear === year){
+        userChatDate = day + '.' + month + ' ' + time
+    }else{
+        userChatDate = day + '.' + month + '.' + year + ' ' + time
+    }
+
+    // return m.format('DD-MM-yyyy hh:mm')
+    return userChatDate
+}
+
+export const epochToDate_userChatTimeOnly = epoch => {
+    const m = moment(epoch * 1000);
+
+    return m.format('hh:mm')
 }
 
 export const dateToEpoch = (date) => {

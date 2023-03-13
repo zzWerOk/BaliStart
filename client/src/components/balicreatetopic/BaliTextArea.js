@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import './BaliTextArea.css'
 
 const BaliTextArea = (props) => {
-    const {labelText, text, onTextChangeHandler, isError} = props
+    const {labelText, text, onTextChangeHandler, isError, rows = 3} = props
 
     // const [loading, setLoading] = useState(true)
     const [elementText, setElementText] = useState('')
@@ -46,7 +46,7 @@ const BaliTextArea = (props) => {
                     <textarea
                         className={`form-control ${isError ? 'invalid' : ''}`}
                         id="textarea-field"
-                        rows="3"
+                        rows={rows}
                         required
                         onChange={handleChange}
                         value={elementText}

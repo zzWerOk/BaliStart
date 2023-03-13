@@ -6,6 +6,7 @@ import {getAgentById, getGuideById, saveAgentData, saveGuideData} from "../http/
 import {epochToDate_guide} from "../utils/consts";
 import AgentProfile from "../components/user/AgentProfile";
 import {Button} from "react-bootstrap";
+import ChatProfile from "../components/user/ChatProfile";
 
 const UserProfile = () => {
     const {user} = useContext(Context)
@@ -13,7 +14,7 @@ const UserProfile = () => {
     const [loading, setLoading] = useState(true)
 
     const [show, setShow] = useState(false);
-    const [avatar_img, setAvatar_img] = useState('');
+    const [avatar_img, setAvatar_img] = useState(process.env.REACT_APP_API_URL + '/static/guide_avatar.png');
 
     const [guideLoaded, setGuideLoaded] = useState(false);
 
@@ -253,7 +254,6 @@ const UserProfile = () => {
         checkAgentIsChanged()
     }
 
-
     const checkAgentIsChanged = () => {
         const currAgentData = JSON.stringify(user.agent)
         setIsAgentChanged(agentSaveForCheck !== currAgentData)
@@ -369,26 +369,22 @@ const UserProfile = () => {
                                             {/*<div className="ms-4 me-4 mt-5 d-flex flex-column" >*/}
                                             <img
                                                 src={avatar_img} alt="Guide avatar"
-                                                className="rounded-circle img-thumbnail shadow-sm"
+                                                className="rounded-circle img-thumbnail shadow-sm "
                                                 style={{
                                                     display: 'block',
-                                                    maxWidth: '80%',
-                                                    height: 'auto',
+                                                    width: '80px',
+                                                    minWidth: '80px',
+                                                    height: '80px',
+                                                    minHeight: '80px',
                                                     position: 'relative',
                                                     top: '25px',
-                                                    // minWidth: '150px',
-                                                    // minHeight: '150px',
-                                                    // maxWidth: '150px',
-                                                    // maxHeight: '150px',
                                                     objectFit: 'cover',
                                                     zIndex: '1'
                                                 }}/>
                                         </div>
-                                        {/*<div className="ms-3" style={{marginTop: '110px'}}>*/}
                                         <div className="ms-2 mb-2 d-flex flex-column flex-column-reverse">
                                             <h5>{user.name}</h5>
                                         </div>
-                                        {/*<div className="ms-5" style={{marginTop: '110px'}}>*/}
                                         <div className="ms-2 d-flex flex-column flex-column-reverse text-end me-4">
                                             <p>01.01.2023</p>
                                             <h5>Registration date</h5>
@@ -415,22 +411,35 @@ const UserProfile = () => {
 
 
                                     <ul className="nav nav-tabs mb-3" id="myTab0" role="tablist">
+                                        <li className="nav-item" role="presentation">
+                                            <button
+                                                className={`nav-link active`}
+                                                disabled={!!isSaving}
+                                                id="chat-tab0"
+                                                data-mdb-toggle="tab"
+                                                data-mdb-target="#chat"
+                                                type="button"
+                                                role="tab"
+                                                aria-controls="home"
+                                                aria-selected="true"
+                                            >
+                                                Chat
+                                            </button>
+                                        </li>
                                         {
                                             user.isGuide && guideLoaded
                                                 ?
                                                 <li className="nav-item" role="presentation">
                                                     <button
-                                                        // className={`nav-link ${user.isGuide ? 'active' : ''} ${isSaving ? 'disabled' : ''} `}
-                                                        className={`nav-link ${user.isGuide ? 'active' : ''}`}
+                                                        className={`nav-link `}
                                                         disabled={!!isSaving}
-                                                        id="home-tab0"
+                                                        id="guide-tab0"
                                                         data-mdb-toggle="tab"
                                                         data-mdb-target="#guide0"
                                                         type="button"
                                                         role="tab"
                                                         aria-controls="home"
-                                                        aria-selected="true"
-                                                        // disabled={guideIsSaving}
+                                                        aria-selected="false"
                                                     >
                                                         Guide
                                                     </button>
@@ -443,10 +452,9 @@ const UserProfile = () => {
                                                 ?
                                                 <li className="nav-item" role="presentation">
                                                     <button
-                                                        // className={`nav-link ${!user.isGuide ? 'active' : ''}  ${isSaving ? 'disabled' : ''} `}
-                                                        className={`nav-link ${!user.isGuide ? 'active' : ''}`}
+                                                        className={`nav-link `}
                                                         disabled={!!isSaving}
-                                                        id="profile-tab0"
+                                                        id="agent-tab0"
                                                         data-mdb-toggle="tab"
                                                         data-mdb-target="#agent0"
                                                         type="button"
@@ -463,15 +471,32 @@ const UserProfile = () => {
                                     </ul>
                                     <div className="tab-content" id="myTabContent0"
                                     >
+
+                                        <div
+                                            className={`tab-pane fade active show`}
+                                            id="chat"
+                                            role="tabpanel"
+                                            aria-labelledby="chat-tab0"
+                                            style={{minHeight: '50vh'}}
+                                        >
+                                            <ChatProfile key={!!guideLoaded}
+                                            />
+
+                                            <div
+                                                className={'d-flex flex-column align-items-center justify-content-center mb-4'}>
+                                            </div>
+                                        </div>
+
                                         {
                                             user.isGuide && guideLoaded
                                                 ?
 
                                                 <div
-                                                    className={`tab-pane fade-out ${user.isGuide ? 'active show' : ''} `}
+                                                    // className={`tab-pane fade ${user.isGuide ? 'active show' : ''} `}
+                                                    className={`tab-pane fade `}
                                                     id="guide0"
                                                     role="tabpanel"
-                                                    // aria-labelledby="guide-tab0"
+                                                    aria-labelledby="guide-tab0"
                                                     style={{minHeight: '80vh'}}
                                                 >
                                                     <GuideProfile key={!!guideLoaded}
@@ -519,10 +544,11 @@ const UserProfile = () => {
                                                 :
                                                 null
                                         }
+
                                         {
                                             user.isAgent && agentLoaded
                                                 ?
-                                                <div className={`tab-pane fade ${!user.isGuide ? 'active show' : ''}`}
+                                                <div className={`tab-pane fade `}
                                                      id="agent0"
                                                      role="tabpanel"
                                                      style={{minHeight: '70vh'}}
@@ -567,6 +593,7 @@ const UserProfile = () => {
                                                 :
                                                 null
                                         }
+
                                     </div>
                                 </div>
                             </div>
