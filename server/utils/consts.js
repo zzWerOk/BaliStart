@@ -3,6 +3,10 @@ const fs = require("fs")
 const {Files} = require("../models/models")
 const uniqueFilename = require("unique-filename")
 
+dateToEpoch = function(date) {
+    return new Date(date).getTime() / 1000 || 0
+}
+
 removeFile = function (fileName) {
 
     try {
@@ -178,5 +182,6 @@ module.exports = {
     removeFile,
     reWrightFile,
     createNewFile,
+    dateToEpoch,
 }
 

@@ -101,6 +101,7 @@ const Topics = sequelize.define('topics', {
     deleted_by_user_id: {type: DataTypes.INTEGER},
     deleted_date: {type: DataTypes.BIGINT},
     file_name: {type: DataTypes.STRING},
+    seen: {type: DataTypes.INTEGER, defaultValue: true},
 })
 
 const TopicComments = sequelize.define('topic_comments', {
@@ -160,7 +161,8 @@ const Messages = sequelize.define('messages', {
     userIdTo: {type: DataTypes.INTEGER},
     message: {type: DataTypes.STRING, allowNull: false},
     deleted: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
-    seen: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
+    seenFrom: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
+    seenTo: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
 })
 
 User.hasOne(Guide)

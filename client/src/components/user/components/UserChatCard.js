@@ -1,7 +1,16 @@
 import React, {useEffect, useState} from 'react';
 
 const UserChatCard = (props) => {
-    const {userId, userName, isReaded, userImg, userLastMessage, lastMessageDate, userChatSelected, onUserChatClick} = props
+    const {
+        userId,
+        userName,
+        isReaded,
+        userImg,
+        userLastMessage,
+        lastMessageDate,
+        userChatSelected,
+        onUserChatClick
+    } = props
 
     const [userAvatarImg, setUserAvatarImg] = useState()
 
@@ -14,16 +23,18 @@ const UserChatCard = (props) => {
         }
 
 
-
     }, [])
 
     return (
         <li className={`d-flex ${userChatSelected > -1 ? 'col-12' : 'col-12'} p-2 list-group-item ${userChatSelected === userId ? 'btn-primary' : 'btn-outline-dark'} `}
-            onClick={() => {onUserChatClick(userId)}}
+            onClick={() => {
+                onUserChatClick(userId)
+            }}
         >
 
-            <div className={`${userChatSelected > -1 ? 'col-12' : 'col-2'} d-flex justify-content-center align-items-center`}
-            style={{minHeight: '46px'}}
+            <div
+                className={`${userChatSelected > -1 ? 'col-12' : 'col-2'} d-flex justify-content-center align-items-center`}
+                style={{minHeight: '46px'}}
             >
                 <img
                     src={userAvatarImg} alt="Guide avatar"
@@ -37,6 +48,23 @@ const UserChatCard = (props) => {
                         objectFit: 'cover',
                         zIndex: '1'
                     }}/>
+                {
+                    !isReaded
+                        ?
+                        <span className="badge badge-pill rounded-9 badge-danger"
+                              style={{
+                                  // backgroundColor: '#F44336',
+                                  backgroundColor: '#2979FF',
+                                  position: "relative",
+                                  left: '-12px',
+                                  top: '17px',
+                                  zIndex: '10',
+                                  padding: '7px'
+                              }}
+                        > </span>
+                        :
+                        null
+                }
             </div>
             <div className={`col-10 d-flex flex-column ${userChatSelected > -1 ? 'd-none' : 'd-block'}`}>
                 <div className={'row'}>

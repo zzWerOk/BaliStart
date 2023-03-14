@@ -1,19 +1,22 @@
 import React, {useContext, useEffect, useState} from 'react';
 import './Chat.css'
-import {createMessage, getMessages} from "../../../http/messagesAPI";
+import {createMessage, getMessages, getMessagesNew, setMessagesSeen} from "../../../http/messagesAPI";
 import {Context} from "../../../index";
 import {dateToEpoch, epochToDate_userChatTimeOnly} from "../../../utils/consts";
 
 const Chat = (props) => {
-    const {userChatSelected, onCloseChat} = props
+    const {userChatSelected, onCloseChat, onSeenHandler} = props
 
-    const {user} = useContext(Context)
+    const {user, messagesStore} = useContext(Context)
+
+    const messagesEndRef = React.createRef()
 
     const [loading, setLoading] = useState(true)
 
     const [messages, setMessages] = useState([])
     const [messageText, setMessageText] = useState('')
     const [sendingMessage, setSendingMessage] = useState(false)
+    const [sendMessageError, setSendMessageError] = useState(false)
 
     const [userChatAvatarImg, setUserChatAvatarImg] = useState()
     const [userAvatarImg, setUserAvatarImg] = useState()
@@ -35,12 +38,19 @@ const Chat = (props) => {
     }, [])
 
     useEffect(() => {
+        messagesStore.onNewMessageTrigger = () => {
+            getNewMessage(messages)
+        }
+    }, [messages])
+
+    useEffect(() => {
         setLoading(true)
         let isCanceled = false
         getMessages(userChatSelected.userId).then(async data => {
 
             if (data?.status === 'ok' && data?.data && data?.data?.count > 0 && data?.data?.rows && !isCanceled) {
                 setMessages(data.data.rows)
+                setMessagesSeenHandler(data.data.rows)
             } else {
                 setMessages([])
             }
@@ -57,31 +67,114 @@ const Chat = (props) => {
 
     }, [])
 
-    const SendNewMessage = () => {
+    useEffect(() => {
+        // if (isNewMessages) {
+        //     messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
+        // } else {
+        messagesEndRef.current?.scrollIntoView();
+        // }
+    }, [messages]);
+
+    const setMessagesSeenHandler = (messages) => {
+        let messagesIdsArr = []
+
+
+        for (let i = 0; i < messages.length; i++) {
+            const currMessage = messages[i]
+
+            if (userChatSelected.userId === currMessage.userIdTo && !currMessage.seenFrom) {
+                messagesIdsArr.push(currMessage.id)
+            }
+            if (userChatSelected.userId === currMessage.userIdFrom && !currMessage.seenTo) {
+                messagesIdsArr.push(currMessage.id)
+            }
+
+        }
+
+        if (messagesIdsArr.length > 0) {
+            setMessagesSeen(JSON.stringify(messagesIdsArr)).then(async data => {
+                if (data?.status === 'ok') {
+                    console.log('set seen - done')
+
+                    const currMessages = JSON.parse(JSON.stringify(messages))
+                    currMessages.map(message => {
+                        if(userChatSelected.userId === message.userIdTo){
+                            message.seenFrom = true
+
+                        }
+                        if(userChatSelected.userId === message.userIdFrom){
+                            message.seenTo = true
+
+                        }
+
+                    })
+                    setMessages(currMessages)
+                }
+            }).catch((e) => {
+                console.log(e)
+            }).finally(() => {
+                onSeenHandler(userChatSelected)
+            })
+        }
+
+    }
+
+    const getNewMessage = (messages) => {
+        // const dateBefore = userChatSelected.lastMessageDate
+        let dateBefore = 0
+        if (messages.length > 0) {
+            dateBefore = dateToEpoch(messages[messages.length - 1].createdAt)
+        }
+
+        getMessagesNew(dateBefore, userChatSelected.userId).then(async data => {
+            if (data?.status === 'ok' && data?.data && data?.data?.count > 0 && data?.data?.rows) {
+
+                const currMessages = JSON.parse(JSON.stringify(messages))
+                currMessages.push(...data.data.rows)
+                setMessages(currMessages)
+
+                setMessagesSeenHandler(currMessages)
+
+            }
+
+        }).catch((e) => {
+            console.log(e)
+        }).finally(() => {
+        })
+    }
+
+    const sendNewMessage = () => {
         setSendingMessage(true)
+        setSendMessageError(false)
 
         if (user?.isAuth && userChatSelected.userId > -1 && messageText) {
-
-            console.log(user)
 
             createMessage(userChatSelected.userId, messageText).then(async data => {
                 if (data?.status === 'ok' && data?.data) {
                     console.log('Message sent')
+                    setMessageText('')
+                    messagesStore.sendMessage(userChatSelected.userId, messageText)
+                } else {
+                    setSendMessageError(true)
                 }
             }).catch((e) => {
                 console.log(e)
+                setSendMessageError(true)
             }).finally(() => {
                 setSendingMessage(false)
             })
         } else {
             if (!user?.isAuth) {
                 console.log('user?.isAuth')
+                setSendMessageError(true)
             }
             if (userChatSelected.userId <= -1) {
                 console.log('userChatSelected.userId <= -1')
+                setSendMessageError(true)
             }
             if (!messageText) {
                 console.log('message')
+                setSendMessageError(true)
             }
         }
     }
@@ -148,15 +241,16 @@ const Chat = (props) => {
                      }}
                 >
 
-                    <div className="chat-messages p-4 h-100">
+                    <div className="chat-messages p-4 h-100"
+
+                    >
 
                         {
-
-                            messages.map(message => {
+                            messages.map(function (message, index) {
                                 return (
-                                    // userChatSelected
-                                    <div key={message.id}
-                                        className={`${userChatSelected.userId === message.userIdFrom ? 'chat-message-left' : 'chat-message-right'}  pb-4`}>
+                                    <div key={message.id + '' + index + "" + message.seen}
+                                         ref={messagesEndRef}
+                                         className={`${userChatSelected.userId === message.userIdFrom ? 'chat-message-left' : 'chat-message-right'}  pb-4`}>
                                         <div>
                                             <img
                                                 src={userChatSelected.userId === message.userIdFrom ? userChatAvatarImg : userAvatarImg}
@@ -186,7 +280,25 @@ const Chat = (props) => {
                                                         user.name
                                                 }
                                             </div>
-                                            {message.message}
+                                            {/*<div>*/}
+                                            <div className={`${
+
+                                                (userChatSelected.userId === message.userIdTo)
+                                                    ?
+                                                    (!message.seenFrom ? 'fw-bolder' : "")
+                                                    :
+                                                    (
+                                                        (userChatSelected.userId === message.userIdFrom)
+                                                            ?
+                                                            (!message.seenTo ? 'fw-bolder' : "")
+                                                            :
+                                                            ''
+                                                    )
+
+                                            }
+                                                `}>
+                                                {message.message}
+                                            </div>
                                         </div>
                                     </div>
                                 )
@@ -194,159 +306,8 @@ const Chat = (props) => {
 
                         }
 
-                        {/*<div className="chat-message-right pb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar1.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Chris Wood" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2 text-center">2:33</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">You</div>*/}
-                        {/*        Lorem ipsum dolor sit amet, vis erat denique in, dicunt prodesset te vix.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-left pb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar3.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2 text-center">2:34</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">Sharon Lessman</div>*/}
-                        {/*        Sit meis deleniti eu, pri vidit meliore docendi ut, an eum erat animal commodo.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-right mb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar1.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Chris Wood" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:35 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">You</div>*/}
-                        {/*        Cum ea graeci tractatos.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-left pb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar3.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:36 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">Sharon Lessman</div>*/}
-                        {/*        Sed pulvinar, massa vitae interdum pulvinar, risus lectus porttitor magna, vitae commodo*/}
-                        {/*        lectus mauris et velit.*/}
-                        {/*        Proin ultricies placerat imperdiet. Morbi varius quam ac venenatis tempus.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-left pb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar3.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:37 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">Sharon Lessman</div>*/}
-                        {/*        Cras pulvinar, sapien id vehicula aliquet, diam velit elementum orci.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-right mb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar1.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Chris Wood" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:38 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">You</div>*/}
-                        {/*        Lorem ipsum dolor sit amet, vis erat denique in, dicunt prodesset te vix.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-left pb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar3.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:39 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">Sharon Lessman</div>*/}
-                        {/*        Sit meis deleniti eu, pri vidit meliore docendi ut, an eum erat animal commodo.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-right mb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar1.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Chris Wood" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:40 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">You</div>*/}
-                        {/*        Cum ea graeci tractatos.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-right mb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar1.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Chris Wood" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:41 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">You</div>*/}
-                        {/*        Morbi finibus, lorem id placerat ullamcorper, nunc enim ultrices massa, id dignissim*/}
-                        {/*        metus urna eget purus.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-left pb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar3.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:42 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">Sharon Lessman</div>*/}
-                        {/*        Sed pulvinar, massa vitae interdum pulvinar, risus lectus porttitor magna, vitae commodo*/}
-                        {/*        lectus mauris et velit.*/}
-                        {/*        Proin ultricies placerat imperdiet. Morbi varius quam ac venenatis tempus.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-right mb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar1.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Chris Wood" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:43 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">You</div>*/}
-                        {/*        Lorem ipsum dolor sit amet, vis erat denique in, dicunt prodesset te vix.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="chat-message-left pb-4">*/}
-                        {/*    <div>*/}
-                        {/*        <img src="https://bootdey.com/img/Content/avatar/avatar3.png"*/}
-                        {/*             className="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40"/>*/}
-                        {/*        <div className="text-muted small text-nowrap mt-2">2:44 am</div>*/}
-                        {/*    </div>*/}
-                        {/*    <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">*/}
-                        {/*        <div className="font-weight-bold mb-1">Sharon Lessman</div>*/}
-                        {/*        Sit meis deleniti eu, pri vidit meliore docendi ut, an eum erat animal commodo.*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
                     </div>
                 </div>
-
-                {/*</div>*/}
 
                 <div className={'d-flex py-3 px-3 border-top input-group'}
                      style={{
@@ -361,13 +322,15 @@ const Chat = (props) => {
                     id="textarea-field"
                     rows={1}
                     onChange={handleMessageTextChange}
-                    // value={elementText}
+                    value={messageText}
+                    disabled={sendingMessage}
                 />
 
-                    <button className="btn btn-secondary "
+                    <button className={`btn ${sendMessageError ? 'btn-danger' : 'btn-secondary'}  `}
                             onClick={() => {
-                                SendNewMessage()
+                                sendNewMessage()
                             }}
+                            disabled={sendingMessage}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              className="bi bi-send" viewBox="0 0 16 16">

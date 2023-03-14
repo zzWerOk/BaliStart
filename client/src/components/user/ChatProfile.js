@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import UserChatCard from "./components/UserChatCard";
-import {dateToEpoch, epochToDate_userChatWithTime} from "../../utils/consts";
+import {epochToDate_userChatWithTime} from "../../utils/consts";
 import Chat from "./components/Chat";
 import {getChatUsers} from "../../http/messagesAPI";
+import {Context} from "../../index";
 
 const ChatProfile = () => {
+    const {messagesStore} = useContext(Context)
 
     const [loading, setLoading] = useState(true)
 
@@ -17,10 +19,48 @@ const ChatProfile = () => {
         setLoading(true)
         let isCanceled = false
 
+        // getChatUsers().then(async data => {
+        //
+        //     if (data?.status === 'ok' && data?.data) {
+        //         const newArr = JSON.parse(JSON.stringify(data.data))
+        //
+        //         newArr.sort((a, b) => (a.lastMessageDate < b.lastMessageDate) ? 1 : ((b.lastMessageDate < a.lastMessageDate) ? -1 : 0))
+        //
+        //         setUserChatList(newArr)
+        //     }
+        //
+        // }).catch((e) => {
+        //     console.log(e)
+        // }).finally(() => {
+        //     setLoading(false)
+        // })
+
+        getNewChatUsers()
+
+        return () => {
+            isCanceled = true
+        };
+    }, [])
+
+    useEffect(() => {
+        messagesStore.onNewMessageTriggerChatUsers = () => {
+            getNewChatUsers()
+        }
+    }, [])
+
+    const getNewChatUsers = () => {
+
         getChatUsers().then(async data => {
 
-            if(data?.status === 'ok' && data?.data){
-                setUserChatList(data.data)
+            if (data?.status === 'ok' && data?.data) {
+
+                const newArr = JSON.parse(JSON.stringify(data.data))
+
+                newArr.sort((a, b) => (a.lastMessageDate < b.lastMessageDate) ? 1 : ((b.lastMessageDate < a.lastMessageDate) ? -1 : 0))
+
+                setUserChatList(newArr)
+
+                // setUserChatList(data.data)
             }
 
         }).catch((e) => {
@@ -29,11 +69,7 @@ const ChatProfile = () => {
             setLoading(false)
         })
 
-        return () => {
-            isCanceled = true
-        };
-    }, [])
-
+    }
 
     const selectUserChat = (userId) => {
         setUserChatSelectedId(userId)
@@ -41,33 +77,55 @@ const ChatProfile = () => {
         const filtered = userChatList.filter(function (value) {
             return value.userId === userId
         })
-        setUserChatSelected({userId, userName: filtered[0].userName, userImg: filtered[0].userImg})
+        setUserChatSelected({
+            userId,
+            userName: filtered[0].userName,
+            userImg: filtered[0].userImg,
+            lastMessageDate: filtered[0].lastMessageDate,
+            read: filtered[0].read,
+        })
+    }
+
+    const onSeenHandler = (userChatSelected) => {
+
+        const newUserChatSelected = JSON.parse(JSON.stringify(userChatSelected))
+        newUserChatSelected.read = true
+        setUserChatSelected(newUserChatSelected)
+
+        const newUserChatList = JSON.parse(JSON.stringify(userChatList))
+        for (let i = 0; i < newUserChatList.length; i++) {
+            if (newUserChatList[i].userId === userChatSelected.userId) {
+                newUserChatList[i].read = true
+                break
+            }
+        }
+        setUserChatList(newUserChatList)
+
     }
 
     const onCloseChat = () => {
         setUserChatSelectedId(-1)
     }
 
-    if(loading) {
-    }else {
+    if (loading) {
+    } else {
         return (
             <div className={'d-flex'}>
-                {/*<div className={`${userChatSelectedId > -1 ? 'col-2 col-md' : 'col-12'} d-flex`}>*/}
                 <div className={`d-flex ${userChatSelectedId > -1 ? 'col' : 'col'}`}>
                     <ul className={`list-group list-group-flush ${userChatSelectedId > -1 ? 'col' : 'col'}`}>
-                        {/*<ul className={'list-group '}>*/}
                         {
                             userChatList.map(function (user, index) {
                                 return (
-                                    <UserChatCard key={user.userId + '' + index}
-                                                  userId={user.userId}
-                                                  userName={user.userName}
-                                                  userImg={user.userImg}
-                                                  userLastMessage={user.lastMessage}
-                                                  isReaded={user.read}
-                                                  lastMessageDate={epochToDate_userChatWithTime(dateToEpoch(user.lastMessageDate))}
-                                                  userChatSelected={userChatSelectedId}
-                                                  onUserChatClick={selectUserChat}
+                                    <UserChatCard
+                                        key={user.userId + '' + index + '' + ((user.userId === userChatSelected?.userId) ? userChatSelected?.read : user.read)}
+                                        userId={user.userId}
+                                        userName={user.userName}
+                                        userImg={user.userImg}
+                                        userLastMessage={user.lastMessage}
+                                        isReaded={((user.userId === userChatSelected?.userId) ? userChatSelected?.read : user.read)}
+                                        lastMessageDate={epochToDate_userChatWithTime(user.lastMessageDate)}
+                                        userChatSelected={userChatSelectedId}
+                                        onUserChatClick={selectUserChat}
                                     />
                                 )
                             })
@@ -85,6 +143,7 @@ const ChatProfile = () => {
                             <Chat key={userChatSelected.userId}
                                   userChatSelected={userChatSelected}
                                   onCloseChat={onCloseChat}
+                                  onSeenHandler={onSeenHandler}
                             />
                         </div>
                         :

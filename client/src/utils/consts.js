@@ -91,6 +91,7 @@ export const epochToDate_userChatWithTime = epoch => {
 
     const year = m.format('yyyy')
     const month = m.format('MM')
+    const monthT = m.format('MMM')
     const day = m.format('DD')
     const time = m.format('hh:mm')
 
@@ -106,9 +107,9 @@ export const epochToDate_userChatWithTime = epoch => {
     // }else if(currMonth === month && currYear === year){
     //     userChatDate = day + ' ' + time
     }else if(currYear === year){
-        userChatDate = day + '.' + month + ' ' + time
+        userChatDate = day + ' ' + monthT + ' ' + time
     }else{
-        userChatDate = day + '.' + month + '.' + year + ' ' + time
+        userChatDate = day + ' ' + monthT + ' ' + year + ' ' + time
     }
 
     // return m.format('DD-MM-yyyy hh:mm')
