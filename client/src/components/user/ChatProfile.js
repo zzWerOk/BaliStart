@@ -19,22 +19,6 @@ const ChatProfile = () => {
         setLoading(true)
         let isCanceled = false
 
-        // getChatUsers().then(async data => {
-        //
-        //     if (data?.status === 'ok' && data?.data) {
-        //         const newArr = JSON.parse(JSON.stringify(data.data))
-        //
-        //         newArr.sort((a, b) => (a.lastMessageDate < b.lastMessageDate) ? 1 : ((b.lastMessageDate < a.lastMessageDate) ? -1 : 0))
-        //
-        //         setUserChatList(newArr)
-        //     }
-        //
-        // }).catch((e) => {
-        //     console.log(e)
-        // }).finally(() => {
-        //     setLoading(false)
-        // })
-
         getNewChatUsers()
 
         return () => {
@@ -59,6 +43,16 @@ const ChatProfile = () => {
                 newArr.sort((a, b) => (a.lastMessageDate < b.lastMessageDate) ? 1 : ((b.lastMessageDate < a.lastMessageDate) ? -1 : 0))
 
                 setUserChatList(newArr)
+
+                let isHasUnseen = false
+                for(let i = 0;i < data.data.length;i++){
+                    const currChatUser = data.data[i]
+                    if(!currChatUser.read){
+                        isHasUnseen = true
+                        break
+                    }
+                }
+                messagesStore.checkNewMessagesNav(isHasUnseen)
 
                 // setUserChatList(data.data)
             }
@@ -100,6 +94,16 @@ const ChatProfile = () => {
             }
         }
         setUserChatList(newUserChatList)
+
+        let isHasUnseen = false
+        for(let i = 0;i < newUserChatList.length;i++){
+            const currChatUser = newUserChatList[i]
+            if(!currChatUser.read){
+                isHasUnseen = true
+                break
+            }
+        }
+        messagesStore.checkNewMessagesNav(isHasUnseen)
 
     }
 

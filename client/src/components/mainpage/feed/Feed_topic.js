@@ -1,13 +1,21 @@
-import React from 'react';
+import React, {useState} from 'react';
 import classes from "./Feed_topics.module.css";
-import {dateToEpoch, epochToDateWithTime} from "../../../utils/consts";
+import {dateToEpoch, epochToDateWithTime, linkShareButtonsModalChildComponent} from "../../../utils/consts";
 import {useHistory} from "react-router-dom";
 import {Col} from "react-bootstrap";
+import ModalPopUp from "../../ModalPopUp";
 
 const FeedTopic = (props) => {
     const history = useHistory()
 
     const {item} = props
+
+    const [showModal, setShowModal] = useState(false)
+
+    const modalChildComponent = () => (
+        linkShareButtonsModalChildComponent('topic', item.id, item.name)
+    )
+
 
     return (
 
@@ -79,7 +87,7 @@ const FeedTopic = (props) => {
                                 d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
                         </svg>
                         <small style={{marginLeft: '5px'}}>
-                            0
+                            {item.seen}
                         </small>
                     </div>
                 </div>
@@ -87,11 +95,22 @@ const FeedTopic = (props) => {
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                      className="bi bi-share align-self-end" viewBox="0 0 16 16"
                      style={{marginTop: '3px', marginLeft: '25px', marginRight: '0px'}}
+                     onClick={() => {
+                         setShowModal(true)
+                     }}
                 >
                     <path
                         d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
                 </svg>
             </div>
+            <ModalPopUp
+                show={showModal}
+                title={'Topic link share'}
+                onHide={() => {
+                    setShowModal(false)
+                }}
+                child={modalChildComponent}
+            />
 
         </li>
 

@@ -27,3 +27,8 @@ export const setMessagesSeen = async (messagesIds) => {
     return data
 }
 
+export const checkMessagesNew = async () => {
+    const {data} = await $authHost.get(apiUrl + '/checkMessagesNew')
+    return data
+}
+

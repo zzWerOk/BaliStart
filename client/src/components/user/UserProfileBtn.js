@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 const UserProfileBtn = (props) => {
-    const {image, onClickHandler} = props
+    const {image, onClickHandler, hasUnseen} = props
 
     const [avatar_img, setAvatar_img] = useState('');
     const [loading, setLoading] = useState(true);
@@ -17,9 +17,9 @@ const UserProfileBtn = (props) => {
         setLoading(false)
     }, [])
 
-    if(loading){
+    if (loading) {
 
-    }else {
+    } else {
         return (
             <div onClick={onClickHandler}
             >
@@ -40,6 +40,24 @@ const UserProfileBtn = (props) => {
                         objectFit: 'cover',
                     }}
                 />
+                {
+                    hasUnseen
+                        ?
+                        <span className="badge badge-pill rounded-9 badge-danger"
+                              style={{
+                                  // backgroundColor: '#F44336',
+                                  backgroundColor: '#2979FF',
+                                  position: "relative",
+                                  left: '25px',
+                                  top: '-45px',
+                                  zIndex: '10',
+                                  padding: '7px'
+                              }}
+                        > </span>
+                        :
+                        null
+                }
+
             </div>
         );
     }

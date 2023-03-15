@@ -59,6 +59,7 @@ const Chat = (props) => {
             console.log(e)
         }).finally(() => {
             setLoading(false)
+            // messagesStore.checkNewMessagesNav()
         })
 
         return () => {

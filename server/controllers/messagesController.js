@@ -246,13 +246,10 @@ class MessagesController {
                         createdAt: {
                             [Op.gt]: (dateBefore * 1000),
                             [Op.lt]: new Date(),
-                            // [Op.gt]: 1678688120000,
-                            // [Op.lt]: 1678688420000,
                         },
 
                     },
-
-                    limit: 10,
+                    // limit: 10,
                     order: [['createdAt', 'DESC']],
                 })
 
@@ -261,19 +258,86 @@ class MessagesController {
                     rows: fromUserMessages.rows.reverse()
                 }
 
-                // const toUserMessages = await Messages.findAll({
-                //     where: {
-                //         userIdFrom: chatUserId,
-                //         userIdTo: currUser.id,
-                //     }
-                // })
-
                 return res.json({status: 'ok', data: newData})
             } else {
                 return next(ApiError.forbidden("Необходимо указать все данные сообщения..."))
             }
         } catch (e) {
             return next(ApiError.internal("Ошибка " + e.message))
+        }
+    }
+
+    async checkNewMessages(req, res, next) {
+        try {
+            // const {dateBefore, chatUserId} = req.query
+            const currUser = req.user
+
+            if (currUser) {
+
+                // const fromUserMessages = await Messages.findAndCountAll({
+                const fromUserMessages = await Messages.findOne({
+                    where: {
+                        [Op.or]: [
+                            // {userIdFrom: currUser.id},
+                            {userIdTo: currUser.id}
+                        ],
+                        seenTo: false,
+
+                        // // userIdFrom:{
+                        // //     [Op.or]: currUser.id
+                        // // },
+                        // // userIdTo:{
+                        // //     [Op.or]: currUser.id
+                        // // },
+                        //
+                        // createdAt: {
+                        //     [Op.gt]: (new Date() - 3600),
+                        //     [Op.lt]: new Date(),
+                        // },
+                        // [Op.or]: [
+                        //     {
+                        //         userIdFrom: currUser.id,
+                        //         seenFrom: false
+                        //     },
+                        //     {
+                        //         userIdTo: currUser.id,
+                        //         seenTo: false
+                        //     }
+                        // ]
+                        // // seenFrom:{
+                        // //     [Op.or]: false
+                        // // },
+                        // // seenTo:{
+                        // //     [Op.or]: false
+                        // // },
+                    },
+                    limit: 1,
+                    order: [['createdAt', 'DESC']],
+                })
+
+
+                console.log('')
+                console.log('')
+                console.log(currUser)
+                console.log('')
+                console.log('')
+                console.log('')
+
+
+
+                const newData = {
+                    // count: fromUserMessages.count,
+                    count: fromUserMessages ? 1 : 0,
+                    // rows: fromUserMessages.rows.reverse()
+                    rows: fromUserMessages
+                }
+
+                return res.json({status: 'ok', data: newData})
+            } else {
+                return next(ApiError.forbidden("Необходимо указать все данные сообщения..."))
+            }
+        } catch (e) {
+            return next(ApiError.internal("Ошибка! " + e.message))
         }
     }
 

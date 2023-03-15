@@ -510,6 +510,7 @@ class TopicsController {
                                     topicData.name = candidate.name
                                     topicData.description = candidate.description
                                     topicData.categories = candidate.tag
+                                    topicData.seen = candidate.seen
                                     // image_logo: {type: DataTypes.STRING, allowNull: false},
                                     // images: {type: DataTypes.STRING},
                                     // videos: {type: DataTypes.STRING},
@@ -836,6 +837,31 @@ class TopicsController {
                     await TableUpdates.upsert({table_name: 'Topics', date: Date.now()})
                 } catch (e) {
                 }
+
+                return res.json({status: 'ok'})
+            }
+            return next(ApiError.badRequest("Ошибка установки параметра"))
+        }
+    }
+
+    async setTopicSeen(req, res, next) {
+        const {id} = req.body
+
+        if (!id) {
+            return next(ApiError.badRequest("Ошибка параметра"))
+        } else {
+            const candidate = await Topics.findOne({where: {id: id}})
+            if (candidate) {
+
+                await Topics.increment('seen', { by: 1, where: {id: id} });
+
+                // await Topics.update(
+                //     {seq: sequelize.literal('seq + 5')},
+                //
+                //     {
+                //         where: {id: id},
+                //     }
+                // );
 
                 return res.json({status: 'ok'})
             }

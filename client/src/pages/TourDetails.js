@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
-import {delay} from "../utils/consts";
+import {delay, linkShareButtonsModalChildComponent} from "../utils/consts";
 import FeedTopBar from "../components/mainpage/FeedTopBar";
 import classes from "./TopicDetails.module.css";
 import {Col, Row} from "react-bootstrap";
@@ -14,11 +14,14 @@ import {getMapPointById} from "../http/mapPointsAPI";
 import ElementName from "../components/topics/components/ElementName";
 import TourMpCard from "../components/tours/TourMPCard";
 import TourGuidesCard from "../components/tours/TourGuidesCard";
+import ModalPopUp from "../components/ModalPopUp";
 
 const TourDetails = () => {
     let {id} = useParams();
 
     const {toursCategoryStore, toursTypeStore} = useContext(Context)
+
+    const [showModal, setShowModal] = useState(false)
 
     const [loading, setLoading] = useState(true)
     const [loadingType, setLoadingType] = useState(true)
@@ -264,13 +267,18 @@ const TourDetails = () => {
                     aria-labelledby={"flush-heading" + item.id}
                     data-mdb-parent="#accordionFlush"
                 >
-                    <div className="accordion-body">
+                    <div className="accordion-body px-0">
                         <TourMpCard item={item}/>
                     </div>
                 </div>
             </div>
         </li>
     }
+
+    const modalChildComponent = () => (
+        linkShareButtonsModalChildComponent('tour', id, pageTitle)
+    )
+
 
     if (loading || loadingCat || loadingType || loadingMP) {
 
@@ -306,21 +314,6 @@ const TourDetails = () => {
                                             </small>
                                         </div>
 
-                                        <div className={'d-flex'}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                 fill="currentColor"
-                                                 className="bi bi-eye" viewBox="0 0 16 16"
-                                                 style={{marginTop: '3px', marginLeft: '15px'}}
-                                            >
-                                                <path
-                                                    d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                                                <path
-                                                    d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                                            </svg>
-                                            <small style={{marginLeft: '5px', marginRight: '15px'}}>
-                                                0
-                                            </small>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -341,7 +334,10 @@ const TourDetails = () => {
 
                                     <a className={`badge badge-secondary ${classes.badge_outlined}`}
                                        type="button"
-                                    >
+                                       onClick={() => {
+                                           setShowModal(true)
+                                       }}>
+
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                              fill="currentColor"
                                              className="bi bi-share" viewBox="0 0 16 16">
@@ -441,6 +437,15 @@ const TourDetails = () => {
                         </Col>
                     </div>
                 </div>
+                <ModalPopUp
+                    show={showModal}
+                    title={'Tour link share'}
+                    onHide={() => {
+                        setShowModal(false)
+                    }}
+                    child={modalChildComponent}
+                />
+
             </div>
         );
     }

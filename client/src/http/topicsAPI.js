@@ -31,6 +31,13 @@ export const getTopicData = async (id, user_id = -1) => {
     return data
 }
 
+export const setTopicSeen = async (id) => {
+    const {data} = await $authHost.post(apiUrl + '/topicplusseen', {id}).catch((e) => {
+        console.log('error ', e.response.data)
+    })
+    return data
+}
+
 export const getTopicEditable = async (id) => {
     const {data} = await $authHost.get(apiUrl + '/canedit', {params: {id}}).catch((e) => {
         console.log('error ', e.response.data)

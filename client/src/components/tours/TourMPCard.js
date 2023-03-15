@@ -55,7 +55,7 @@ const TourMpCard = (props) => {
                 style={{
                     marginLeft: '25px',
                     marginRight: '15px',
-                    marginTop: '25px',
+                    marginTop: '5px',
                     marginBottom: '15px',
                 }}
             >
@@ -73,7 +73,6 @@ const TourMpCard = (props) => {
                                  alt={nameMP}
                             />
                         </div>
-
 
                         <div className="col-sm-7">
                             <div className="card-block" style={{padding: '20px'}}>

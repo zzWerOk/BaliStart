@@ -60,11 +60,11 @@ const TourGuidesDetailsCard = (props) => {
 
             >
                 <div className={` rounded py-3 px-md-4 ${isHover ? 'shadow' : 'shadow-sm'}
-                                ${tourGuideClicked === currGuide.id ? 'd-flex justify-content-start' : null} `}
+                                ${tourGuideClicked === currGuide.id ? 'd-block d-md-flex justify-content-start' : null} `}
                      style={{
                          paddingRight: '15px',
                          paddingLeft: '5px',
-                }}
+                     }}
                      onMouseEnter={handleMouseEnter}
                      onMouseLeave={handleMouseLeave}
                 >
@@ -72,37 +72,38 @@ const TourGuidesDetailsCard = (props) => {
                     {
 
                         <>
-                            <div className={`${tourGuideClicked === currGuide.id ? 'col-3' : null}
-                                        ${tourGuideClicked === currGuide.id ? 'clicked' : null} 
-                        `}
+                            <div className={`${tourGuideClicked === currGuide.id ? 'col-12 col-md-3' : ''}
+                                        ${tourGuideClicked === currGuide.id ? 'clicked' : ''}`}
                                  onClick={() => {
                                      if (tourGuideClicked === currGuide.id) {
                                          clickTourGuide(currGuide.id)
                                      }
                                  }}
                             >
-                                <img
-                                    src={guideImage} alt="Guide avatar"
-                                    width="100"
-                                    className={`rounded-circle mb-3 img-thumbnail shadow-sm`}
-                                    style={{
-                                        // display: "block",
-                                        // width: '100%',
-                                        maWidth: '20%',
-                                        height: 'auto',
-                                        objectFit: 'cover',
-                                        // width: '100px',
-                                        // // height: '100px',
-                                        // objectFit: 'cover',
-                                    }}/>
-                                <h5 className="mb-0">{currGuide.name}</h5><span
-                                className="small text-uppercase text-muted">&nbsp;{currGuide.about}&nbsp;</span>
+                                <div className={'d-flex d-md-block align-items-center justify-content-center'}>
+                                    <img
+                                        src={guideImage} alt="Guide avatar"
+                                        width="100"
+                                        className={`rounded-circle mb-3 img-thumbnail shadow-sm`}
+                                        style={{
+                                            width: '100px',
+                                            height: '100px',
+                                            objectFit: 'cover',
+                                        }}/>
+                                    <div>
+                                        <h5 className="mb-0">{currGuide.name}</h5>
+                                        <span
+                                            className="small text-uppercase text-muted">&nbsp;{currGuide.about}&nbsp;
+                                    </span>
+                                    </div>
+                                </div>
+
                             </div>
 
                             {
                                 tourGuideClicked === currGuide.id
                                     ?
-                                    <div className={'col-9'}>
+                                    <div className={'col-12 col-md-9'}>
                                         <div className={'row d-flex justify-content-around'}>
                                             <div className={'col-11'}>
 
@@ -137,7 +138,6 @@ const TourGuidesDetailsCard = (props) => {
                                             }
                                             <div className={'row d-flex align-content-center'}>
                                                 <div className={'col-5'}>
-                                                    {/*<ElementName name={'Guide email'}/>*/}
                                                     <span className="">{'Guide email'}</span>
                                                 </div>
                                                 <div className={'col-7'}>
@@ -148,7 +148,6 @@ const TourGuidesDetailsCard = (props) => {
                                             <hr/>
                                             <div className={'row d-flex align-content-center'}>
                                                 <div className={'col-5'}>
-                                                    {/*<ElementName name={'Languages'}/>*/}
                                                     <span className="">{'Languages'}</span>
                                                 </div>
                                                 <div className={'col-7'}>
@@ -158,7 +157,6 @@ const TourGuidesDetailsCard = (props) => {
                                             <hr/>
                                             <div className={'row d-flex align-content-center'}>
                                                 <div className={'col-5'}>
-                                                    {/*<ElementName name={'Links'}/>*/}
                                                     <span className="">{'Links'}</span>
                                                 </div>
                                                 <div className={'col-7'}>
@@ -171,7 +169,6 @@ const TourGuidesDetailsCard = (props) => {
                                             <hr/>
                                             <div className={'row d-flex align-content-center'}>
                                                 <div className={'col-5'}>
-                                                    {/*<ElementName name={'Contacts'}/>*/}
                                                     <span className="">{'Contacts'}</span>
                                                 </div>
                                                 <div className={'col-7'}>

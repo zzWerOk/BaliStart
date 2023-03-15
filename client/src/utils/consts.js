@@ -1,4 +1,18 @@
 import sideBarItem from '../classes/sideBarItem'
+import {
+    EmailIcon,
+    EmailShareButton,
+    FacebookIcon,
+    FacebookShareButton,
+    TelegramIcon,
+    TelegramShareButton, TwitterIcon, TwitterShareButton, ViberIcon,
+    ViberShareButton,
+    VKIcon,
+    VKShareButton,
+    WhatsappIcon,
+    WhatsappShareButton
+} from "react-share";
+import React from "react";
 // import React from "react";
 const moment = require('moment');
 
@@ -459,3 +473,31 @@ export const leftSideBarElements = [
         link: GUIDES_ROUTE,
     },
 ]
+
+export const linkShareButtonsModalChildComponent = (type, topicIDUrl, pageTitle) => (
+    <div className={'d-flex justify-content-center'}>
+        <div className={'d-flex justify-content-between col-8'}>
+            <WhatsappShareButton url={`https://balistart.com/${type}/${topicIDUrl}`} title={pageTitle}>
+                <WhatsappIcon size={32} round={true}/>
+            </WhatsappShareButton>
+            <VKShareButton url={`https://balistart.com/${type}/${topicIDUrl}`} title={pageTitle}>
+                <VKIcon size={32} round={true}/>
+            </VKShareButton>
+            <TelegramShareButton url={`https://balistart.com/${type}/${topicIDUrl}`} title={pageTitle}>
+                <TelegramIcon size={32} round={true}/>
+            </TelegramShareButton>
+            <ViberShareButton url={`https://balistart.com/${type}/${topicIDUrl}`} title={pageTitle}>
+                <ViberIcon size={32} round={true}/>
+            </ViberShareButton>
+            <FacebookShareButton url={`https://balistart.com/${type}/${topicIDUrl}`} quote={pageTitle}>
+                <FacebookIcon size={32} round={true}/>
+            </FacebookShareButton>
+            <TwitterShareButton url={`https://balistart.com/${type}/${topicIDUrl}`} title={pageTitle}>
+                <TwitterIcon size={32} round={true}/>
+            </TwitterShareButton>
+            <EmailShareButton body={`https://balistart.com/${type}/${topicIDUrl}`} subject={pageTitle}>
+                <EmailIcon size={32} round={true}/>
+            </EmailShareButton>
+        </div>
+    </div>
+)

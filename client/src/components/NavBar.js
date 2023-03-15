@@ -1,4 +1,4 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 
@@ -13,19 +13,45 @@ import UserProfileBtn from "./user/UserProfileBtn";
 import {useHistory} from "react-router-dom";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import SideBarL from "./SideBarL";
+import {getChatUsers} from "../http/messagesAPI";
 
 const NavBar = observer(() => {
-    const {user} = useContext(Context)
+    const {user, messagesStore} = useContext(Context)
 
     const history = useHistory()
 
     const [showModal, setShowModal] = useState(false)
 
     const [showSideBar, setShowSideBar] = useState(false);
+    const [hasUnseen, setHasUnseen] = useState(false);
 
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
     const ref = useRef(null);
+
+
+    useEffect(() => {
+        // messagesStore.onNewMessageNavTrigger = () => {
+        //     getNewChatUsers()
+        // }
+        messagesStore.onNewMessageTriggerChatUsers = () => {
+            getNewChatUsers()
+        }
+        getNewChatUsers()
+
+        return () => {
+            messagesStore.removeFromNewMessageTriggerChatUsers(() => {
+                getNewChatUsers()
+            })
+        }
+
+    }, [])
+
+    useEffect(() => {
+        messagesStore.onNewMessageNavTrigger = (isUnseen) => {
+            setHasUnseen(isUnseen)
+        }
+    }, [])
 
     const logOut = () => {
         user.logout()
@@ -63,6 +89,37 @@ const NavBar = observer(() => {
 
     const showLeftSideBar = () => {
         setShowSideBar(true)
+    }
+
+    const getNewChatUsers = () => {
+
+        getChatUsers().then(async data => {
+            if (data?.status === 'ok' && data?.data) {
+                let isHasUnseen = false
+                for(let i = 0;i < data.data.length;i++){
+                    const currChatUser = data.data[i]
+                    if(!currChatUser.read){
+                        isHasUnseen = true
+                        break
+                    }
+                }
+                setHasUnseen(isHasUnseen)
+            }
+        }).catch((e) => {
+            console.log(e)
+        }).finally(() => {
+        })
+
+
+        // checkMessagesNew().then(async data => {
+        //     if (data?.status === 'ok' && data?.data) {
+        //         console.log(data)
+        //     }
+        // }).catch((e) => {
+        //     console.log(e)
+        // }).finally(() => {
+        // })
+
     }
 
     return (
@@ -119,7 +176,7 @@ const NavBar = observer(() => {
 
                             <UserProfileBtn image={user.avatar_img}
                                             onClickHandler={handleClick}
-
+                                            hasUnseen={hasUnseen}
                             />
 
                             <Overlay

@@ -7,6 +7,7 @@ const checkIsAdmin = require('../middleware/checkIsAdminMiddleWare')
 router.post('/create', authMiddleWare, userController.create)
 router.post('/setMessagesSeen', authMiddleWare, userController.setMessagesSeen)
 router.get('/getChatUsers', authMiddleWare, userController.getChatUsers)
+router.get('/checkMessagesNew', authMiddleWare, userController.checkNewMessages)
 router.get('/getMessagesNew', authMiddleWare, userController.getNewMessages)
 router.get('/:chatUserId', authMiddleWare, userController.get)
 

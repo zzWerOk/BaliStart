@@ -1,7 +1,13 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useParams} from "react-router-dom";
-import {delay, EDIT_TOPIC_ROUTE, epochToDateWithTime, NOPAGE_ROUTE} from "../utils/consts";
-import {getTopicData, getTopicEditable} from "../http/topicsAPI";
+import {
+    delay,
+    EDIT_TOPIC_ROUTE,
+    epochToDateWithTime,
+    linkShareButtonsModalChildComponent,
+    NOPAGE_ROUTE
+} from "../utils/consts";
+import {getTopicData, getTopicEditable, setTopicSeen} from "../http/topicsAPI";
 import {Context} from "../index";
 import {Col, Row} from "react-bootstrap";
 import classes from './TopicDetails.module.css'
@@ -19,6 +25,8 @@ import TopicDetailImagesComponent from "../components/topics/components/TopicDet
 import TopicDetailGoogleMapUrlComponent from "../components/topics/components/TopicDetailGoogleMapUrlComponent";
 import TopicDetailLineComponent from "../components/topics/components/TopicDetailLineComponent";
 
+import ModalPopUp from "../components/ModalPopUp";
+
 const TopicDetails = (props) => {
     const {savedTopic, closePreview} = props
 
@@ -26,6 +34,8 @@ const TopicDetails = (props) => {
     const history = useHistory()
 
     const {user, topicsCategoryStore, rightSideBarStore} = useContext(Context)
+
+    const [showModal, setShowModal] = useState(false)
 
     const [loading, setLoading] = useState(true)
     const [topic, setTopic] = useState({})
@@ -48,6 +58,16 @@ const TopicDetails = (props) => {
     useEffect(() => {
         document.title = pageTitle;
     }, [pageTitle]);
+
+    // useEffect(() => {
+    //
+    //     setTopicSeen(topicIDUrl).then(
+    //     ).catch((e) => {
+    //         console.log(e)
+    //     }).finally(() => {
+    //     })
+    //
+    // }, []);
 
     useEffect(() => {
         setLoading(true)
@@ -92,6 +112,13 @@ const TopicDetails = (props) => {
                             getTopicsCategoriesList(dataJson.categories)
                         } catch (e) {
                         }
+
+                        setTopicSeen(topicIDUrl).then(
+                        ).catch((e) => {
+                            console.log(e)
+                        }).finally(() => {
+                        })
+
                     } else if (dataJson.hasOwnProperty('message')) {
                         if (dataJson.message === 'topic not found') {
                             history.push(NOPAGE_ROUTE)
@@ -195,9 +222,11 @@ const TopicDetails = (props) => {
                     return <TopicDetailLineComponent key={index} element={element}/>
             }
         }
-
-
     }
+
+    const modalChildComponent = () => (
+        linkShareButtonsModalChildComponent('topic', topicIDUrl, pageTitle)
+    )
 
     if (loading) {
     } else {
@@ -248,7 +277,7 @@ const TopicDetails = (props) => {
                                                         d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
                                                 </svg>
                                                 <small style={{marginLeft: '5px', marginRight: '15px'}}>
-                                                    0
+                                                    {parseInt(topic.seen) + 1}
                                                 </small>
                                             </div>
                                         </div>
@@ -271,7 +300,9 @@ const TopicDetails = (props) => {
 
                                         <a className={`badge badge-secondary ${classes.badge_outlined}`}
                                            type="button"
-                                        >
+                                           onClick={() => {
+                                               setShowModal(true)
+                                           }}>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                  fill="currentColor"
                                                  className="bi bi-share" viewBox="0 0 16 16">
@@ -376,6 +407,15 @@ const TopicDetails = (props) => {
                         </Col>
                     </div>
                 </div>
+                <ModalPopUp
+                    show={showModal}
+                    title={'Topic link share'}
+                    onHide={() => {
+                        setShowModal(false)
+                    }}
+                    child={modalChildComponent}
+                />
+
             </div>
         );
     }

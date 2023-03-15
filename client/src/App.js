@@ -22,7 +22,6 @@ const App = observer(() => {
     let ws = null
 
     useMemo(() => {
-        console.log(ws)
         if (ws === null) {
             ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
         }
