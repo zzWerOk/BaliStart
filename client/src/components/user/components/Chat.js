@@ -2,7 +2,11 @@ import React, {useContext, useEffect, useState} from 'react';
 import './Chat.css'
 import {createMessage, getMessages, getMessagesNew, setMessagesSeen} from "../../../http/messagesAPI";
 import {Context} from "../../../index";
-import {dateToEpoch, epochToDate_userChatTimeOnly} from "../../../utils/consts";
+import {
+    dateToEpoch,
+    epochToDate_guide,
+    epochToDate_userChatTimeOnly,
+} from "../../../utils/consts";
 
 const Chat = (props) => {
     const {userChatSelected, onCloseChat, onSeenHandler} = props
@@ -13,6 +17,7 @@ const Chat = (props) => {
 
     const [loading, setLoading] = useState(true)
 
+    const [messages2, setMessages2] = useState([])
     const [messages, setMessages] = useState([])
     const [messageText, setMessageText] = useState('')
     const [sendingMessage, setSendingMessage] = useState(false)
@@ -51,6 +56,7 @@ const Chat = (props) => {
             if (data?.status === 'ok' && data?.data && data?.data?.count > 0 && data?.data?.rows && !isCanceled) {
                 setMessages(data.data.rows)
                 setMessagesSeenHandler(data.data.rows)
+                setUpMessages(data.data.rows)
             } else {
                 setMessages([])
             }
@@ -59,7 +65,6 @@ const Chat = (props) => {
             console.log(e)
         }).finally(() => {
             setLoading(false)
-            // messagesStore.checkNewMessagesNav()
         })
 
         return () => {
@@ -68,12 +73,75 @@ const Chat = (props) => {
 
     }, [])
 
+
+    const setUpMessages = (messages) => {
+        const currMessagesArr = JSON.parse(JSON.stringify(messages))
+        const newMessagesArr = {}
+        const newMessagesIdsArr = []
+        let messageDate = ''
+        let messageTime = ''
+        let isSameTime = false
+        let lastUserFromId = -1
+        let lastNewMessageId = '-1'
+        let newMessage = {messages: []}
+        currMessagesArr.map(function (item) {
+            const currMessageDate = epochToDate_guide(dateToEpoch(item.createdAt))
+            const currMessageTime = epochToDate_userChatTimeOnly(dateToEpoch(item.createdAt))
+
+            const newMessageId = `${item.userIdFrom}${item.userIdTo}${currMessageTime}${currMessageDate}`
+
+            if (newMessageId !== lastNewMessageId) {
+                lastNewMessageId = newMessageId
+                newMessage = {messages: []}
+            }
+
+            if (messageDate !== currMessageDate) {
+                newMessagesArr[newMessageId + 'date'] = {date: currMessageDate}
+                newMessagesIdsArr.push(newMessageId + 'date')
+                messageDate = "" + currMessageDate
+            }
+
+            if (newMessagesIdsArr.length > 0) {
+                if (newMessagesIdsArr[newMessagesIdsArr.length - 1] !== newMessageId) {
+                    newMessagesIdsArr.push(newMessageId)
+                }
+            }
+
+            if (lastUserFromId !== item.userIdFrom) {
+                lastUserFromId = item.userIdFrom
+                // if (lastUserFromId > -1) {
+                //     newMessage = {messages: []}
+                // }
+            }
+
+
+            newMessage.messages.push(item)
+            newMessage.userIdFrom = item.userIdFrom
+            newMessage.createdAt = item.createdAt
+
+            if (currMessageTime !== messageTime) {
+                messageTime = currMessageTime
+                isSameTime = true
+            }
+
+            newMessagesArr[newMessageId] = newMessage
+        })
+
+        const lastMessagesArr = []
+        newMessagesIdsArr.map(messageId => {
+            lastMessagesArr.push({item: newMessagesArr[messageId], id: messageId})
+        })
+
+        setMessages2(lastMessagesArr)
+
+        // console.log(lastMessagesArr)
+
+        return newMessagesArr
+    }
+
+
     useEffect(() => {
-        // if (isNewMessages) {
-        //     messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
-        // } else {
         messagesEndRef.current?.scrollIntoView();
-        // }
     }, [messages]);
 
     const setMessagesSeenHandler = (messages) => {
@@ -99,17 +167,17 @@ const Chat = (props) => {
 
                     const currMessages = JSON.parse(JSON.stringify(messages))
                     currMessages.map(message => {
-                        if(userChatSelected.userId === message.userIdTo){
+                        if (userChatSelected.userId === message.userIdTo) {
                             message.seenFrom = true
-
                         }
-                        if(userChatSelected.userId === message.userIdFrom){
+                        if (userChatSelected.userId === message.userIdFrom) {
                             message.seenTo = true
-
                         }
 
                     })
-                    setMessages(currMessages)
+                    // setMessages(currMessages)
+                    setUpMessages(currMessages)
+
                 }
             }).catch((e) => {
                 console.log(e)
@@ -136,6 +204,7 @@ const Chat = (props) => {
 
                 setMessagesSeenHandler(currMessages)
 
+                setUpMessages(currMessages)
             }
 
         }).catch((e) => {
@@ -247,64 +316,112 @@ const Chat = (props) => {
                     >
 
                         {
-                            messages.map(function (message, index) {
+                            messages2.map(function (item, indexM) {
+                                // const isSame = item?.item?.isSame
                                 return (
-                                    <div key={message.id + '' + index + "" + message.seen}
-                                         ref={messagesEndRef}
-                                         className={`${userChatSelected.userId === message.userIdFrom ? 'chat-message-left' : 'chat-message-right'}  pb-4`}>
-                                        <div>
-                                            <img
-                                                src={userChatSelected.userId === message.userIdFrom ? userChatAvatarImg : userAvatarImg}
-                                                alt={userChatSelected.userName}
-                                                className="rounded-circle img-thumbnail shadow-sm"
-                                                style={{
-                                                    display: 'block',
-                                                    maxWidth: '40px',
-                                                    maxHeight: '40px',
-                                                    minWidth: '40px',
-                                                    minHeight: '40px',
-                                                    objectFit: 'cover',
-                                                    zIndex: '1'
-                                                }}
-                                            />
+                                    item?.item?.hasOwnProperty('date')
+                                        ?
+                                        <div key={item.id + '' + indexM}
+                                             className={'p-1 mx-5 mb-2 mt-0 d-flex align-items-center justify-content-center align-self-center'}
+                                        >
+                                            <span
+                                                className="badge rounded-pill badge-light py-2 px-3"
+                                            >
+                                                {item.item.date}
+                                            </span>
+                                        </div>
+                                        :
+                                        <div key={item.item.id + '' + indexM}
+                                             ref={messagesEndRef}
+                                        >
 
                                             <div
-                                                className="text-muted small text-nowrap mt-2 text-center">{epochToDate_userChatTimeOnly(dateToEpoch(message.createdAt))}</div>
-                                        </div>
-                                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
-                                            <div className="font-weight-bold mb-1">
-                                                {
-                                                    userChatSelected.userId === message.userIdFrom
-                                                        ?
-                                                        userChatSelected.userName
-                                                        :
-                                                        user.name
-                                                }
-                                            </div>
-                                            {/*<div>*/}
-                                            <div className={`${
-
-                                                (userChatSelected.userId === message.userIdTo)
-                                                    ?
-                                                    (!message.seenFrom ? 'fw-bolder' : "")
-                                                    :
-                                                    (
-                                                        (userChatSelected.userId === message.userIdFrom)
+                                                ref={messagesEndRef}
+                                                className={`${userChatSelected.userId === item.item.userIdFrom ? 'chat-message-left' : 'chat-message-right'} ${!item?.item?.isSame ? 'pt-2 pb-1' : 'pb-1'} `}>
+                                                <div>
+                                                    {
+                                                        !item?.item?.isSame
                                                             ?
-                                                            (!message.seenTo ? 'fw-bolder' : "")
+                                                            <img
+                                                                src={userChatSelected.userId === item.item.userIdFrom ? userChatAvatarImg : userAvatarImg}
+                                                                alt={userChatSelected.userName}
+                                                                className="rounded-circle img-thumbnail shadow-sm"
+                                                                style={{
+                                                                    display: 'block',
+                                                                    maxWidth: '40px',
+                                                                    maxHeight: '40px',
+                                                                    minWidth: '40px',
+                                                                    minHeight: '40px',
+                                                                    objectFit: 'cover',
+                                                                    zIndex: '1'
+                                                                }}
+                                                            />
                                                             :
-                                                            ''
-                                                    )
+                                                            null
+                                                    }
+                                                    <div
+                                                        className="text-muted small text-nowrap mt-2 text-center"
+                                                    >
+                                                        {epochToDate_userChatTimeOnly(dateToEpoch(item.item.createdAt))}
+                                                    </div>
+                                                </div>
 
-                                            }
-                                                `}>
-                                                {message.message}
+                                                <div
+                                                    className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
+                                                    {
+                                                        !item?.item?.isSame
+                                                            ?
+
+                                                            <div className="font-weight-bold mb-1">
+                                                                {
+                                                                    userChatSelected.userId === item.item.userIdFrom
+                                                                        ?
+                                                                        userChatSelected.userName
+                                                                        :
+                                                                        user.name
+                                                                }
+                                                            </div>
+                                                            :
+                                                            null
+                                                    }
+                                                    {
+                                                        item?.item?.messages.map(function (message, index) {
+                                                            return (
+
+                                                                <div key={message.id + '' + index + ""}
+                                                                     className={`${
+
+                                                                         (userChatSelected.userId === message.userIdTo)
+                                                                             ?
+                                                                             (!message.seenFrom ? 'fw-bolder' : "")
+                                                                             :
+                                                                             (
+                                                                                 (userChatSelected.userId === message.userIdFrom)
+                                                                                     ?
+                                                                                     (!message.seenTo ? 'fw-bolder' : "")
+                                                                                     :
+                                                                                     ''
+                                                                             )
+
+                                                                     }
+                                                                        `}
+                                                                >
+                                                                    {message.message}
+                                                                </div>
+
+                                                            )
+                                                        })
+                                                    }
+
+
+                                                </div>
                                             </div>
+
+
                                         </div>
-                                    </div>
+
                                 )
                             })
-
                         }
 
                     </div>

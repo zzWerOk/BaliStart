@@ -96,9 +96,9 @@ const NavBar = observer(() => {
         getChatUsers().then(async data => {
             if (data?.status === 'ok' && data?.data) {
                 let isHasUnseen = false
-                for(let i = 0;i < data.data.length;i++){
+                for (let i = 0; i < data.data.length; i++) {
                     const currChatUser = data.data[i]
-                    if(!currChatUser.read){
+                    if (!currChatUser.read) {
                         isHasUnseen = true
                         break
                     }
@@ -109,16 +109,6 @@ const NavBar = observer(() => {
             console.log(e)
         }).finally(() => {
         })
-
-
-        // checkMessagesNew().then(async data => {
-        //     if (data?.status === 'ok' && data?.data) {
-        //         console.log(data)
-        //     }
-        // }).catch((e) => {
-        //     console.log(e)
-        // }).finally(() => {
-        // })
 
     }
 
@@ -210,9 +200,38 @@ const NavBar = observer(() => {
 
                                             <div className={'p-3 d-flex justify-content-center'}>
                                                 <Nav.Link variant="info"
-                                                        onClick={() => {
-                                                            openProfile()
-                                                        }}>
+                                                          onClick={() => {
+                                                              openProfile()
+                                                          }}>
+
+                                                    <span>
+                                                        Messages
+                                                        {
+                                                            hasUnseen
+                                                                ?
+                                                                <span className="badge badge-pill rounded-9 badge-danger"
+                                                                      style={{
+                                                                          // backgroundColor: '#F44336',
+                                                                          backgroundColor: '#2979FF',
+                                                                          position: "relative",
+                                                                          left: '3px',
+                                                                          top: '3px',
+                                                                          zIndex: '10',
+                                                                          padding: '7px'
+                                                                      }}
+                                                                > </span>
+                                                                :
+                                                                null
+                                                        }
+                                                    </span>
+                                                </Nav.Link>
+                                            </div>
+
+                                            <div className={'p-3 d-flex justify-content-center'}>
+                                                <Nav.Link variant="info"
+                                                          onClick={() => {
+                                                              openProfile()
+                                                          }}>
                                                     Open profile
                                                 </Nav.Link>
                                             </div>

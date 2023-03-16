@@ -15,16 +15,23 @@ const App = observer(() => {
     const [loading, setLoading] = useState(true)
     const {user, rightSideBarStore, messagesStore} = useContext(Context)
 
-    // const [messages, setMessages] = useState([]);
-    // const [ws, setWs] = useState(new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token')));
-    // const [ws, setWs] = useState(null)
+    const [delayedMessages, setDelayedMessages] = useState([])
+    const [connectAttempts, setConnectAttempts] = useState(5)
 
     let ws = null
+    let myInterval = null// setInterval(checkWsConnection, 5000);
 
     useMemo(() => {
         if (ws === null) {
             ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
         }
+
+        // console.log(messagesStore)
+        // console.log(messagesStore.onMessageSend)
+        //
+        // if (messagesStore) {
+        //     messagesStore.onMessageSend = sendMessage
+        // }
 
         return () => {
             ws.close();
@@ -32,7 +39,33 @@ const App = observer(() => {
 
     }, [])
 
+    function isWsIsOpen(ws) {
+
+        if (ws.readyState !== ws.OPEN) {
+            ws.close()
+            ws = null
+
+            return false
+        } else {
+            return true
+        }
+
+        // return ws.readyState === ws.OPEN
+    }
+
     const sendMessage = (recipient, text) => {
+        if (!isWsIsOpen(ws)) {
+            console.log('ws - unavailable')
+            setDelayedMessages(prevState => {
+                prevState.push({recipient, text})
+            })
+            // setDelayedMessages([...delayedMessages, {recipient, text}])
+            ws.close()
+            ws = null
+            connect()
+            return
+        }
+
         const message = {
             type: 'SEND_MESSAGE',
             payload: {recipient, text},
@@ -45,41 +78,16 @@ const App = observer(() => {
         }
     };
 
-    // useEffect(() => {
-    //
-    //     setWs((prev) => ({...prev,ws}))
-    //
-    //     // if (ws) {
-    //     //
-    //     //     if(messagesStore){
-    //     //         messagesStore.onMessageSend = sendMessage
-    //     //     }
-    //     //
-    //     //     // setWs((prev) => ({...prev,ws}))
-    //     //
-    //     //     ws.onopen = () => {
-    //     //         console.log('WebSocket connection established');
-    //     //         // sendMessage(ws, '111', '22', 'text')
-    //     //         // sendMessage('22', 'text')
-    //     //         setWs(ws)
-    //     //     };
-    //     //
-    //     //
-    //     //     ws.onmessage = (event) => {
-    //     //         const data = JSON.parse(event.data);
-    //     //         console.log('MESSAGE! ', event.data)
-    //     //
-    //     //         if (data.type === 'MESSAGE_SENT') {
-    //     //             setMessages((messages) => [...messages, data.payload]);
-    //     //         }
-    //     //     };
-    //     //
-    //     //     return () => {
-    //     //         ws.close();
-    //     //     };
-    //     // }
-    //
-    // }, [])
+    const checkWsConnection = () => {
+        if (!isWsIsOpen(ws)) {
+            setConnectAttempts(prev => prev - 1)
+            console.log('Connect attempt ', 5 - connectAttempts)
+            ws.close()
+            ws = null
+            connect()
+
+        }
+    }
 
     useEffect(() => {
 
@@ -106,9 +114,15 @@ const App = observer(() => {
     const connect = () => {
         let newWs = ws
 
-        // if(!newWs) {
-        //     newWs = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
-        //     setWs(newWs)
+        // clearInterval(myInterval)
+
+        if (newWs === null) {
+            ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
+            newWs = ws
+        }
+
+        // if (!isWsIsOpen(ws)) {
+        //     myInterval = setInterval(reconnectAttempt, connectAttempts > 0 ? 1000 : 5000);
         // }
 
         if (newWs) {
@@ -119,6 +133,16 @@ const App = observer(() => {
 
             newWs.onopen = () => {
                 console.log('WebSocket connection established');
+                console.log(delayedMessages);
+                if (delayedMessages.length > 0) {
+                    delayedMessages.map(message => {
+                        sendMessage(message.recipient, message.text)
+                    })
+                    setDelayedMessages([])
+                }
+
+                setConnectAttempts(5)
+
             };
 
             newWs.onmessage = (event) => {
@@ -136,9 +160,13 @@ const App = observer(() => {
                 }
             };
 
-            return () => {
-                newWs.close();
-            };
+            // return () => {
+            //     newWs.close();
+            // };
+        }
+
+        if (myInterval === null) {
+            myInterval = setInterval(checkWsConnection, 5000);
         }
 
     }

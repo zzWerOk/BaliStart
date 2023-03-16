@@ -12,9 +12,20 @@ function connectWebSocketBali() {
 
         let currUser = null
 
-        if (token) {
-            currUser = jwt.verify(token, process.env.SECRET_KEY)
-            ws.user = currUser
+        if (token !== null) {
+            try {
+                currUser = jwt.verify(token, process.env.SECRET_KEY)
+
+                wss.clients.forEach(function each(client) {
+                    if(client?.user?.id === currUser?.id && client.readyState === WebSocket.OPEN){
+                        client.user = null
+                    }
+                });
+
+                ws.user = currUser
+            } catch (e) {
+                console.log(e.message)
+            }
         }
 
         // const interval = individualPipeline(ws);
@@ -43,13 +54,7 @@ function connectWebSocketBali() {
                         client.send(JSON.stringify(systemMessageJSON));
                     }
                     if (chatUserId > -1) {
-                        // console.log('')
-                        // console.log('')
-                        // console.log(chatUserId)
-                        // console.log('')
-                        // console.log('')
-                        // console.log('')
-                        if (client.user.id === chatUserId && client.readyState === WebSocket.OPEN) {
+                        if (client?.user?.id === chatUserId && client.readyState === WebSocket.OPEN) {
                             const systemMessageJSON = {
                                 type: 'SYSTEM_MESSAGE',
                                 message: 'new_message',

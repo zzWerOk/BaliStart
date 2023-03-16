@@ -96,7 +96,7 @@ export const epochToDateWithTime = epoch => {
 export const epochToDate_guide = epoch => {
     const m = moment(epoch * 1000);
 
-    return m.format('DD-MM-yyyy')
+    return m.format('DD.MM.yyyy')
 }
 
 export const epochToDate_userChatWithTime = epoch => {
@@ -118,22 +118,19 @@ export const epochToDate_userChatWithTime = epoch => {
 
     if(currDay === day && currMonth === month && currYear === year){
         userChatDate = time
-    // }else if(currMonth === month && currYear === year){
-    //     userChatDate = day + ' ' + time
     }else if(currYear === year){
         userChatDate = day + ' ' + monthT + ' ' + time
     }else{
         userChatDate = day + ' ' + monthT + ' ' + year + ' ' + time
     }
 
-    // return m.format('DD-MM-yyyy hh:mm')
     return userChatDate
 }
 
 export const epochToDate_userChatTimeOnly = epoch => {
     const m = moment(epoch * 1000);
 
-    return m.format('hh:mm')
+    return m.format('HH:mm')
 }
 
 export const dateToEpoch = (date) => {

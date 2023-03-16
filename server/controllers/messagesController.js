@@ -207,7 +207,7 @@ class MessagesController {
                         userIdTo: [chatUserId, currUser.id],
 
                     },
-                    limit: 10,
+                    limit: 30,
                     order: [['createdAt', 'DESC']],
                 })
 
