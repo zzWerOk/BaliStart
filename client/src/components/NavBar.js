@@ -3,7 +3,7 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 
 import {Button, Container, Nav, Navbar, Overlay, Popover} from "react-bootstrap";
-import {MAIN_ROUTE, USER_ROUTE} from "../utils/consts";
+import {MAIN_ROUTE, MESSAGES_ROUTE, USER_ROUTE} from "../utils/consts";
 import {observer} from "mobx-react-lite";
 import classes from './NavBar.module.css'
 import ModalPopUp from "./ModalPopUp";
@@ -80,6 +80,11 @@ const NavBar = observer(() => {
 
     const openProfile = () => {
         history.push(USER_ROUTE)
+        overlayClose()
+    }
+
+    const openMessages = () => {
+        history.push(MESSAGES_ROUTE)
         overlayClose()
     }
 
@@ -201,7 +206,7 @@ const NavBar = observer(() => {
                                             <div className={'p-3 d-flex justify-content-center'}>
                                                 <Nav.Link variant="info"
                                                           onClick={() => {
-                                                              openProfile()
+                                                              openMessages()
                                                           }}>
 
                                                     <span>

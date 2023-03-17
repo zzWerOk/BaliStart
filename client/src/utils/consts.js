@@ -157,6 +157,8 @@ export const TOPICS_ROUTE = '/topics'
 export const TOPIC_ROUTE = '/topic/:id'
 export const CREATE_TOPIC_ROUTE = '/newTopic'
 export const EDIT_TOPIC_ROUTE = '/editTopic'
+export const MESSAGES_ROUTE = '/messages'
+export const ADS_ROUTE = '/ads'
 
 export const SIDEBAR_ISADMIN = [
     new sideBarItem('MAIN', MAIN_ROUTE),

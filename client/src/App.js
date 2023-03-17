@@ -19,19 +19,12 @@ const App = observer(() => {
     const [connectAttempts, setConnectAttempts] = useState(5)
 
     let ws = null
-    let myInterval = null// setInterval(checkWsConnection, 5000);
+    let myInterval = null
 
     useMemo(() => {
         if (ws === null) {
             ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
         }
-
-        // console.log(messagesStore)
-        // console.log(messagesStore.onMessageSend)
-        //
-        // if (messagesStore) {
-        //     messagesStore.onMessageSend = sendMessage
-        // }
 
         return () => {
             ws.close();
@@ -49,8 +42,6 @@ const App = observer(() => {
         } else {
             return true
         }
-
-        // return ws.readyState === ws.OPEN
     }
 
     const sendMessage = (recipient, text) => {
@@ -59,7 +50,6 @@ const App = observer(() => {
             setDelayedMessages(prevState => {
                 prevState.push({recipient, text})
             })
-            // setDelayedMessages([...delayedMessages, {recipient, text}])
             ws.close()
             ws = null
             connect()
@@ -114,16 +104,10 @@ const App = observer(() => {
     const connect = () => {
         let newWs = ws
 
-        // clearInterval(myInterval)
-
         if (newWs === null) {
             ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
             newWs = ws
         }
-
-        // if (!isWsIsOpen(ws)) {
-        //     myInterval = setInterval(reconnectAttempt, connectAttempts > 0 ? 1000 : 5000);
-        // }
 
         if (newWs) {
 
@@ -159,10 +143,6 @@ const App = observer(() => {
 
                 }
             };
-
-            // return () => {
-            //     newWs.close();
-            // };
         }
 
         if (myInterval === null) {

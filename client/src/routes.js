@@ -8,7 +8,7 @@ import {
     TOUR_ROUTE,
     TOURS_ROUTE,
     MAPPOINT_ROUTE,
-    CREATE_TOPIC_ROUTE, EDIT_TOPIC_ROUTE, USER_ROUTE,
+    CREATE_TOPIC_ROUTE, EDIT_TOPIC_ROUTE, USER_ROUTE, MESSAGES_ROUTE, ADS_ROUTE,
 } from "./utils/consts";
 import Main from "./pages/Main";
 import Category from "./pages/Category";
@@ -21,6 +21,8 @@ import TourDetails from "./pages/TourDetails";
 import MapPointsPage from "./pages/MapPointsPage";
 import CreateTopicPage from "./pages/CreateTopicPage";
 import UserProfile from "./pages/UserProfile";
+import MessagesPage from "./pages/MessagesPage";
+import AdsPage from "./pages/Ads";
 
 export const publicRoutes = [
     {
@@ -70,5 +72,13 @@ export const publicRoutes = [
     {
         path: USER_ROUTE,
         Component: UserProfile
+    },
+    {
+        path: MESSAGES_ROUTE,
+        Component: MessagesPage
+    },
+    {
+        path: ADS_ROUTE,
+        Component: AdsPage
     },
 ]
