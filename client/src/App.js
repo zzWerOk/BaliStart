@@ -66,6 +66,29 @@ const App = observer(() => {
         }
     }
 
+    const editMessage = (recipient, messageId, userIdFrom, messageText) => {
+        if (!isWsIsOpen(ws)) {
+            setDelayedMessages(prevState => {
+                prevState.push({recipient, messageId, userIdFrom, messageText})
+            })
+            ws.close()
+            ws = null
+            connect()
+            return
+        }
+
+        const message = {
+            type: 'EDIT_MESSAGE',
+            payload: {recipient, messageId, userIdFrom, messageText},
+        };
+
+        if (ws) {
+            ws.send(JSON.stringify(message));
+        } else {
+            console.log('Not WS')
+        }
+    }
+
     const sendMessage = (recipient, text) => {
         if (!isWsIsOpen(ws)) {
             setDelayedMessages(prevState => {
@@ -133,6 +156,7 @@ const App = observer(() => {
             if (messagesStore) {
                 messagesStore.onMessageSend = sendMessage
                 messagesStore.onMessageDeleted = deleteMessage
+                messagesStore.onMessageEdited = editMessage
             }
 
             newWs.onopen = () => {
@@ -163,6 +187,14 @@ const App = observer(() => {
                     if (data?.message === 'delete_message') {
                         if (messagesStore) {
                             messagesStore.checkDeletedMessages(data?.messageId, data?.userIdFrom)
+                            messagesStore.getNewMessages()
+                        }
+                    }
+
+                    if (data?.message === 'edit_message') {
+                        if (messagesStore) {
+                            messagesStore.checkEditedMessages(data?.messageId, data?.userIdFrom, data?.messageText)
+                            messagesStore.getNewMessages()
                         }
                     }
 

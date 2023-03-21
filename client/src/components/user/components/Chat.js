@@ -63,11 +63,6 @@ const Chat = (props) => {
         }
 
         messagesStore.onMessageDeletedTrigger = (messageId, userIdFrom) => {
-            console.log('on delete')
-            console.log('messageId ', messageId)
-            console.log('userIdFrom ', userIdFrom)
-
-            console.log('Is same user ', (userChatSelected.userId + '') === (userIdFrom + ''))
 
             if((userChatSelected.userId + '') === (userIdFrom + '')) {
                 const messagesArr = JSON.parse(JSON.stringify(messages))
@@ -80,10 +75,31 @@ const Chat = (props) => {
 
                         setMessages(filtered)
                         setUpMessages(filtered)
+
+                        if(messagesArr[messagesArr.length - 1].id === messagesArr[i].id) {
+                            messagesStore.getNewMessages()
+                        }
+
                         break
                     }
                 }
             }
+        }
+
+        messagesStore.onMessageEditedTrigger = (messageId, userIdFrom, messageText) => {
+
+            const messagesArr = messages
+            for (let i = 0; i < messagesArr.length; i++) {
+                if (messagesArr[i].id + '' === messageId + '') {
+                    messagesArr[i].message = messageText
+                    setMessages(messagesArr)
+                    setUpMessages(messagesArr)
+
+                    break
+                }
+            }
+
+
         }
 
     }, [messages])
@@ -292,6 +308,13 @@ const Chat = (props) => {
                         messagesStore.sendMessage(userChatSelected.userId, messageText)
                     } else {
                         changeSelectedMessage(messageText)
+                        messagesStore.editMessage(userChatSelected.userId, selectedMessage.id, selectedMessage.userIdFrom, messageText)
+
+                        if(messages[messages.length - 1].id === selectedMessage.id) {
+                            console.log('Last message')
+                            messagesStore.getNewMessages()
+                        }
+
                     }
 
                 } else {
@@ -365,6 +388,12 @@ const Chat = (props) => {
 
                 setMessages(filtered)
                 setUpMessages(filtered)
+
+                if(messagesArr[messagesArr.length - 1].id === selectedMessage.id) {
+                    messagesStore.getNewMessages()
+                }
+
+
                 break
             }
         }

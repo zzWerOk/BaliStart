@@ -6,15 +6,24 @@ export default class MessagesStore {
         this._onMessageSend = null
         this._onNewMessageTrigger = null
         this._onNewMessageNavTrigger = null
-        // this._onNewMessageTriggerChatUsers = null
         this._onNewMessageTriggerChatUsers = []
         this._onMessageDeleted = null
         this._onMessageDeletedTrigger = null
+        this._onMessageEdited = null
+        this._onMessageEditedTrigger = null
 
 
         makeAutoObservable(this)
     }
 
+
+    set onMessageEdited(value) {
+        this._onMessageEdited = value;
+    }
+
+    set onMessageEditedTrigger(value) {
+        this._onMessageEditedTrigger = value;
+    }
 
     set onMessageDeleted(value) {
         this._onMessageDeleted = value;
@@ -82,6 +91,18 @@ export default class MessagesStore {
     deleteMessage(recipient, messageId, userIdFrom) {
         if (this._onMessageDeleted !== null && this._onMessageDeleted !== undefined) {
             this._onMessageDeleted(recipient, messageId, userIdFrom)
+        }
+    }
+
+    checkEditedMessages(messageId, userIdFrom, messageText) {
+        if (this._onMessageEditedTrigger !== null && this._onMessageEditedTrigger !== undefined) {
+            this._onMessageEditedTrigger(messageId, userIdFrom, messageText)
+        }
+    }
+
+    editMessage(recipient, messageId, userIdFrom, messageText) {
+        if (this._onMessageEdited !== null && this._onMessageEdited !== undefined) {
+            this._onMessageEdited(recipient, messageId, userIdFrom, messageText)
         }
     }
 

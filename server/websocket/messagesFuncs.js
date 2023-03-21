@@ -17,7 +17,7 @@ function connectWebSocketBali() {
                 currUser = jwt.verify(token, process.env.SECRET_KEY)
 
                 wss.clients.forEach(function each(client) {
-                    if(client?.user?.id === currUser?.id && client.readyState === WebSocket.OPEN){
+                    if (client?.user?.id === currUser?.id && client.readyState === WebSocket.OPEN) {
                         client.user = null
                     }
                 });
@@ -49,16 +49,35 @@ function connectWebSocketBali() {
                         if (client?.user?.id === chatUserId && client.readyState === WebSocket.OPEN) {
                             const systemMessageJSON = {
                                 type: 'SYSTEM_MESSAGE',
-                                message: 'delete_message',
+                                message: messageJson?.type?.toLowerCase(),
                                 messageId: messageJson?.payload?.messageId,
                                 userIdFrom: messageJson?.payload?.userIdFrom,
                             }
                             client.send(JSON.stringify(systemMessageJSON));
                         }
                     }
-
                 });
+            }
 
+            if (messageJson?.type === 'EDIT_MESSAGE') {
+
+                let chatUserId = -1
+                chatUserId = messageJson?.payload?.recipient || -1
+
+                wss.clients.forEach(function each(client) {
+                    if (chatUserId > -1) {
+                        if (client?.user?.id === chatUserId && client.readyState === WebSocket.OPEN) {
+                            const systemMessageJSON = {
+                                type: 'SYSTEM_MESSAGE',
+                                message: messageJson?.type?.toLowerCase(),
+                                messageId: messageJson?.payload?.messageId,
+                                userIdFrom: messageJson?.payload?.userIdFrom,
+                                messageText: messageJson?.payload?.messageText,
+                            }
+                            client.send(JSON.stringify(systemMessageJSON));
+                        }
+                    }
+                });
             }
 
             if (messageJson?.type === 'SEND_MESSAGE') {
