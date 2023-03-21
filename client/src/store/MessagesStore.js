@@ -8,11 +8,21 @@ export default class MessagesStore {
         this._onNewMessageNavTrigger = null
         // this._onNewMessageTriggerChatUsers = null
         this._onNewMessageTriggerChatUsers = []
+        this._onMessageDeleted = null
+        this._onMessageDeletedTrigger = null
 
 
         makeAutoObservable(this)
     }
 
+
+    set onMessageDeleted(value) {
+        this._onMessageDeleted = value;
+    }
+
+    set onMessageDeletedTrigger(value) {
+        this._onMessageDeletedTrigger = value;
+    }
 
     set onNewMessageNavTrigger(value) {
         this._onNewMessageNavTrigger = value;
@@ -60,6 +70,18 @@ export default class MessagesStore {
     checkNewMessagesNav(isUnseen) {
         if (this._onNewMessageNavTrigger !== null && this._onNewMessageNavTrigger !== undefined) {
             this._onNewMessageNavTrigger(isUnseen)
+        }
+    }
+
+    checkDeletedMessages(messageId, userIdFrom) {
+        if (this._onMessageDeletedTrigger !== null && this._onMessageDeletedTrigger !== undefined) {
+            this._onMessageDeletedTrigger(messageId, userIdFrom)
+        }
+    }
+
+    deleteMessage(recipient, messageId, userIdFrom) {
+        if (this._onMessageDeleted !== null && this._onMessageDeleted !== undefined) {
+            this._onMessageDeleted(recipient, messageId, userIdFrom)
         }
     }
 

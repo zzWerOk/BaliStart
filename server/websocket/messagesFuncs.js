@@ -39,10 +39,31 @@ function connectWebSocketBali() {
 
             const messageJson = JSON.parse(data.toString())
 
+            if (messageJson?.type === 'DELETE_MESSAGE') {
+
+                let chatUserId = -1
+                chatUserId = messageJson?.payload?.recipient || -1
+
+                wss.clients.forEach(function each(client) {
+                    if (chatUserId > -1) {
+                        if (client?.user?.id === chatUserId && client.readyState === WebSocket.OPEN) {
+                            const systemMessageJSON = {
+                                type: 'SYSTEM_MESSAGE',
+                                message: 'delete_message',
+                                messageId: messageJson?.payload?.messageId,
+                                userIdFrom: messageJson?.payload?.userIdFrom,
+                            }
+                            client.send(JSON.stringify(systemMessageJSON));
+                        }
+                    }
+
+                });
+
+            }
+
             if (messageJson?.type === 'SEND_MESSAGE') {
 
                 let chatUserId = -1
-
                 chatUserId = messageJson?.payload?.recipient || -1
 
                 wss.clients.forEach(function each(client) {

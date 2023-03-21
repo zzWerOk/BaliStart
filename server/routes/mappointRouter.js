@@ -10,8 +10,9 @@ router.get('/getAllAdmin',checkIsAdminMiddleWare,mapPointController.getAllAdmin)
 router.get('/getByIdAdmin/:id', checkIsAdminMiddleWare,mapPointController.getByIdAdmin)
 router.get('/getById/:id',mapPointController.getById)
 router.get('/getByTour',mapPointController.getByTour)
-router.delete('/', checkIsAdminMiddleWare,mapPointController.deleteMapPoint)
 router.get('/dataAdmin/:id', checkIsAdminMiddleWare, mapPointController.getDataAdmin)
 router.get('/data/:id', mapPointController.getData)
+
+router.delete('/', checkIsAdminMiddleWare,mapPointController.deleteMapPoint)
 
 module.exports = router

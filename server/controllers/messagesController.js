@@ -8,33 +8,57 @@ class MessagesController {
 
     async create(req, res, next) {
         try {
-            const {userIdTo, message} = req.body
+            const {userIdTo, message, editedMessageId = -1} = req.body
             const currUser = req.user
 
             if (currUser && userIdTo !== null && message) {
-                const candidateFrom = await User.findOne({
-                    where: {
-                        id: currUser.id
-                    }
-                })
-                const candidateTo = await User.findOne({
-                    where: {
-                        id: userIdTo
-                    }
-                })
 
-                if (candidateFrom && candidateTo) {
-                    const newMessage = await Messages.create({
-                        userIdFrom: currUser.id,
-                        userIdTo,
-                        message,
-                        seenFrom: true
+                if (editedMessageId > -1) {
+                    try {
+                        const editedMessage = await Messages.update(
+                            {
+                                message
+                            },
+                            {
+                                where: {
+                                    id: editedMessageId,
+                                    userIdFrom: currUser.id,
+                                }
+                            })
+
+                        if (editedMessage > 0) {
+                            return res.json({status: 'ok', data: editedMessageId, message: editedMessage})
+                        }
+                    } catch (e) {
+                        return res.json({status: 'error', message: e.message})
+                    }
+                    return res.json({status: 'error'})
+
+                } else {
+                    const candidateFrom = await User.findOne({
+                        where: {
+                            id: currUser.id
+                        }
+                    })
+                    const candidateTo = await User.findOne({
+                        where: {
+                            id: userIdTo
+                        }
                     })
 
-                    if (newMessage) {
-                        return res.json({status: 'ok', data: newMessage.id})
-                    }
+                    if (candidateFrom && candidateTo) {
+                        const newMessage = await Messages.create({
+                            userIdFrom: currUser.id,
+                            userIdTo,
+                            message,
+                            seenFrom: true
+                        })
 
+                        if (newMessage) {
+                            return res.json({status: 'ok', data: newMessage.id})
+                        }
+
+                    }
                 }
                 return next(ApiError.badRequest("Ошибка сохранения сообщения"))
             } else {
@@ -142,6 +166,7 @@ class MessagesController {
                                 where: {
                                     userIdFrom: selectedUser.id,
                                     userIdTo: currUser.id,
+                                    deleted: false,
                                 },
                                 order: [['createdAt', 'DESC']],
                                 attributes: ['message', 'createdAt', 'seenFrom', 'seenTo'],
@@ -150,12 +175,13 @@ class MessagesController {
                             let lastMessageText = ''
                             let lastMessageDate = ''
                             // let lastMessageStatus = 'to'
-                            let lastMessageSeen = false
+                            let lastMessageSeen = true
 
                             const toUserMessage = await Messages.findOne({
                                 where: {
                                     userIdFrom: currUser.id,
                                     userIdTo: selectedUser.id,
+                                    deleted: false,
                                 },
                                 order: [['createdAt', 'DESC']],
                                 attributes: ['message', 'createdAt', 'seenFrom', 'seenTo'],
@@ -197,17 +223,20 @@ class MessagesController {
 
     async get(req, res, next) {
         try {
-            const {chatUserId} = req.params
+            // const {chatUserId, countBefore} = req.params
+            const {chatUserId, countBefore = 0} = req.query
             const currUser = req.user
+
             if (currUser && chatUserId) {
 
                 const fromUserMessages = await Messages.findAndCountAll({
                     where: {
                         userIdFrom: [currUser.id, chatUserId],
                         userIdTo: [chatUserId, currUser.id],
-
+                        deleted: false,
                     },
-                    limit: 30,
+                    offset: countBefore,
+                    limit: 20,
                     order: [['createdAt', 'DESC']],
                 })
 
@@ -241,6 +270,7 @@ class MessagesController {
 
                 const fromUserMessages = await Messages.findAndCountAll({
                     where: {
+                        deleted: false,
                         userIdFrom: [currUser.id, chatUserId],
                         userIdTo: [chatUserId, currUser.id],
                         createdAt: {
@@ -282,48 +312,12 @@ class MessagesController {
                             {userIdTo: currUser.id}
                         ],
                         seenTo: false,
+                        deleted: false,
 
-                        // // userIdFrom:{
-                        // //     [Op.or]: currUser.id
-                        // // },
-                        // // userIdTo:{
-                        // //     [Op.or]: currUser.id
-                        // // },
-                        //
-                        // createdAt: {
-                        //     [Op.gt]: (new Date() - 3600),
-                        //     [Op.lt]: new Date(),
-                        // },
-                        // [Op.or]: [
-                        //     {
-                        //         userIdFrom: currUser.id,
-                        //         seenFrom: false
-                        //     },
-                        //     {
-                        //         userIdTo: currUser.id,
-                        //         seenTo: false
-                        //     }
-                        // ]
-                        // // seenFrom:{
-                        // //     [Op.or]: false
-                        // // },
-                        // // seenTo:{
-                        // //     [Op.or]: false
-                        // // },
                     },
                     limit: 1,
                     order: [['createdAt', 'DESC']],
                 })
-
-
-                console.log('')
-                console.log('')
-                console.log(currUser)
-                console.log('')
-                console.log('')
-                console.log('')
-
-
 
                 const newData = {
                     // count: fromUserMessages.count,
@@ -341,16 +335,39 @@ class MessagesController {
         }
     }
 
-    async delete(req, res, next) {
+    async deleteMessageById(req, res, next) {
         try {
-            const {id} = req.params
+            const {messageId} = req.query
+            const currUser = req.user
 
-            if (!id) {
+            if (!messageId || !currUser) {
                 return next(ApiError.badRequest("Ошибка параметра"))
             } else {
+                const count = await Messages.update(
+                    {
+                        deleted: true,
+                    },
+                    {
+                        where: {
+                            id: messageId,
+                            userIdFrom: currUser.id,
+                        }
+                    }
+                )
+                // const count = await Messages.destroy({
+                //         where: {
+                //             id: messageId,
+                //             userIdFrom: currUser.id,
+                //         }
+                //     }
+                // )
 
-                const count = await Messages.destroy({where: {id: id}})
-                return res.json(`Удалено записей: ${count}`)
+                if(count > 0){
+                    return res.json({status: 'ok', count})
+                }else{
+                    return res.json({status: 'error'})
+                }
+
             }
         } catch (e) {
             return next(ApiError.forbidden("Ошибка добавления пользователя"))

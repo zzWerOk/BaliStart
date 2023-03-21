@@ -1,18 +1,18 @@
 const Router = require('express')
 const router = new Router()
-const userController = require('../controllers/messagesController')
+const messagesController = require('../controllers/messagesController')
 const authMiddleWare = require('../middleware/authMiddleWare')
-const checkIsAdmin = require('../middleware/checkIsAdminMiddleWare')
 
-router.post('/create', authMiddleWare, userController.create)
-router.post('/setMessagesSeen', authMiddleWare, userController.setMessagesSeen)
-router.get('/getChatUsers', authMiddleWare, userController.getChatUsers)
-router.get('/checkMessagesNew', authMiddleWare, userController.checkNewMessages)
-router.get('/getMessagesNew', authMiddleWare, userController.getNewMessages)
-router.get('/:chatUserId', authMiddleWare, userController.get)
+router.post('/create', authMiddleWare, messagesController.create)
+router.post('/setMessagesSeen', authMiddleWare, messagesController.setMessagesSeen)
+router.get('/getChatUsers', authMiddleWare, messagesController.getChatUsers)
+router.get('/checkMessagesNew', authMiddleWare, messagesController.checkNewMessages)
+router.get('/getMessagesNew', authMiddleWare, messagesController.getNewMessages)
+// router.get('/:chatUserId', authMiddleWare, userController.get)
+router.get('/', authMiddleWare, messagesController.get)
 
-router.get('/newMessages', authMiddleWare, userController.getNewMessages)
+router.get('/newMessages', authMiddleWare, messagesController.getNewMessages)
 
-router.delete('/:id',checkIsAdmin,userController.delete)
+router.delete('/',authMiddleWare,messagesController.deleteMessageById)
 
 module.exports = router

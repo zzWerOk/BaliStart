@@ -45,9 +45,9 @@ const ChatProfile = () => {
                 setUserChatList(newArr)
 
                 let isHasUnseen = false
-                for(let i = 0;i < data.data.length;i++){
+                for (let i = 0; i < data.data.length; i++) {
                     const currChatUser = data.data[i]
-                    if(!currChatUser.read){
+                    if (!currChatUser.read) {
                         isHasUnseen = true
                         break
                     }
@@ -96,9 +96,9 @@ const ChatProfile = () => {
         setUserChatList(newUserChatList)
 
         let isHasUnseen = false
-        for(let i = 0;i < newUserChatList.length;i++){
+        for (let i = 0; i < newUserChatList.length; i++) {
             const currChatUser = newUserChatList[i]
-            if(!currChatUser.read){
+            if (!currChatUser.read) {
                 isHasUnseen = true
                 break
             }
@@ -127,7 +127,7 @@ const ChatProfile = () => {
                                         userImg={user.userImg}
                                         userLastMessage={user.lastMessage}
                                         isReaded={((user.userId === userChatSelected?.userId) ? userChatSelected?.read : user.read)}
-                                        lastMessageDate={epochToDate_userChatWithTime(user.lastMessageDate)}
+                                        lastMessageDate={user.lastMessageDate === "" ? '' : user.lastMessageDate === 0 ? '' : epochToDate_userChatWithTime(user.lastMessageDate)}
                                         userChatSelected={userChatSelectedId}
                                         onUserChatClick={selectUserChat}
                                     />

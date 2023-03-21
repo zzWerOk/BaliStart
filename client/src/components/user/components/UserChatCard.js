@@ -74,9 +74,14 @@ const UserChatCard = (props) => {
                         </strong>
                     </div>
                     <div className={'col-5 text-truncate d-flex justify-content-end'}>
-                        <small>
-                            {lastMessageDate}
-                        </small>
+                        {lastMessageDate !== ''
+                            ?
+                            <small>
+                                {lastMessageDate}
+                            </small>
+                            :
+                            null
+                        }
                     </div>
                 </div>
                 <div className={'row text-truncate'}>

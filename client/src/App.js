@@ -16,7 +16,6 @@ const App = observer(() => {
     const {user, rightSideBarStore, messagesStore} = useContext(Context)
 
     const [delayedMessages, setDelayedMessages] = useState([])
-    const [connectAttempts, setConnectAttempts] = useState(5)
 
     let ws = null
     let myInterval = null
@@ -44,9 +43,31 @@ const App = observer(() => {
         }
     }
 
+    const deleteMessage = (recipient, messageId, userIdFrom) => {
+        if (!isWsIsOpen(ws)) {
+            setDelayedMessages(prevState => {
+                prevState.push({recipient, messageId, userIdFrom})
+            })
+            ws.close()
+            ws = null
+            connect()
+            return
+        }
+
+        const message = {
+            type: 'DELETE_MESSAGE',
+            payload: {recipient, messageId, userIdFrom},
+        };
+
+        if (ws) {
+            ws.send(JSON.stringify(message));
+        } else {
+            console.log('Not WS')
+        }
+    }
+
     const sendMessage = (recipient, text) => {
         if (!isWsIsOpen(ws)) {
-            console.log('ws - unavailable')
             setDelayedMessages(prevState => {
                 prevState.push({recipient, text})
             })
@@ -70,8 +91,6 @@ const App = observer(() => {
 
     const checkWsConnection = () => {
         if (!isWsIsOpen(ws)) {
-            setConnectAttempts(prev => prev - 1)
-            console.log('Connect attempt ', 5 - connectAttempts)
             ws.close()
             ws = null
             connect()
@@ -113,6 +132,7 @@ const App = observer(() => {
 
             if (messagesStore) {
                 messagesStore.onMessageSend = sendMessage
+                messagesStore.onMessageDeleted = deleteMessage
             }
 
             newWs.onopen = () => {
@@ -125,7 +145,6 @@ const App = observer(() => {
                     setDelayedMessages([])
                 }
 
-                setConnectAttempts(5)
 
             };
 
@@ -138,6 +157,12 @@ const App = observer(() => {
                     if (data?.message === 'new_message') {
                         if (messagesStore) {
                             messagesStore.getNewMessages()
+                        }
+                    }
+
+                    if (data?.message === 'delete_message') {
+                        if (messagesStore) {
+                            messagesStore.checkDeletedMessages(data?.messageId, data?.userIdFrom)
                         }
                     }
 
