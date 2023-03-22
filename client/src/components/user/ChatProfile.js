@@ -5,7 +5,9 @@ import Chat from "./components/Chat";
 import {getChatUsers} from "../../http/messagesAPI";
 import {Context} from "../../index";
 
-const ChatProfile = () => {
+const ChatProfile = (props) => {
+    const {newChatUserId} = props
+
     const {messagesStore} = useContext(Context)
 
     const [loading, setLoading] = useState(true)
@@ -19,7 +21,7 @@ const ChatProfile = () => {
         setLoading(true)
         let isCanceled = false
 
-        getNewChatUsers()
+        getNewChatUsers(newChatUserId)
 
         return () => {
             isCanceled = true
@@ -32,9 +34,9 @@ const ChatProfile = () => {
         }
     }, [])
 
-    const getNewChatUsers = () => {
+    const getNewChatUsers = (newChatUserId = null) => {
 
-        getChatUsers().then(async data => {
+        getChatUsers(newChatUserId).then(async data => {
 
             if (data?.status === 'ok' && data?.data) {
 
@@ -42,6 +44,7 @@ const ChatProfile = () => {
 
                 newArr.sort((a, b) => (a.lastMessageDate < b.lastMessageDate) ? 1 : ((b.lastMessageDate < a.lastMessageDate) ? -1 : 0))
 
+                // setUserChatList(newArr)
                 setUserChatList(newArr)
 
                 let isHasUnseen = false
@@ -54,7 +57,25 @@ const ChatProfile = () => {
                 }
                 messagesStore.checkNewMessagesNav(isHasUnseen)
 
-                // setUserChatList(data.data)
+                if(newChatUserId !== null){
+
+                    const filtered = newArr.filter(function (value) {
+                        return value.userId + '' === newChatUserId + ''
+                    })
+
+                    setUserChatSelected({
+                        userId: newChatUserId,
+                        userName: filtered[0].userName,
+                        userImg: filtered[0].userImg,
+                        lastMessageDate: filtered[0].lastMessageDate,
+                        read: filtered[0].read,
+                    })
+
+                    setUserChatSelectedId(newChatUserId)
+
+
+                }
+
             }
 
         }).catch((e) => {
@@ -71,6 +92,7 @@ const ChatProfile = () => {
         const filtered = userChatList.filter(function (value) {
             return value.userId === userId
         })
+
         setUserChatSelected({
             userId,
             userName: filtered[0].userName,

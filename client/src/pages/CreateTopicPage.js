@@ -176,11 +176,8 @@ class NewTopicCl {
 let newTopic = new NewTopicCl()
 let savedTopicToCheck = ''
 const CreateTopicPage = (props) => {
-    // const {categoryId, topicID} = props
 
     const {topicsCategoryStore, rightSideBarStore, user} = useContext(Context)
-
-    // const [newTopic, setNewTopic] = useState({id: -1, data: []})
 
     const [isSaving, setIsSaving] = useState(false)
     const [saveError, setSaveError] = useState(false)
@@ -680,23 +677,22 @@ const CreateTopicPage = (props) => {
 
                         newTopic.imageFile = null
 
-                        // if (data.hasOwnProperty('image_logo')) {
-                        //     newTopic.image = data.image_logo
-                        //     newTopic.imageFile = null
-                        //     setNewTopicImage(data.image_logo + '?' + Date.now())
-                        // }
                         getTopicDataHandler(data.id).then()// save
                     } else {
+                        // console.log(data?.message)
                         setSaveError(true)
                         setSaveAlert(false)
+                        setIsSaving(false)
                     }
                 } else {
                     setSaveError(true)
                     setSaveAlert(false)
+                    setIsSaving(false)
                 }
             }).catch(() => {
                 setSaveError(true)
                 setSaveAlert(false)
+                setIsSaving(false)
             }).finally(() => {
                 // setIsSaving(false)
             })
@@ -720,23 +716,22 @@ const CreateTopicPage = (props) => {
 
                         newTopic.imageFile = null
 
-                        // if (data.hasOwnProperty('image_logo')) {
-                        //     newTopic.image = data.image_logo
-                        //     newTopic.imageFile = null
-                        //     setNewTopicImage(data.image_logo + '?' + Date.now())
-                        // }
                         getTopicDataHandler(newTopic.id).then()// change
                     } else {
+                        // console.log(data?.message)
                         setSaveError(true)
                         setSaveAlert(false)
+                        setIsSaving(false)
                     }
                 } else {
                     setSaveError(true)
                     setSaveAlert(false)
+                    setIsSaving(false)
                 }
             }).catch(() => {
                 setSaveError(true)
                 setSaveAlert(false)
+                setIsSaving(false)
             }).finally(() => {
                 // setIsSaving(false)
             })

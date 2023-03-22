@@ -26,6 +26,7 @@ import TopicDetailGoogleMapUrlComponent from "../components/topics/components/To
 import TopicDetailLineComponent from "../components/topics/components/TopicDetailLineComponent";
 
 import ModalPopUp from "../components/ModalPopUp";
+import BaliUserNameBtn from "../components/BaliUserName_btn";
 
 const TopicDetails = (props) => {
     const {savedTopic, closePreview} = props
@@ -58,16 +59,6 @@ const TopicDetails = (props) => {
     useEffect(() => {
         document.title = pageTitle;
     }, [pageTitle]);
-
-    // useEffect(() => {
-    //
-    //     setTopicSeen(topicIDUrl).then(
-    //     ).catch((e) => {
-    //         console.log(e)
-    //     }).finally(() => {
-    //     })
-    //
-    // }, []);
 
     useEffect(() => {
         setLoading(true)
@@ -199,28 +190,31 @@ const TopicDetails = (props) => {
     }
 
     const getTopicDetailsElement = (element, index) => {
-
-        if (element.hasOwnProperty('type')) {
-            switch (element.type) {
-                case 'text':
-                    return <TopicDetailTextComponent key={index} element={element}/>
-                case 'comment':
-                    return <TopicDetailCommentComponent key={index} element={element}/>
-                case 'list':
-                    return <TopicDetailListComponent key={index} element={element}/>
-                case 'link':
-                    return <TopicDetailLinkComponent key={index} element={element}/>
-                case 'email':
-                    return <TopicDetailEmailComponent key={index} element={element}/>
-                case 'phone':
-                    return <TopicDetailPhoneComponent key={index} element={element}/>
-                case 'images':
-                    return <TopicDetailImagesComponent key={index} element={element}/>
-                case 'googleMapUrl':
-                    return <TopicDetailGoogleMapUrlComponent key={index} element={element}/>
-                case 'line':
-                    return <TopicDetailLineComponent key={index} element={element}/>
+        try {
+            if (element.hasOwnProperty('type')) {
+                switch (element.type) {
+                    case 'text':
+                        return <TopicDetailTextComponent key={index} element={element}/>
+                    case 'comment':
+                        return <TopicDetailCommentComponent key={index} element={element}/>
+                    case 'list':
+                        return <TopicDetailListComponent key={index} element={element}/>
+                    case 'link':
+                        return <TopicDetailLinkComponent key={index} element={element}/>
+                    case 'email':
+                        return <TopicDetailEmailComponent key={index} element={element}/>
+                    case 'phone':
+                        return <TopicDetailPhoneComponent key={index} element={element}/>
+                    case 'images':
+                        return <TopicDetailImagesComponent key={index} element={element}/>
+                    case 'googleMapUrl':
+                        return <TopicDetailGoogleMapUrlComponent key={index} element={element}/>
+                    case 'line':
+                        return <TopicDetailLineComponent key={index} element={element}/>
+                }
             }
+        }catch (e) {
+
         }
     }
 
@@ -329,7 +323,8 @@ const TopicDetails = (props) => {
                             <Row className={classes.topic_row_top}>
                                 <div className={'d-flex justify-content-between'}>
                                     <small>
-                                        {topic.userName}
+                                        {/*{topic.userName}*/}
+                                        {<BaliUserNameBtn userName={topic.userName} userId={topic.userId} />}
                                     </small>
                                     <small>
                                         {epochToDateWithTime(topic.created_date)}

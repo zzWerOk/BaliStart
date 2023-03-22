@@ -1,20 +1,18 @@
 import React from 'react';
 import ChatProfile from "../components/user/ChatProfile";
 import FeedTopBar from "../components/mainpage/FeedTopBar";
-import {sortTours} from "../utils/consts";
 
-const MessagesPage = () => {
+const MessagesPage = (props) => {
+
+    const newChatUserId = props?.location?.state?.userId || null
+    window.history.replaceState({}, document.title)
+
     return (
         <div>
             <div style={{marginTop: '20px'}}>
 
                 <FeedTopBar
-                    isSearch={true}
-                    // setSearchHandler={setSearchHandler}
-                    // setSort={setSortHandler}
-                    // isLoading={isLoadingSorted}
-                    // selectedSortCode={selectedSortCode}
-                    sortCodes={sortTours}
+
                 />
 
                 <div
@@ -24,7 +22,7 @@ const MessagesPage = () => {
                     aria-labelledby="chat-tab0"
                     style={{height: 'calc(100vh - 129px'}}
                 >
-                    <ChatProfile/>
+                    <ChatProfile newChatUserId={newChatUserId}/>
                 </div>
 
             </div>

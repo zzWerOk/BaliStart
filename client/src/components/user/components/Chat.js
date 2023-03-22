@@ -297,10 +297,9 @@ const Chat = (props) => {
         setSendingMessage(true)
         setSendMessageError(false)
 
-        if (user?.isAuth && userChatSelected.userId > -1 && messageText) {
+        if (user?.isAuth && userChatSelected?.userId > -1 && messageText) {
 
             createMessage(userChatSelected.userId, messageText, editedMessage?.id).then(async data => {
-
 
                 if (data?.status === 'ok' && data?.data) {
                     editMessageCancel()

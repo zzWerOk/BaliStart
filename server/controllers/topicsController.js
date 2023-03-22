@@ -111,6 +111,11 @@ class TopicsController {
                 new_images_count,
             } = req.body
 
+            let activeAdmin = active
+            if (typeof active != "boolean") {
+                activeAdmin = (active?.toLowerCase?.() === 'true');
+            }
+
             let created_by_user_admin_id = created_by_user_id
             const currUser = req.user
             let userAdmin = null
@@ -145,6 +150,7 @@ class TopicsController {
 
                 if (result.hasOwnProperty('status')) {
                     if (result.status === 'ok') {
+
                         const fileName = result.fileName
                         let imgFileName = ''
                         if (result.imgFileName) {
@@ -159,7 +165,7 @@ class TopicsController {
                             images: images,
                             videos: videos,
                             google_map_url: google_map_url,
-                            active: active,
+                            active: activeAdmin,
                             created_by_user_id: created_by_user_admin_id,
                             created_date: created_date,
                             deleted_by_user_id: deleted_by_user_id,
@@ -175,7 +181,6 @@ class TopicsController {
                         } catch (e) {
                             console.log(e)
                         }
-
 
                         /**
                          Обновление таблиц
@@ -210,8 +215,6 @@ class TopicsController {
             }
         } catch (e) {
             return res.json({status: 'error', message: e.message})
-
-            // return next(ApiError.forbidden("Ошибка добавления..."))
         }
     }
 
@@ -522,6 +525,7 @@ class TopicsController {
                                     // deleted_date: {type: DataTypes.BIGINT},
                                     // topicData.image = candidate.file_name
                                     topicData.userName = topicUser.name
+                                    topicData.userId = topicUser.id
 
                                     if (candidate.created_by_user_id === user_id) {
                                         topicFileData.editable = true
@@ -853,7 +857,7 @@ class TopicsController {
             const candidate = await Topics.findOne({where: {id: id}})
             if (candidate) {
 
-                await Topics.increment('seen', { by: 1, where: {id: id} });
+                await Topics.increment('seen', {by: 1, where: {id: id}});
 
                 // await Topics.update(
                 //     {seq: sequelize.literal('seq + 5')},

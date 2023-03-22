@@ -117,7 +117,10 @@ class MessagesController {
 
     async getChatUsers(req, res, next) {
         try {
+            const {newChatUserId = null} = req.query
+            let isAdded = false
             const currUser = req.user
+
             if (currUser) {
 
                 const fromUserMessages = await Messages.findAll({
@@ -151,6 +154,12 @@ class MessagesController {
 
                 for (let i = 0; i < uniqueIds.length; i++) {
                     const currId = uniqueIds[i]
+
+                    if (newChatUserId !== null) {
+                        if (currId + '' === newChatUserId + '') {
+                            isAdded = true
+                        }
+                    }
 
                     if (currId !== currUser.id) {
 
@@ -209,6 +218,27 @@ class MessagesController {
                                 lastMessageDate,
                             })
                         }
+                    }
+                }
+
+                if(newChatUserId !== null) {
+                    if (!isAdded) {
+                        const selectedUser = await User.findOne({
+                            where: {
+                                id: newChatUserId,
+                            },
+                            attributes: ['name', 'id', 'avatar_img'],
+                        })
+
+                        usersIds.push({
+                            userId: selectedUser.id,
+                            userName: selectedUser.name,
+                            userImg: selectedUser.avatar_img,
+                            lastMessage: '',
+                            read: true,
+                            lastMessageDate: '',
+                        })
+
                     }
                 }
 
@@ -362,9 +392,9 @@ class MessagesController {
                 //     }
                 // )
 
-                if(count > 0){
+                if (count > 0) {
                     return res.json({status: 'ok', count})
-                }else{
+                } else {
                     return res.json({status: 'error'})
                 }
 

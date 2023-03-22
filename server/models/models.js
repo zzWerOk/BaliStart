@@ -101,7 +101,7 @@ const Topics = sequelize.define('topics', {
     deleted_by_user_id: {type: DataTypes.INTEGER},
     deleted_date: {type: DataTypes.BIGINT},
     file_name: {type: DataTypes.STRING},
-    seen: {type: DataTypes.INTEGER, defaultValue: true},
+    seen: {type: DataTypes.INTEGER, defaultValue: 0},
 })
 
 const TopicComments = sequelize.define('topic_comments', {

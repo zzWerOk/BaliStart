@@ -8,15 +8,12 @@ export const createMessage = async (userIdTo, message, editedMessageId = -1) => 
 }
 
 export const deleteMessage = async (messageId = -1) => {
-    // const {data} = await $authHost.post(apiUrl + '/messagedelete', {messageId})
-    // const {data} = await $authHost.delete(apiUrl+'/' + messageId)
-
     const {data} = await $authHost.delete(apiUrl + '/', {params: {messageId}})
     return data
 }
 
-export const getChatUsers = async () => {
-    const {data} = await $authHost.get(apiUrl + '/getChatUsers')
+export const getChatUsers = async (newChatUserId = null) => {
+    const {data} = await $authHost.get(apiUrl + '/getChatUsers', {params: {newChatUserId}})
     return data
 }
 
