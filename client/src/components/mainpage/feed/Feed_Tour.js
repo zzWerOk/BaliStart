@@ -17,7 +17,7 @@ const FeedTour = (props) => {
     useEffect(() => {
 
         if (item.image) {
-            setItemImage(process.env.REACT_APP_API_URL + '/static/' + item.image + '?' + Date.now())
+            setItemImage(process.env.REACT_APP_API_URL + '/static/' + item.image + '_s?' + Date.now())
         }
 
     }, [])

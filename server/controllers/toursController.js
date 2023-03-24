@@ -3,7 +3,7 @@ const {Op} = require("sequelize");
 const ApiError = require("../error/ApiError");
 const path = require("path");
 const fs = require("fs");
-const {removeFile, createNewFile, reWrightFile, readFile, getDirName, getFreeFileName} = require("../utils/consts");
+const {removeFile, createNewFile, reWrightFile, readFile, getDirName, getFreeFileName, resizeImageWithThumb} = require("../utils/consts");
 
 const saveTourImageFile = (dataText, newImagesArr, tourId) => {
     let dataText_json = JSON.parse(dataText)
@@ -23,7 +23,18 @@ const saveTourImageFile = (dataText, newImagesArr, tourId) => {
             let dirName = getDirName('img')
             const fileName = getFreeFileName(dirName)
             const imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
-            image.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
+            image.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
+                try {
+                    removeFile('static/' + imgFileName)
+                    removeFile('static/' + imgFileName + '_s')
+                    removeFile('static/' + imgFileName + '_th')
+
+                    resizeImageWithThumb('static/' + imgFileName)
+                }catch (e) {
+
+                }
+            })
+
 
             imagesArr.push(imgFileName)
 

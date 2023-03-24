@@ -170,75 +170,79 @@ const TourDetails = () => {
     }
 
     const getTourDataElements = (tourData) => {
-        const tourDataJson = JSON.parse(tourData)
-        let imagesElement = {name: '', items: '[]'}
-        if (tourDataJson.hasOwnProperty('images')) {
-            imagesElement.items = tourDataJson.images
-        }
-
-        let includesElement = {name: '', items: '[]'}
-        if (tourDataJson.hasOwnProperty('includes')) {
-            includesElement.name = 'What Includes'
-            includesElement.items = tourDataJson.includes
-        }
-
-        let notIncludesElement = {name: '', items: '[]'}
-        if (tourDataJson.hasOwnProperty('notincludes')) {
-            notIncludesElement.name = 'What not includes'
-            notIncludesElement.items = tourDataJson.notincludes
-        }
-
-        return <div>
-            {
-                JSON.parse(imagesElement.items).length > 0
-                    ?
-                    <TopicDetailImagesComponent element={imagesElement}/>
-                    :
-                    null
+        try {
+            const tourDataJson = JSON.parse(tourData)
+            let imagesElement = {name: '', items: '[]'}
+            if (tourDataJson.hasOwnProperty('images')) {
+                imagesElement.items = tourDataJson.images
             }
 
-            {
-                tourMP.length > 0
-                    ?
-                    <div>
+            let includesElement = {name: '', items: '[]'}
+            if (tourDataJson.hasOwnProperty('includes')) {
+                includesElement.name = 'What Includes'
+                includesElement.items = tourDataJson.includes
+            }
 
-                        <ElementName name={'Itinerary'}/>
+            let notIncludesElement = {name: '', items: '[]'}
+            if (tourDataJson.hasOwnProperty('notincludes')) {
+                notIncludesElement.name = 'What not includes'
+                notIncludesElement.items = tourDataJson.notincludes
+            }
 
-                        <div className="accordion accordion-borderless"
-                             id="accordionFlushExample"
-                             style={{marginTop: '-10px'}}
-                        >
-                            <ul className="timeline-with-icons">
+            return <div>
+                {
+                    JSON.parse(imagesElement.items).length > 0
+                        ?
+                        <TopicDetailImagesComponent element={imagesElement}/>
+                        :
+                        null
+                }
 
-                                {
-                                    tourMP.map(function (item, index) {
-                                        return getMapPointsTimeLineItem(item, index)
-                                    })
-                                }
+                {
+                    tourMP.length > 0
+                        ?
+                        <div>
 
-                            </ul>
+                            <ElementName name={'Itinerary'}/>
+
+                            <div className="accordion accordion-borderless"
+                                 id="accordionFlushExample"
+                                 style={{marginTop: '-10px'}}
+                            >
+                                <ul className="timeline-with-icons">
+
+                                    {
+                                        tourMP.map(function (item, index) {
+                                            return getMapPointsTimeLineItem(item, index)
+                                        })
+                                    }
+
+                                </ul>
+                            </div>
                         </div>
-                    </div>
 
-                    :
-                    null
-            }
+                        :
+                        null
+                }
 
-            {
-                JSON.parse(includesElement.items).length > 0
-                    ?
-                    <TopicDetailListComponent isIncludes={true} element={includesElement}/>
-                    :
-                    null
-            }
-            {
-                JSON.parse(notIncludesElement.items).length > 0
-                    ?
-                    <TopicDetailListComponent isNotIncludes={true} element={notIncludesElement}/>
-                    :
-                    null
-            }
-        </div>
+                {
+                    JSON.parse(includesElement.items).length > 0
+                        ?
+                        <TopicDetailListComponent isIncludes={true} element={includesElement}/>
+                        :
+                        null
+                }
+                {
+                    JSON.parse(notIncludesElement.items).length > 0
+                        ?
+                        <TopicDetailListComponent isNotIncludes={true} element={notIncludesElement}/>
+                        :
+                        null
+                }
+            </div>
+        }catch (e) {
+
+        }
     }
 
     const getMapPointsTimeLineItem = (item, index) => {

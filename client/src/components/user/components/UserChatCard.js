@@ -17,9 +17,9 @@ const UserChatCard = (props) => {
     useEffect(() => {
 
         if (userImg) {
-            setUserAvatarImg(process.env.REACT_APP_API_URL + '/static/' + userImg + '?' + Date.now())
+            setUserAvatarImg(process.env.REACT_APP_API_URL + '/static/' + userImg + '_th?' + Date.now())
         } else {
-            setUserAvatarImg(process.env.REACT_APP_API_URL + '/static/guide_avatar.png')
+            setUserAvatarImg(process.env.REACT_APP_API_URL + '/static/guide_avatar_th.png')
         }
 
 
@@ -37,7 +37,7 @@ const UserChatCard = (props) => {
                 style={{minHeight: '46px'}}
             >
                 <img
-                    src={userAvatarImg} alt="Guide avatar"
+                    src={userAvatarImg} alt="Guide avatar chat"
                     className="rounded-circle img-thumbnail shadow-sm"
                     style={{
                         display: 'block',

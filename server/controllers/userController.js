@@ -2,7 +2,7 @@ const {User, Guide, TableUpdates, Agent} = require('../models/models')
 const ApiError = require('../error/ApiError')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const {createNewFile, readFile} = require("../utils/consts");
+const {createNewFile, readFile, removeFile, resizeUserAvatarWithThumb} = require("../utils/consts");
 const path = require("path");
 
 const generateJWT = (id, email, isAdmin, isGuide, isAgent) => {
@@ -156,7 +156,14 @@ class UserController {
                     } else {
                         if (img) {
                             imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
-                            await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                            await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
+                                removeFile('static/' + imgFileName)
+                                removeFile('static/' + imgFileName + '_s')
+                                removeFile('static/' + imgFileName + '_th')
+
+                                resizeUserAvatarWithThumb('static/' + imgFileName)
+                            })
+
                         }
 
                     }

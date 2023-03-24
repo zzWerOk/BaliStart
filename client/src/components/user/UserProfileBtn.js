@@ -9,9 +9,9 @@ const UserProfileBtn = (props) => {
     useEffect(() => {
         setLoading(true)
         if (image) {
-            setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + image + '?' + Date.now())
+            setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + image + '_th?' + Date.now())
         } else {
-            setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar.png')
+            setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar_th.png')
         }
 
         setLoading(false)
@@ -24,7 +24,7 @@ const UserProfileBtn = (props) => {
             <div onClick={onClickHandler}
             >
                 <img
-                    src={avatar_img} alt="Guide avatar"
+                    src={avatar_img} alt="Guide avatar profile btn"
                     className={`rounded-circle img-thumbnail shadow-sm`}
                     // className={`rounded-circle shadow-sm`}
                     style={{

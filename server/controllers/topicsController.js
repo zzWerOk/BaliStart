@@ -3,7 +3,10 @@ const ApiError = require("../error/ApiError");
 const fs = require("fs");
 const path = require("path");
 const {Op} = require("sequelize");
-const {createNewFile, reWrightFile, readFile, removeFile, getFreeFileName, getDirName} = require("../utils/consts");
+const {
+    createNewFile, reWrightFile, readFile, removeFile, getFreeFileName, getDirName,
+    resizeImageWithThumb
+} = require("../utils/consts");
 
 const removeTopicsCountFromCategories = (removeArr) => {
     try {
@@ -40,6 +43,7 @@ const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
                 const arrIndex = item.index
 
                 newImagesArr.map(function (image) {
+
                     const imageArrIndex = image.name.substring(image.name.lastIndexOf(" ") + 1, image.name.length);
                     let imageArrName = image.name.replace(' ' + imageArrIndex, '')
 
@@ -53,7 +57,7 @@ const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
                         let dirName = getDirName('img')
                         const fileName = getFreeFileName(dirName)
                         const imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
-                        image.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
+                        image.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then()
 
                         imagesArr.push(imgFileName)
 
@@ -61,7 +65,17 @@ const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
                             table_name: 'Topic ' + topicId,
                             file_name: fileName,
                             md5
-                        }).then()
+                        }).then(() => {
+
+                            try {
+                                resizeImageWithThumb(fileName)
+                            } catch (e) {
+                                console.log('e', e.message)
+                            }
+
+                        })
+
+
                     }
                 })
                 item.items = JSON.stringify(imagesArr)
@@ -214,6 +228,7 @@ class TopicsController {
                 return next(ApiError.forbidden("Необходимо указать все данные..."))
             }
         } catch (e) {
+            console.log(e.message)
             return res.json({status: 'error', message: e.message})
         }
     }
@@ -311,6 +326,8 @@ class TopicsController {
                                 /** Remove images of topic data from drive **/
                                 topicDataImage_db.map(item => {
                                     removeFile(item.file_name)
+                                    removeFile(item.file_name + '_s')
+                                    removeFile(item.file_name + '_th')
                                 })
                                 /** Remove images of topic data from DB **/
                                 await Files.destroy({
@@ -354,7 +371,12 @@ class TopicsController {
                             try {
                                 if (img) {
                                     imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
-                                    await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                                    await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig'))
+                                    removeFile('static/' + imgFileName)
+                                    removeFile('static/' + imgFileName + '_s')
+                                    removeFile('static/' + imgFileName + '_th')
+
+                                    resizeImageWithThumb('static/' + imgFileName)
                                 }
                             } catch (e) {
                                 return res.json({
@@ -365,7 +387,6 @@ class TopicsController {
                                 })
                             }
 
-                            // return res.json({status: 'error', message: 'save image error', created_date: "" + created_date})
                             await Topics.update({
                                 name: name,
                                 description: description,
@@ -394,7 +415,6 @@ class TopicsController {
                              Обновление таблиц
                              **/
                             try {
-                                // await TableUpdates.update({date: Date.now()}, {where: { table_name: 'User' }})
                                 await TableUpdates.upsert({table_name: 'Topics', date: Date.now()})
 
                                 const tagsArr = JSON.parse(tag)
@@ -403,8 +423,6 @@ class TopicsController {
                                     if (topicCategoryItem) {
 
                                         const topicsCount = topicCategoryItem.topics_count + 1 || 1
-                                        // topicCategoryItem.topics_count = topicsCount;
-                                        // topicCategoryItem.save();
 
                                         TopicsCategory.update({
                                             topics_count: topicsCount,
@@ -859,14 +877,6 @@ class TopicsController {
 
                 await Topics.increment('seen', {by: 1, where: {id: id}});
 
-                // await Topics.update(
-                //     {seq: sequelize.literal('seq + 5')},
-                //
-                //     {
-                //         where: {id: id},
-                //     }
-                // );
-
                 return res.json({status: 'ok'})
             }
             return next(ApiError.badRequest("Ошибка установки параметра"))
@@ -936,6 +946,9 @@ class TopicsController {
                     /** Remove all images of topic data from drive **/
                     topicDataImages.map(item => {
                         removeFile(item.file_name)
+                        removeFile(item.file_name + '_s')
+                        removeFile(item.file_name + '_th')
+
                     })
 
                     /** Remove all images of topic data from DB **/

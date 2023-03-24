@@ -124,7 +124,7 @@ const BaliImagesComponent = (props) => {
                                     >
                                         {
                                             JSON.parse(imagesBlob).map(function (image, index) {
-                                                let itemImage = `${process.env.REACT_APP_API_URL}` + "/static/" + image + '?' + Date.now()
+                                                let itemImage = `${process.env.REACT_APP_API_URL}` + "/static/" + image + '_th?' + Date.now()
 
                                                 try {
                                                     if (image.indexOf('blob:http://') !== -1) {

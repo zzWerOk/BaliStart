@@ -24,6 +24,7 @@
     "pg-hstore": "^2.3.4",
     "react-use-websocket": "^3.0.0",
     "sequelize": "^6.28.0",
+    "sharp": "^0.31.3",
     "socket.io": "^4.6.1",
     "unique-filename": "^3.0.0",
     "urid": "^1.1.0",

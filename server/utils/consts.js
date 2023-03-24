@@ -2,8 +2,9 @@ const path = require('path')
 const fs = require("fs")
 const {Files} = require("../models/models")
 const uniqueFilename = require("unique-filename")
+const sharp = require('sharp');
 
-dateToEpoch = function(date) {
+dateToEpoch = function (date) {
     return new Date(date).getTime() / 1000 || 0
 }
 
@@ -12,7 +13,6 @@ removeFile = function (fileName) {
     try {
 
         if (fileName) {
-            // const filePath = path.resolve(__dirname, '..', "data", fileName)
             const filePath = path.resolve(__dirname, '..', fileName)
 
             fs.unlinkSync(filePath)
@@ -53,22 +53,6 @@ reWrightFile = async function (textData, tableName, fileName) {
         let dirName = getDirName(tableName)
 
         const dirPath = path.resolve(__dirname, '..', "data")
-        // fs.mkdir(dirPath, (err) => {
-        //     if (err) {
-        //         return {err}
-        //     }
-        // });
-        // fs.mkdir(dirPath + "/" + dirName, (err) => {
-        //     if (err) {
-        //         return {err}
-        //     }
-        // });
-
-        // fs.mkdir(dirPath + "/" + dirName,  { recursive: true },(err) => {
-        //     if (err) {
-        //         return {err}
-        //     }
-        // });
 
         fs.mkdirSync(dirPath + "/" + dirName, {recursive: true});
 
@@ -86,7 +70,8 @@ reWrightFile = async function (textData, tableName, fileName) {
 }
 
 createNewFile = async function (textData, tableName, img) {
-
+    let imgFileName = ''
+    let filePath = ''
     try {
         let dirName = getDirName(tableName)
 
@@ -96,7 +81,7 @@ createNewFile = async function (textData, tableName, img) {
 
         fs.mkdirSync(dirPath + "/" + dirName, {recursive: true});
 
-        const filePath = path.resolve(__dirname, '..', "data", fileName)
+        filePath = path.resolve(__dirname, '..', "data", fileName)
 
         if (tableName !== 'img') {
             await fs.writeFile(filePath, "" + textData, 'utf-8', (err) => {
@@ -112,11 +97,22 @@ createNewFile = async function (textData, tableName, img) {
 
         await addNewFileNameToTable(tableName, fileName, imageMd5)
 
-        let imgFileName = ''
         if (img) {
             try {
                 imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
-                await img.mv(path.resolve(__dirname, '..', "static", imgFileName)).then()
+                await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
+
+                    try {
+                        removeFile('/static/' + imgFileName)
+                        removeFile('/static/' + imgFileName + '_s')
+                        removeFile('/static/' + imgFileName + '_th')
+
+                        resizeImageWithThumb('static/' + imgFileName)
+                    } catch (e) {
+                        console.log('e', e.message)
+                    }
+
+                })
                 return {'status': 'ok', fileName, imgFileName}
             } catch (e) {
                 return {status: 'error', message: e.message}
@@ -126,6 +122,18 @@ createNewFile = async function (textData, tableName, img) {
         return {status: 'ok', fileName}
 
     } catch (e) {
+
+        if (imgFileName && imgFileName !== '') {
+            removeFile('/static/' + imgFileName)
+            removeFile('/static/' + imgFileName + '_orig')
+            removeFile('/static/' + imgFileName + '_s')
+            removeFile('/static/' + imgFileName + '_th')
+        }
+
+        if (filePath && filePath !== '') {
+            removeFile('/data/' + filePath)
+        }
+
         return {error: e.message}
     }
     // return {error: "Ошибка создания файла"}
@@ -174,6 +182,104 @@ addNewFileNameToTable = async function (tableName, fileName, next, md5 = '') {
 }
 
 
+function resizeImageWithThumb(filePath) {
+    try {
+
+        return resizeImage(500, filePath + '_orig', filePath, () => {
+                resizeImage(250, filePath + '_orig', filePath + '_s', () => {
+                        resizeImage(100, filePath + '_orig', filePath + '_th', () => {
+                                removeFile(filePath + '_orig')
+                            }
+                        )
+                    }
+                )
+            }
+        )
+
+        // let isOk = sharp(filePath + '_orig')
+        //     .resize({height: 500})
+        //     .toFile(filePath, (err) => {
+        //         if (err) throw err;
+        //         // console.log(info);
+        //
+        //         isOk = sharp(filePath + '_orig')
+        //             .resize({height: 250})
+        //             .toFile(filePath + '_s', (err) => {
+        //                 if (err) throw err;
+        //                 // console.log(info);
+        //
+        //                 isOk = sharp(filePath + '_orig')
+        //                     .resize({height: 100})
+        //                     .toFile(filePath + '_th', (err) => {
+        //                         if (err) throw err;
+        //
+        //                         removeFile(filePath + '_orig')
+        //
+        //                     });
+        //             });
+        //     });
+        //
+        // return isOk
+    } catch (e) {
+
+    }
+    return null
+}
+
+function resizeImage(height, filePath_read, filePath_save, onFinishFunc) {
+    return sharp(filePath_read)
+        .resize({height: height})
+        .toFile(filePath_save, (err) => {
+            if (err) return null
+
+            onFinishFunc()
+
+        });
+}
+
+function resizeUserAvatarWithThumb(filePath) {
+    try {
+
+        return resizeImage(250, filePath + '_orig', filePath, () => {
+                resizeImage(150, filePath + '_orig', filePath + '_s', () => {
+                        resizeImage(70, filePath + '_orig', filePath + '_th', () => {
+                                removeFile(filePath + '_orig')
+                            }
+                        )
+                    }
+                )
+            }
+        )
+
+        // let isOk = sharp(filePath + '_orig')
+        //     .resize({height: 500})
+        //     .toFile(filePath, (err) => {
+        //         if (err) throw err;
+        //         // console.log(info);
+        //
+        //         isOk = sharp(filePath + '_orig')
+        //             .resize({height: 250})
+        //             .toFile(filePath + '_s', (err) => {
+        //                 if (err) throw err;
+        //                 // console.log(info);
+        //
+        //                 isOk = sharp(filePath + '_orig')
+        //                     .resize({height: 100})
+        //                     .toFile(filePath + '_th', (err) => {
+        //                         if (err) throw err;
+        //
+        //                         removeFile(filePath + '_orig')
+        //
+        //                     });
+        //             });
+        //     });
+        //
+        // return isOk
+    } catch (e) {
+
+    }
+    return null
+}
 
 module.exports = {
     getFreeFileName,
@@ -183,5 +289,7 @@ module.exports = {
     reWrightFile,
     createNewFile,
     dateToEpoch,
+    resizeImageWithThumb,
+    resizeUserAvatarWithThumb,
 }
 

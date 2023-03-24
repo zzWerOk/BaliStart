@@ -1,7 +1,8 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import classes from "../../pages/TopicDetails.module.css";
 import AddNewCommentComponent from "./AddNewCommentComponent";
 import {dateToEpoch, epochToDateWithTime} from "../../utils/consts";
+import BaliUserNameBtn from "../BaliUserName_btn";
 
 const CommentField = (props) => {
     const {
@@ -18,8 +19,16 @@ const CommentField = (props) => {
         sortCode,
     } = props
 
+    const [userAvatarImage, setUserAvatarImage] = useState('');
 
     useEffect(() => {
+
+        if (comment.hasOwnProperty('avatar_img') && comment.avatar_img !== '') {
+            setUserAvatarImage(process.env.REACT_APP_API_URL + '/static/' + comment.avatar_img + '?' + Date.now())
+        } else {
+            setUserAvatarImage(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar.png' + '?' + Date.now())
+        }
+
 
     }, [])
 
@@ -52,16 +61,26 @@ const CommentField = (props) => {
         <div className="media-block"
              style={{marginLeft: '10px'}}
         >
-            <a className="media-left" href="#">
+            <a className="media-left" >
                 <img className="img-circle img-sm"
                      alt="Profile Picture"
-                     src="https://bootdey.com/img/Content/avatar/avatar1.png"/>
+                     src={userAvatarImage}
+                     style={{
+                         maxWidth: '40px',
+                         maxHeight: '40px',
+                         minWidth: '40px',
+                         minHeight: '40px',
+                         objectFit: "cover",
+                }}
+                />
             </a>
             <div className="media-body">
                 <div className="mar-btm">
-                    <a href="#" className="btn-link text-semibold media-heading box-inline">
-                        {comment.created_by_user_name}
-                    </a>
+                    <div className={'d-flex justify-content-between'}>
+                        <small>
+                            {<BaliUserNameBtn userName={comment.created_by_user_name} userId={comment.created_by_user_id} />}
+                        </small>
+                    </div>
                     <p className="text-muted text-sm">
                         {epochToDateWithTime(dateToEpoch(comment.createdAt))}
                     </p>

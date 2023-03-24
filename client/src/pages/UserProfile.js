@@ -14,7 +14,7 @@ const UserProfile = () => {
     const [loading, setLoading] = useState(true)
 
     const [show, setShow] = useState(false);
-    const [avatar_img, setAvatar_img] = useState(process.env.REACT_APP_API_URL + '/static/guide_avatar.png');
+    const [avatar_img, setAvatar_img] = useState(process.env.REACT_APP_API_URL + '/static/guide_avatar_s.png');
 
     const [guideLoaded, setGuideLoaded] = useState(false);
 
@@ -112,9 +112,9 @@ const UserProfile = () => {
                 }
             }).finally(() => {
                 if (user.avatar_img) {
-                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + user.avatar_img + '?' + Date.now())
+                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + user.avatar_img + '_s?' + Date.now())
                 } else {
-                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/guide_avatar.png')
+                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/guide_avatar_s.png')
                 }
 
                 setLoading(false)
@@ -146,9 +146,9 @@ const UserProfile = () => {
                 }
             }).finally(() => {
                 if (user.avatar_img) {
-                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + user.avatar_img + '?' + Date.now())
+                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + user.avatar_img + '_s?' + Date.now())
                 } else {
-                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/guide_avatar.png')
+                    setAvatar_img(process.env.REACT_APP_API_URL + '/static/guide_avatar_s.png')
                 }
 
                 setLoading(false)
@@ -277,7 +277,7 @@ const UserProfile = () => {
                 if (data.status === 'ok') {
 
                     if (data.hasOwnProperty('avatar_img')) {
-                        setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + data.avatar_img + '?' + Date.now())
+                        setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + data.avatar_img + '_s?' + Date.now())
                     }
 
                     setGuideSaveForCheck(JSON.stringify(user.guide))
@@ -320,7 +320,7 @@ const UserProfile = () => {
                 if (data.status === 'ok') {
 
                     if (data.hasOwnProperty('avatar_img')) {
-                        setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + data.avatar_img + '?' + Date.now())
+                        setAvatar_img(process.env.REACT_APP_API_URL + '/static/' + data.avatar_img + '_s?' + Date.now())
                     }
 
                     setAgentSaveForCheck(JSON.stringify(user.agent))
@@ -368,7 +368,7 @@ const UserProfile = () => {
                                              style={{width: '140px'}}>
                                             {/*<div className="ms-4 me-4 mt-5 d-flex flex-column" >*/}
                                             <img
-                                                src={avatar_img} alt="Guide avatar"
+                                                src={avatar_img} alt="Guide avatar profile"
                                                 className="rounded-circle img-thumbnail shadow-sm "
                                                 style={{
                                                     display: 'block',

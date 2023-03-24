@@ -117,107 +117,110 @@ const TourDetailsPage = observer((props) => {
         currTour = new TourCL()
 
         getTourDataF().finally(() => {//start
-
             durationItems = []
             for (let i = 1; i <= 21; i++) {
                 durationItems.push({id: i})
             }
 
+            try {
 
-            // setTourCategoriesItems_load(true)
-            currTour.setFromJson(item)
+                // setTourCategoriesItems_load(true)
+                currTour.setFromJson(item)
 
-            setDurationTime(parseInt(currTour.duration.split(' ')[0]) || 1)
-            setDurationTimeType(currTour.duration.split(' ')[1] || 'h')
-            setActivityType(parseInt(currTour.activity_level) || 1)
+                setDurationTime(parseInt(currTour.duration.split(' ')[0]) || 1)
+                setDurationTimeType(currTour.duration.split(' ')[1] || 'h')
+                setActivityType(parseInt(currTour.activity_level) || 1)
 
-            setTourLanguage(currTour.languages)
+                setTourLanguage(currTour.languages)
 
-            setCurrName(currTour.name)
-            setCurrDescription(currTour.description)
-            setIsActive(currTour.active)
-            setTourCategoriesItems(toursCategoryStore.getSavedCategoriesList())
-            setTourTypesItems(toursTypeStore.getSavedCategoriesList())
-            setTourTags(currTour.tour_categoryJSON)
-            setTourTypes(currTour.tour_typeJSON)
+                setCurrName(currTour.name)
+                setCurrDescription(currTour.description)
+                setIsActive(currTour.active)
+                setTourCategoriesItems(toursCategoryStore.getSavedCategoriesList())
+                setTourTypesItems(toursTypeStore.getSavedCategoriesList())
+                setTourTags(currTour.tour_categoryJSON)
+                setTourTypes(currTour.tour_typeJSON)
 
-            setIsGuideCanAdd(currTour.guide_can_add)
-            setSelectedUserList(JSON.parse(currTour.selected_guides))
+                setIsGuideCanAdd(currTour.guide_can_add)
+                setSelectedUserList(JSON.parse(currTour.selected_guides))
 
-            mapPointsStore.loadMapPointsList()
-            let storeMapointsItems = mapPointsStore.getMapPointList
-            setMapPointsArr(mapPointsStore.getMapPointList)
+                mapPointsStore.loadMapPointsList()
+                let storeMapointsItems = mapPointsStore.getMapPointList
+                setMapPointsArr(mapPointsStore.getMapPointList)
 
-            setTourPriceUsd(currTour.price_usd)
+                setTourPriceUsd(currTour.price_usd)
 
-            let newMapPointArr = []
-            let lostMapPointsArr = []
-            let currTourMapPointArr = JSON.parse(currTour.map_points)
+                let newMapPointArr = []
+                let lostMapPointsArr = []
+                let currTourMapPointArr = JSON.parse(currTour.map_points)
 
-            for (let i = 0; i < currTourMapPointArr.length; i++) {
-                mapPointsStore.getMapPointList.map(currMapPoint => {
-                    if (currTourMapPointArr[i] === currMapPoint.id) {
-                        if (!currMapPoint.data) {
-                            lostMapPointsArr.push(i)
-                        }
-
-                        newMapPointArr.push(currTourMapPointArr[i])
-                    }
-                })
-            }
-
-            setTourMapPoints(JSON.stringify(newMapPointArr))
-            currTour.map_points = JSON.stringify(newMapPointArr)
-
-
-            if (item.image_logo) {
-                if (item.id >= 0) {
-                    setItemImageLogo(currTour.image_logo + '?' + Date.now())
-                }
-            }
-
-            setMapPointsArr_Loading(true)
-            if (lostMapPointsArr.length > 0) {
-                lostMapPointsArr.map(async function (lostItem, index) {
-
-                    getMapPointData(currTourMapPointArr[lostItem]).then(data => {
-                        if (data.hasOwnProperty('status')) {
-                            if (data.status === 'ok') {
-
-                                for (let j = 0; j < storeMapointsItems.length; j++) {
-                                    let currStoreMapPointItem = storeMapointsItems[j]
-                                    if (currStoreMapPointItem.id === currTourMapPointArr[lostItem]) {
-                                        // storeMapointsItems[currTourMapPointArr[lostItem]].data = data.data
-                                        currStoreMapPointItem.data = data.data
-
-                                        mapPointsStore.addDataToMapPoint_byId(currStoreMapPointItem.id, data.data)
-
-                                    }
-                                }
-
+                for (let i = 0; i < currTourMapPointArr.length; i++) {
+                    mapPointsStore.getMapPointList.map(currMapPoint => {
+                        if (currTourMapPointArr[i] === currMapPoint.id) {
+                            if (!currMapPoint.data) {
+                                lostMapPointsArr.push(i)
                             }
-                        }
-                    }).finally(() => {
 
-                        if (lostMapPointsArr.length - 1 === index) {
-                            setMapPointsArr_Loading(false)
-                            setMapPointsArr(storeMapointsItems)
+                            newMapPointArr.push(currTourMapPointArr[i])
                         }
                     })
-                })
-            } else {
-                setMapPointsArr(storeMapointsItems)
-                setMapPointsArr_Loading(false)
+                }
+
+                setTourMapPoints(JSON.stringify(newMapPointArr))
+                currTour.map_points = JSON.stringify(newMapPointArr)
+
+
+                if (item.image_logo) {
+                    if (item.id >= 0) {
+                        setItemImageLogo(currTour.image_logo + '?' + Date.now())
+                    }
+                }
+
+                setMapPointsArr_Loading(true)
+                if (lostMapPointsArr.length > 0) {
+                    lostMapPointsArr.map(async function (lostItem, index) {
+
+                        getMapPointData(currTourMapPointArr[lostItem]).then(data => {
+                            if (data.hasOwnProperty('status')) {
+                                if (data.status === 'ok') {
+
+                                    for (let j = 0; j < storeMapointsItems.length; j++) {
+                                        let currStoreMapPointItem = storeMapointsItems[j]
+                                        if (currStoreMapPointItem.id === currTourMapPointArr[lostItem]) {
+                                            // storeMapointsItems[currTourMapPointArr[lostItem]].data = data.data
+                                            currStoreMapPointItem.data = data.data
+
+                                            mapPointsStore.addDataToMapPoint_byId(currStoreMapPointItem.id, data.data)
+
+                                        }
+                                    }
+
+                                }
+                            }
+                        }).finally(() => {
+
+                            if (lostMapPointsArr.length - 1 === index) {
+                                setMapPointsArr_Loading(false)
+                                setMapPointsArr(storeMapointsItems)
+                            }
+                        })
+                    })
+                } else {
+                    setMapPointsArr(storeMapointsItems)
+                    setMapPointsArr_Loading(false)
+
+                }
+
+                setTourIncludes(currTour.tourIncludes || '[]')
+                setTourNotIncludes(currTour.tourNotIncludes || '[]')
+
+                setImagesAdd({0: JSON.parse(currTour.tourImages)} || {})
+                // imagesItem.items = currTour.tourImages
+
+                setImagesItem({name: '', items: currTour.tourImages})
+            } catch (e) {
 
             }
-
-            setTourIncludes(currTour.tourIncludes || '[]')
-            setTourNotIncludes(currTour.tourNotIncludes || '[]')
-
-            setImagesAdd({0: JSON.parse(currTour.tourImages)} || {})
-            // imagesItem.items = currTour.tourImages
-
-            setImagesItem({name: '', items: currTour.tourImages})
 
             setTourCategoriesItems_load(false)
 
@@ -1348,7 +1351,8 @@ const TourDetailsPage = observer((props) => {
                 {/***
                  WHAT INCLUDE
                  ***/}
-                <Row className={'topic-detail-row'} style={{backgroundColor: 'rgba(0,255,0,0.17)', paddingBottom: '30px', paddingTop: '15px'}}>
+                <Row className={'topic-detail-row'}
+                     style={{backgroundColor: 'rgba(0,255,0,0.17)', paddingBottom: '30px', paddingTop: '15px'}}>
                     <span className={'py-2'}>Includes</span>
                     <TourIncludeComponent
                         includes={tourIncludes}

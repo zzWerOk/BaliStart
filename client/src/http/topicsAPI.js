@@ -59,7 +59,7 @@ export const saveTopicAPI = async (
 
     try {
 
-        if(!name || !description || !tag || !dataText || JSON.parse(dataText).length === 0){
+        if (!name || !description || !tag || !dataText || JSON.parse(dataText).length === 0) {
             return {status: 'error'}
         }
 
@@ -101,7 +101,7 @@ export const changeTopicAPI = async (
     imagesAdd,
 ) => {
     try {
-        if(!name || !description || !tag || !dataText || JSON.parse(dataText).length === 0){
+        if (!name || !description || !tag || !dataText || JSON.parse(dataText).length === 0) {
             return {status: 'error'}
         }
 
@@ -133,14 +133,14 @@ export const changeTopicAPI = async (
 }
 
 const addToFormData = (formData,
-                       name,
-                       description,
-                       tag,
-                       image_logo,
-                       created_by_user_id,
-                       created_date,
-                       dataText,
-                       imagesAdd,
+                             name,
+                             description,
+                             tag,
+                             image_logo,
+                             created_by_user_id,
+                             created_date,
+                             dataText,
+                             imagesAdd,
 ) => {
     try {
         formData.append("name", name);
@@ -167,17 +167,17 @@ const addToFormData = (formData,
         }
 
 
-        if(imagesAdd){
+        if (imagesAdd) {
             /** Удаление ссылок на локальные адреса изображений **/
             let newDataJSON = JSON.parse(dataText)
-            for(let i = 0;i < newDataJSON.length;i++){
+            for (let i = 0; i < newDataJSON.length; i++) {
                 const currItem = newDataJSON[i]
-                if(currItem.type === 'images'){
+                if (currItem.type === 'images') {
                     const imagesItems = JSON.parse(currItem.items)
                     let newImagesItems = []
                     imagesItems.map(item => {
                         if (item.indexOf('blob:http://') === -1) {
-                            console.log(item)
+                            // console.log(item)
                             newImagesItems.push(item)
                         }
                     })
@@ -187,18 +187,54 @@ const addToFormData = (formData,
             dataText = JSON.stringify(newDataJSON)
 
             let imagesCount = 0
-            Object.keys(imagesAdd).map(function(key) {
+
+            // console.log(Object.keys(imagesAdd))
+            // console.log(Object.keys(imagesAdd)[0])
+
+            // for (let key = 0; key < Object.keys(imagesAdd).length; key++) {
+                Object.keys(imagesAdd).map(function(key) {
                 let currFilesList = imagesAdd[key]
-                Object.keys(currFilesList).map(function(itemKey) {
+                // let currFilesList = imagesAdd[Object.keys(imagesAdd)[key]]
+                // console.log(currFilesList)
+
+                // for (let itemKey = 0; itemKey < Object.keys(currFilesList).length; itemKey++) {
+                    Object.keys(currFilesList).map(function(itemKey) {
                     let currFile = currFilesList[itemKey]
+                    // let currFile = currFilesList[Object.keys(currFilesList)[itemKey]]
                     try {
                         if (currFile.name && currFile.size) {
+                            // console.log(currFile)
+                            // try {
+                            //     await resizeFile(currFile).then((image) => {
+                            //         formData.append("img" + imagesCount, image);
+                            //         console.log('image Added', image);
+                            //         imagesCount++
+                            //     })
+                            //     // .then((data) => {
+                            //     // console.log("image Resized ", data)
+                            //     // })
+                            //
+                            //     // formData.append("img" + imagesCount, image, currFile.name + ' ' + key);
+                            //
+                            //
+                            //     // formData.append("img" + imagesCount, image);
+                            //     // console.log('image Added', image);
+                            //     // imagesCount++
+                            //
+                            // } catch (err) {
+                            //     console.log(err);
+                            // }
+
                             formData.append("img" + imagesCount, currFile, currFile.name + ' ' + key);
                             imagesCount++
                         }
-                    }catch (e) {}
+                    } catch (e) {
+                    }
+                    });
+                // }
                 });
-            });
+            // }
+            // console.log("new_images_count", imagesCount)
             formData.append("new_images_count", imagesCount);
         }
 
@@ -206,6 +242,7 @@ const addToFormData = (formData,
 
         return formData
     } catch (e) {
+        console.log(e.message)
         return null
     }
 }

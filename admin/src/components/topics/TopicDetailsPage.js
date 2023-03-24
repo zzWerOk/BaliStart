@@ -150,11 +150,15 @@ const TopicDetailsPage = observer((props) => {
                     }
                 }
             }).finally(() => {
-                onItemEditHandler(currTopic.getAsJson(), newImageLogo)
-                setItemData([...currTopic.dataJSON])
+                try {
+                    onItemEditHandler(currTopic.getAsJson(), newImageLogo)
+                    setItemData([...currTopic.dataJSON])
 
-                setRedraw(!redraw)
-                setImagesAdd({})
+                    setRedraw(!redraw)
+                    setImagesAdd({})
+                }catch (e) {
+                    console.log(e.message)
+                }
                 setTopicCategoriesItems_load(false)
                 setIsSaving(false)
             })

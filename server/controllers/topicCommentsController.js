@@ -10,6 +10,7 @@ const convertCommentItemFroTopic = async (commentsItem, currUser) => {
     if (commentsItem.hasOwnProperty('created_by_user_id')) {
         const user = await User.findOne({where: {id: commentsItem.created_by_user_id}})
         convertedItem.created_by_user_name = user.name
+        convertedItem.avatar_img = user.avatar_img
 
         if (currUser) {
             if (currUser.id === user.id) {
@@ -17,6 +18,14 @@ const convertCommentItemFroTopic = async (commentsItem, currUser) => {
             }
         }
 
+    }
+
+    if (commentsItem.hasOwnProperty('avatar_img')) {
+        convertedItem.avatar_img = commentsItem.avatar_img
+    }
+
+    if (commentsItem.hasOwnProperty('created_by_user_id')) {
+        convertedItem.created_by_user_id = commentsItem.created_by_user_id
     }
 
     if (commentsItem.hasOwnProperty('text')) {

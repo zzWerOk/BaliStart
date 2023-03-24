@@ -24,9 +24,9 @@ const TourGuidesDetailsCard = (props) => {
         setLoading(true)
 
         if (currGuide.hasOwnProperty('avatar_img') && currGuide.avatar_img !== '') {
-            setGuideImage(process.env.REACT_APP_API_URL + '/static/' + currGuide.avatar_img + '?' + Date.now())
+            setGuideImage(process.env.REACT_APP_API_URL + '/static/' + currGuide.avatar_img + '_s?' + Date.now())
         } else {
-            setGuideImage(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar.png' + '?' + Date.now())
+            setGuideImage(process.env.REACT_APP_API_URL + '/static/' + 'guide_avatar_s.png')
         }
 
         setLoading(false)
@@ -82,7 +82,7 @@ const TourGuidesDetailsCard = (props) => {
                             >
                                 <div className={'d-flex d-md-block align-items-center justify-content-center'}>
                                     <img
-                                        src={guideImage} alt="Guide avatar"
+                                        src={guideImage} alt="Guide avatar card "
                                         width="100"
                                         className={`rounded-circle mb-3 img-thumbnail shadow-sm`}
                                         style={{
