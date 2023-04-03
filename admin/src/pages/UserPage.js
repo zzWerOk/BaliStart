@@ -1,11 +1,9 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../index";
-import UserPageCard from "../components/users/UserPageCard";
-import {delay, MAIN_ROUTE} from "../utils/consts";
+import {delay} from "../utils/consts";
 import {getAll} from "../http/userAPI";
 import {getTableUpdateByName} from "../http/tableUpdatesAPI"
 import SpinnerSM from "../components/SpinnerSM";
-import UserListCell from "../components/users/UserListCell";
 import UserList from "../components/users/UserList";
 
 const UserPage = () => {
@@ -18,7 +16,7 @@ const UserPage = () => {
     }, [])
 
     useEffect(() => {
-        delay(0).then(r => {
+        delay(0).then(() => {
 
             getTableUpdateByName('User').then(tuData => {
                 const lastDateTable = userList.getSavedLastDateTableUser()

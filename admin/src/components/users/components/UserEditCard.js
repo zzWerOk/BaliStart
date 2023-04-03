@@ -346,7 +346,7 @@ const UserEditCard = (props) => {
                                                     <input type="checkbox"
                                                            className={`btn-check`}
                                                            checked={!currUserIsAdmin && !currUserIsGuide}
-                                                           id="btncheck1"
+                                                           id="btncheck"
                                                            onChange={() => {
                                                                onRoleSelectHandler('user')
                                                            }}
@@ -354,7 +354,7 @@ const UserEditCard = (props) => {
 
                                                            autoComplete="off"/>
                                                     <label className="btn btn-outline-primary"
-                                                           htmlFor="btncheck1"
+                                                           htmlFor="btncheck"
                                                     >
                                                         User
                                                     </label>
@@ -362,7 +362,7 @@ const UserEditCard = (props) => {
                                                     <input type="checkbox"
                                                            className={`btn-check `}
                                                            checked={!!currUserIsAgent}
-                                                           id="btncheck3"
+                                                           id="btncheck1"
                                                            onChange={() => {
                                                                onRoleSelectHandler('agent')
                                                            }}
@@ -370,7 +370,7 @@ const UserEditCard = (props) => {
 
                                                            autoComplete="off"/>
                                                     <label className="btn btn-outline-primary"
-                                                           htmlFor="btncheck3"
+                                                           htmlFor="btncheck1"
                                                     >
                                                         Agent
                                                     </label>

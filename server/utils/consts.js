@@ -79,7 +79,9 @@ createNewFile = async function (textData, tableName, img) {
 
         const dirPath = path.resolve(__dirname, '..', "data")
 
-        fs.mkdirSync(dirPath + "/" + dirName, {recursive: true});
+        if(dirName !== 'static') {
+            fs.mkdirSync(dirPath + "/" + dirName, {recursive: true});
+        }
 
         filePath = path.resolve(__dirname, '..', "data", fileName)
 
@@ -99,7 +101,13 @@ createNewFile = async function (textData, tableName, img) {
 
         if (img) {
             try {
-                imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
+
+                if (process.platform === 'win32') {
+                    imgFileName = fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length);
+                }else{
+                    imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
+                }
+
                 await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
 
                     try {
@@ -239,6 +247,12 @@ function resizeImage(height, filePath_read, filePath_save, onFinishFunc) {
 
 function resizeUserAvatarWithThumb(filePath) {
     try {
+
+        console.log('')
+        console.log('')
+        console.log(filePath)
+        console.log('')
+        console.log('')
 
         return resizeImage(250, filePath + '_orig', filePath, () => {
                 resizeImage(150, filePath + '_orig', filePath + '_s', () => {
