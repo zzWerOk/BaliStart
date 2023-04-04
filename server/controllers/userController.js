@@ -154,19 +154,14 @@ class UserController {
                             }
                         }
 
-
-                        console.log('')
-                        console.log('')
-                        console.log(imgFileName)
-                        console.log('')
-                        console.log('')
-
-
                     } else {
                         if (img) {
 
-                            imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
-
+                            if (process.platform === 'win32') {
+                                imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
+                            }else{
+                                imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
+                            }
 
                             await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
                                 removeFile('static/' + imgFileName)

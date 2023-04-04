@@ -56,7 +56,13 @@ const saveTopicImageFile = (dataText, newImagesArr, topicId) => {
                         const md5 = image.md5
                         let dirName = getDirName('img')
                         const fileName = getFreeFileName(dirName)
-                        const imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
+                        let imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
+
+                        if (process.platform === 'win32') {
+                            imgFileName = fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length);
+                        }
+
+
                         image.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then()
 
                         imagesArr.push(imgFileName)
@@ -370,7 +376,12 @@ class TopicsController {
                             let imgFileName = ''
                             try {
                                 if (img) {
-                                    imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+                                    if (process.platform === 'win32') {
+                                        imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("\\") + 1, candidate.file_name.length);
+                                    }else{
+                                        imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+                                    }
+
                                     await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig'))
                                     removeFile('static/' + imgFileName)
                                     removeFile('static/' + imgFileName + '_s')
@@ -909,7 +920,11 @@ class TopicsController {
 
                     try {
                         /** Remove image_logo of topic from derive **/
-                        const imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+                        let imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+                        if (process.platform === 'win32') {
+                            imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("\\") + 1, candidate.file_name.length);
+                        }
+
                         const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
                         fs.unlinkSync(imgFilePath)
                     } catch (e) {

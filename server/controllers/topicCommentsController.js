@@ -366,8 +366,11 @@ class TopicCommentsController {
                     if (candidate.created_by_user_id === currUser.id || currUser.isAdmin) {
 
                         try {
-                            // let imgFileName = candidate.file_name.split('\\')[1]
-                            const imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+                            let imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+                            if (process.platform === 'win32') {
+                                imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("\\") + 1, candidate.file_name.length);
+                            }
+
                             const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
                             fs.unlinkSync(imgFilePath)
                         } catch (e) {

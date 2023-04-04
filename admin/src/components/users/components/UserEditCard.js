@@ -65,7 +65,6 @@ const UserEditCard = (props) => {
         })
 
 
-
     }, [])
 
 
@@ -130,6 +129,9 @@ const UserEditCard = (props) => {
             }
             // currUser.avatar_img = fileName
             currUser.img = fileName
+            const objectUrl = URL.createObjectURL(fileName)
+
+            setUserAvatar(objectUrl)
             // setUserEdited(true)
             setUserEdited(isUserChanged())
         }
@@ -194,7 +196,9 @@ const UserEditCard = (props) => {
                     </button>
                     <button className={'btn btn-outline-secondary col-2'}
                             disabled={!!saving}
-                            onClick={() => {clickUser(userClicked)}}
+                            onClick={() => {
+                                clickUser(userClicked)
+                            }}
                     >
                         Close
                     </button>
@@ -221,7 +225,11 @@ const UserEditCard = (props) => {
                                             <img
                                                 src={userAvatar
                                                     ?
-                                                    `${process.env.REACT_APP_API_URL}/static/${userAvatar}`
+                                                    userAvatar.indexOf('blob:http://') !== -1
+                                                        ?
+                                                        userAvatar
+                                                        :
+                                                        `${process.env.REACT_APP_API_URL}/static/${userAvatar}`
                                                     :
                                                     noImageLogo
                                                 }

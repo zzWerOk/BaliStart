@@ -248,12 +248,6 @@ function resizeImage(height, filePath_read, filePath_save, onFinishFunc) {
 function resizeUserAvatarWithThumb(filePath) {
     try {
 
-        console.log('')
-        console.log('')
-        console.log(filePath)
-        console.log('')
-        console.log('')
-
         return resizeImage(250, filePath + '_orig', filePath, () => {
                 resizeImage(150, filePath + '_orig', filePath + '_s', () => {
                         resizeImage(70, filePath + '_orig', filePath + '_th', () => {
