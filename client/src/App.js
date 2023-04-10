@@ -21,8 +21,20 @@ const App = observer(() => {
     let myInterval = null
 
     useMemo(() => {
+
+        console.log('')
+        console.log('')
+        console.log('process.env.REACT_APP_WS_URL %s', process.env.REACT_APP_WS_URL)
+        console.log('process.env.REACT_APP_API_URL %s', process.env.REACT_APP_API_URL)
+        console.log('!!!!!!!!!!!!!')
+        console.log('')
+        console.log('')
+
+
+
         if (ws === null) {
-            ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
+            // ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
+            ws = new WebSocket(process.env.REACT_APP_WS_URL + '?token=' + localStorage.getItem('token'))
         }
 
         return () => {
@@ -146,8 +158,10 @@ const App = observer(() => {
     const connect = () => {
         let newWs = ws
 
+
         if (newWs === null) {
-            ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
+            // ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))
+            ws = new WebSocket(process.env.REACT_APP_WS_URL + '?token=' + localStorage.getItem('token'))
             newWs = ws
         }
 
