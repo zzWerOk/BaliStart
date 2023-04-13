@@ -146,7 +146,11 @@ const TourDetailsPage = observer((props) => {
 
                 mapPointsStore.loadMapPointsList()
                 let storeMapointsItems = mapPointsStore.getMapPointList
-                setMapPointsArr(mapPointsStore.getMapPointList)
+                if (storeMapointsItems !== null) {
+                    setMapPointsArr(storeMapointsItems)
+                } else {
+                    setMapPointsArr([])
+                }
 
                 setTourPriceUsd(currTour.price_usd)
 
@@ -665,7 +669,13 @@ const TourDetailsPage = observer((props) => {
                 setTourMapPoints(JSON.stringify([...currMapPointsArr, id]))
             }
 
-            setMapPointsArr(mapPointsStore.getMapPointList)
+            let storeMapointsItems = mapPointsStore.getMapPointList
+            if (storeMapointsItems !== null) {
+                setMapPointsArr(storeMapointsItems)
+            } else {
+                setMapPointsArr([])
+            }
+
             currTour.isSaved = false
             onItemEditHandler(currTour.getAsJson())
         }
@@ -1321,17 +1331,23 @@ const TourDetailsPage = observer((props) => {
 
                             <Dropdown.Menu>
 
-                                {mapPointsArr.map(item => {
-                                    return <Dropdown.Item
-                                        key={item.id}
-                                        name={item.name}
-                                        id={item.id}
-                                        onClick={() => {
-                                            addToTourId(item.id)
-                                        }}
-                                    >{item.name}
-                                    </Dropdown.Item>
-                                })}
+                                {
+                                    mapPointsArr !== null
+                                        ?
+                                        mapPointsArr.map(item => {
+                                            return <Dropdown.Item
+                                                key={item.id}
+                                                name={item.name}
+                                                id={item.id}
+                                                onClick={() => {
+                                                    addToTourId(item.id)
+                                                }}
+                                            >{item.name}
+                                            </Dropdown.Item>
+                                        })
+                                        :
+                                        null
+                                }
                             </Dropdown.Menu>
                         </Dropdown>
                         <Button

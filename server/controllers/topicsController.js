@@ -5,7 +5,7 @@ const path = require("path");
 const {Op} = require("sequelize");
 const {
     createNewFile, reWrightFile, readFile, removeFile, getFreeFileName, getDirName,
-    resizeImageWithThumb
+    resizeImageWithThumb, resizeUserAvatarWithThumb, sleep
 } = require("../utils/consts");
 
 const removeTopicsCountFromCategories = (removeArr) => {
@@ -382,12 +382,22 @@ class TopicsController {
                                         imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                                     }
 
-                                    await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig'))
-                                    removeFile('static/' + imgFileName)
-                                    removeFile('static/' + imgFileName + '_s')
-                                    removeFile('static/' + imgFileName + '_th')
+                                    await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
 
-                                    resizeImageWithThumb('static/' + imgFileName)
+                                        removeFile('static/' + imgFileName)
+                                        removeFile('static/' + imgFileName + '_s')
+                                        removeFile('static/' + imgFileName + '_th')
+
+                                        resizeImageWithThumb('static/' + imgFileName)
+                                        // resizeUserAvatarWithThumb('static/' + imgFileName)
+                                    })
+                                    await sleep(200)
+
+                                    // removeFile('static/' + imgFileName)
+                                    // removeFile('static/' + imgFileName + '_s')
+                                    // removeFile('static/' + imgFileName + '_th')
+
+                                    // resizeImageWithThumb('static/' + imgFileName)
                                 }
                             } catch (e) {
                                 return res.json({

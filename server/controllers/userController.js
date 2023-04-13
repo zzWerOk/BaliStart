@@ -2,8 +2,9 @@ const {User, Guide, TableUpdates, Agent} = require('../models/models')
 const ApiError = require('../error/ApiError')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const {createNewFile, readFile, removeFile, resizeUserAvatarWithThumb} = require("../utils/consts");
+const {createNewFile, readFile, removeFile, resizeUserAvatarWithThumb, sleep} = require("../utils/consts");
 const path = require("path");
+const fs = require("fs");
 
 const generateJWT = (id, email, isAdmin, isGuide, isAgent) => {
     return jwt.sign(
@@ -142,7 +143,7 @@ class UserController {
                     let imgFileName = candidate.avatar_img
 
                     const userImageFile = readFile(candidate.avatar_img)
-                    if (!userImageFile || candidate.avatar_img === '' || candidate.avatar_img === 'null' || candidate.avatar_img === null ) {
+                    if (!userImageFile || candidate.avatar_img === '' || candidate.avatar_img === 'null' || candidate.avatar_img === null) {
 
                         const result = await createNewFile('', 'img', img)
 
@@ -155,21 +156,25 @@ class UserController {
                         }
 
                     } else {
+
                         if (img) {
 
                             if (process.platform === 'win32') {
                                 imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
-                            }else{
+                            } else {
                                 imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
                             }
 
                             await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
+
                                 removeFile('static/' + imgFileName)
                                 removeFile('static/' + imgFileName + '_s')
                                 removeFile('static/' + imgFileName + '_th')
 
                                 resizeUserAvatarWithThumb('static/' + imgFileName)
                             })
+
+                            await sleep(200)
 
                         }
 
@@ -284,7 +289,7 @@ class UserController {
 
                 if (candidate) {
                     return res.json({status: "ok", data: {name: candidate.name, avatar_img: candidate.avatar_img}})
-                }else{
+                } else {
                     return res.json({status: "error", message: 'No user found'})
                 }
             }

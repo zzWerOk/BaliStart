@@ -8,20 +8,27 @@ dateToEpoch = function (date) {
     return new Date(date).getTime() / 1000 || 0
 }
 
-removeFile = function (fileName) {
-
+removeFile = async function (fileName) {
     try {
 
-        if (fileName) {
-            const filePath = path.resolve(__dirname, '..', fileName)
+        return new Promise(function (res) {
 
-            fs.unlinkSync(filePath)
-        }
-        return {status: 'ok'}
+            if (fileName) {
+
+                // const filePath = path.resolve(__dirname, '..', fileName)
+                const filePath = path.join(__dirname, '..', fileName)
+
+                if (fs.existsSync(filePath)) {
+                    fs.promises.unlink(filePath)
+                }
+                res({status: 'ok'})
+            }
+        })
+
     } catch (e) {
-        // throw e
-    }
 
+    }
+    return {status: 'error'}
 }
 
 readFile = function (fileName) {
@@ -79,8 +86,10 @@ createNewFile = async function (textData, tableName, img) {
 
         const dirPath = path.resolve(__dirname, '..', "data")
 
-        if(dirName !== 'static') {
-            fs.mkdirSync(dirPath + "/" + dirName, {recursive: true});
+        if (dirName !== 'static') {
+            await fs.mkdir(dirPath + "/" + dirName, {recursive: true}, (err) => {
+                return {error: 'error', message: err}
+            })
         }
 
         filePath = path.resolve(__dirname, '..', "data", fileName)
@@ -104,7 +113,7 @@ createNewFile = async function (textData, tableName, img) {
 
                 if (process.platform === 'win32') {
                     imgFileName = fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length);
-                }else{
+                } else {
                     imgFileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length);
                 }
 
@@ -115,7 +124,7 @@ createNewFile = async function (textData, tableName, img) {
                         removeFile('/static/' + imgFileName + '_s')
                         removeFile('/static/' + imgFileName + '_th')
 
-                        resizeImageWithThumb('static/' + imgFileName)
+                        resizeImageWithThumb('static/' + imgFileName)// createNewFile
                     } catch (e) {
                         console.log('e', e.message)
                     }
@@ -132,14 +141,14 @@ createNewFile = async function (textData, tableName, img) {
     } catch (e) {
 
         if (imgFileName && imgFileName !== '') {
-            removeFile('/static/' + imgFileName)
-            removeFile('/static/' + imgFileName + '_orig')
-            removeFile('/static/' + imgFileName + '_s')
-            removeFile('/static/' + imgFileName + '_th')
+            await removeFile('/static/' + imgFileName)
+            await removeFile('/static/' + imgFileName + '_orig')
+            await removeFile('/static/' + imgFileName + '_s')
+            await removeFile('/static/' + imgFileName + '_th')
         }
 
         if (filePath && filePath !== '') {
-            removeFile('/data/' + filePath)
+            await removeFile('/data/' + filePath)
         }
 
         return {error: e.message}
@@ -190,19 +199,22 @@ addNewFileNameToTable = async function (tableName, fileName, next, md5 = '') {
 }
 
 
-function resizeImageWithThumb(filePath) {
+async function resizeImageWithThumb(filePath) {
     try {
+        sharp.cache(false);
+        return new Promise(async r => {
 
-        return resizeImage(500, filePath + '_orig', filePath, () => {
-                resizeImage(250, filePath + '_orig', filePath + '_s', () => {
-                        resizeImage(100, filePath + '_orig', filePath + '_th', () => {
-                                removeFile(filePath + '_orig')
-                            }
-                        )
-                    }
-                )
-            }
-        )
+            return resizeImage(500, filePath + '_orig', filePath, () => {
+                    resizeImage(250, filePath + '_orig', filePath + '_s', () => {
+                            resizeImage(100, filePath + '_orig', filePath + '_th', () => {
+                                    removeFile(filePath + '_orig')
+                                }
+                            )
+                        }
+                    )
+                }
+            )
+        })
 
         // let isOk = sharp(filePath + '_orig')
         //     .resize({height: 500})
@@ -234,59 +246,48 @@ function resizeImageWithThumb(filePath) {
     return null
 }
 
-function resizeImage(height, filePath_read, filePath_save, onFinishFunc) {
-    return sharp(filePath_read)
-        .resize({height: height})
-        .toFile(filePath_save, (err) => {
-            if (err) return null
+async function resizeImage(height, filePath_read, filePath_save, onFinishFunc) {
+    return new Promise(async r => {
 
-            onFinishFunc()
+        return await sharp(filePath_read)
+            .resize({height: height})
+            .toFile(filePath_save, (err) => {
+                if (err) {
+                    console.log('resize error ', filePath_save)
+                    return null
+                }
 
-        });
+                if (onFinishFunc !== null) {
+                    onFinishFunc()
+                }
+            })
+    })
 }
 
-function resizeUserAvatarWithThumb(filePath) {
+async function resizeUserAvatarWithThumb(filePath) {
+// resizeUserAvatarWithThumb = async function (filePath) {
+    sharp.cache(false);
+
     try {
+        return new Promise(async r => {
 
-        return resizeImage(250, filePath + '_orig', filePath, () => {
-                resizeImage(150, filePath + '_orig', filePath + '_s', () => {
-                        resizeImage(70, filePath + '_orig', filePath + '_th', () => {
-                                removeFile(filePath + '_orig')
-                            }
-                        )
-                    }
-                )
-            }
-        )
+            return await resizeImage(250, filePath + '_orig', filePath, async () => {
+                await resizeImage(150, filePath + '_orig', filePath + '_s', async () => {
+                    await resizeImage(70, filePath + '_orig', filePath + '_th', () => {
+                        removeFile(filePath + '_orig')
+                    })
+                })
+            })
+        })
 
-        // let isOk = sharp(filePath + '_orig')
-        //     .resize({height: 500})
-        //     .toFile(filePath, (err) => {
-        //         if (err) throw err;
-        //         // console.log(info);
-        //
-        //         isOk = sharp(filePath + '_orig')
-        //             .resize({height: 250})
-        //             .toFile(filePath + '_s', (err) => {
-        //                 if (err) throw err;
-        //                 // console.log(info);
-        //
-        //                 isOk = sharp(filePath + '_orig')
-        //                     .resize({height: 100})
-        //                     .toFile(filePath + '_th', (err) => {
-        //                         if (err) throw err;
-        //
-        //                         removeFile(filePath + '_orig')
-        //
-        //                     });
-        //             });
-        //     });
-        //
-        // return isOk
     } catch (e) {
 
     }
     return null
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 module.exports = {
@@ -299,5 +300,6 @@ module.exports = {
     dateToEpoch,
     resizeImageWithThumb,
     resizeUserAvatarWithThumb,
+    sleep,
 }
 

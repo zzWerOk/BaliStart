@@ -88,8 +88,6 @@ export const saveTourAPI = async (
 
         const {data} = await $authHostUpload.post(apiUrl+'/create', formData)
 
-        console.log('save tour ', data)
-
         return data
     } catch (e) {
         console.log('data error', e.message)

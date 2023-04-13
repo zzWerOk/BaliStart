@@ -129,6 +129,7 @@ const UserEditCard = (props) => {
             }
             // currUser.avatar_img = fileName
             currUser.img = fileName
+
             const objectUrl = URL.createObjectURL(fileName)
 
             setUserAvatar(objectUrl)
@@ -164,6 +165,8 @@ const UserEditCard = (props) => {
                         userList.editUserById(currUser.id, data.data)
                         setUserSaved(JSON.parse(JSON.stringify(data.data)))
                         setCurUserSave(JSON.stringify(data.data))
+
+                        currUser.img = null
 
                         setUserdata(data.data)
 

@@ -22,7 +22,7 @@ export default class MapPointsStore {
             return rows
         } catch (e) {
         }
-        return null
+        return []
     }
 
     addDataToMapPoint_byId(id, data) {
@@ -57,7 +57,7 @@ export default class MapPointsStore {
 
 
     loadMapPointsList(){
-        this._mapPoints = localStorage.getItem("mapPointsPage_listItems")
+        this._mapPoints = localStorage.getItem("mapPointsPage_listItems" || [])
     }
 
 

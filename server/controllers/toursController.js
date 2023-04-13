@@ -3,7 +3,16 @@ const {Op} = require("sequelize");
 const ApiError = require("../error/ApiError");
 const path = require("path");
 const fs = require("fs");
-const {removeFile, createNewFile, reWrightFile, readFile, getDirName, getFreeFileName, resizeImageWithThumb} = require("../utils/consts");
+const {
+    removeFile,
+    createNewFile,
+    reWrightFile,
+    readFile,
+    getDirName,
+    getFreeFileName,
+    resizeImageWithThumb,
+    sleep
+} = require("../utils/consts");
 
 const saveTourImageFile = (dataText, newImagesArr, tourId) => {
     let dataText_json = JSON.parse(dataText)
@@ -28,14 +37,14 @@ const saveTourImageFile = (dataText, newImagesArr, tourId) => {
                 imgFileName = fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length);
             }
 
-            image.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
+            image.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(async () => {
                 try {
-                    removeFile('static/' + imgFileName)
-                    removeFile('static/' + imgFileName + '_s')
-                    removeFile('static/' + imgFileName + '_th')
+                    await removeFile('static/' + imgFileName)
+                    await removeFile('static/' + imgFileName + '_s')
+                    await removeFile('static/' + imgFileName + '_th')
 
-                    resizeImageWithThumb('static/' + imgFileName)
-                }catch (e) {
+                    await resizeImageWithThumb('static/' + imgFileName)
+                } catch (e) {
 
                 }
             })
@@ -293,11 +302,28 @@ class ToursController {
                                 if (img) {
                                     if (process.platform === 'win32') {
                                         imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("\\") + 1, candidate.file_name.length);
-                                    }else{
+                                    } else {
                                         imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                                     }
 
-                                    await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                                    // await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                                    await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
+
+                                        try {
+                                            removeFile('/static/' + imgFileName)
+                                            removeFile('/static/' + imgFileName + '_s')
+                                            removeFile('/static/' + imgFileName + '_th')
+
+                                            resizeImageWithThumb('static/' + imgFileName)// change
+
+                                        } catch (e) {
+                                            console.log('e', e.message)
+                                        }
+
+                                    })
+
+                                    await sleep(200)
+
                                 }
                             } catch (e) {
                                 return res.json({status: 'error', message: 'save image error', e: e.message})
@@ -668,17 +694,6 @@ class ToursController {
 
                 if (candidate) {
 
-                    try {
-                        let imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
-                        if (process.platform === 'win32') {
-                            imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("\\") + 1, candidate.file_name.length);
-                        }
-
-                        const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
-                        fs.unlinkSync(imgFilePath)
-                    } catch (e) {
-                    }
-
                     /**
                      Обновление таблиц
                      **/
@@ -687,14 +702,50 @@ class ToursController {
                     } catch (e) {
                     }
 
-                    const result = removeFile("data/" + candidate.file_name)
-                    if (result.hasOwnProperty('status')) {
-                        if (result.status === 'ok') {
-                            await Files.destroy({where: {table_name: 'Tours', file_name: candidate.file_name}})
-                            const count = await Tours.destroy({where: {id: id}})
-                            return res.json({status: "ok", message: `Удалено записей: ${count}`})
-                        }
-                    }
+                    await removeFile("data/" + candidate.file_name).then(async function (result) {
+                        return new Promise(async function (resolve) {
+
+                            if (result.hasOwnProperty('status')) {
+
+                                try {
+                                    let imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
+                                    if (process.platform === 'win32') {
+                                        imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("\\") + 1, candidate.file_name.length);
+                                    }
+
+                                    // const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
+                                    removeFile('static/' + imgFileName).then(() => {
+                                    })
+                                    removeFile('static/' + imgFileName + '_s').then(() => {
+                                    })
+                                    removeFile('static/' + imgFileName + '_th').then(() => {
+                                    })
+                                    removeFile('static/' + imgFileName + '_orig').then(() => {
+                                    })
+
+                                    // fs.unlinkSync(imgFilePath)
+                                    // fs.unlinkSync(imgFilePath + '_s')
+                                    // fs.unlinkSync(imgFilePath + '_th')
+                                    // fs.unlinkSync(imgFilePath + '_orig')
+                                } catch (e) {
+                                }
+
+
+                                if (result.status === 'ok') {
+                                    await Files.destroy({where: {table_name: 'Tours', file_name: candidate.file_name}})
+                                    const count = await Tours.destroy({where: {id: id}})
+                                    resolve({status: "ok", message: `Удалено записей: ${count}`})
+                                    // return res.json({status: "ok", message: `Удалено записей: ${count}`})
+                                }
+                            }else {
+                                res.json({status: "error"})
+                            }
+                        })
+                    }).then(function (ress) {
+                        res.json(ress)
+                    })
+
+                    return res
                 }
             }
         } catch (e) {

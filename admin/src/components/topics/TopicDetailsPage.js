@@ -418,12 +418,6 @@ const TopicDetailsPage = observer((props) => {
                             }
 
                             getTopicDataHandler(data.id)//saveTopicAPI
-
-                            // changeTopicId(data.id)
-
-
-                            // currTopic.newId = data.id
-
                         }
                     }
                 }).catch(() => {
