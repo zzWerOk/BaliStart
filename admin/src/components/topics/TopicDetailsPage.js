@@ -78,7 +78,6 @@ let currTopic = null
 
 const TopicDetailsPage = observer((props) => {
 
-
     const {item, onItemEditHandler, deleteTopic, scrollToTop} = props
 
     const {topicDetailsStore} = useContext(Context)
@@ -124,12 +123,7 @@ const TopicDetailsPage = observer((props) => {
                 }
             }
 
-            if (Object.keys(currTopic.dataJSON).length === 0) {
                 getTopicDataHandler()//start
-            } else {
-                setItemData(currTopic.dataJSON)
-                setTopicCategoriesItems_load(false)
-            }
 
         }, []
     )
@@ -153,6 +147,8 @@ const TopicDetailsPage = observer((props) => {
                 try {
                     onItemEditHandler(currTopic.getAsJson(), newImageLogo)
                     setItemData([...currTopic.dataJSON])
+
+                    setCurrDescription(currTopic.getDescriptionData())
 
                     setRedraw(!redraw)
                     setImagesAdd({})
@@ -178,7 +174,10 @@ const TopicDetailsPage = observer((props) => {
 
     const onDescriptionHandler = (value) => {
         setCurrDescription(value)
-        currTopic.description = value
+        currTopic.description = value.substring(0, 120)
+
+        currTopic.setDescriptionData(value)
+
         currTopic.isSaved = false
         onItemEditHandler(currTopic.getAsJson())
     }

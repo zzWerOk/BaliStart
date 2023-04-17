@@ -29,6 +29,50 @@ export default class TopicCL {
         this.setFromJson(itemObj)
     }
 
+    getDescriptionData() {
+        let descriptionDataText = null
+        const currDataJSONArr = this.dataJSON
+        for (let i = 0; i < currDataJSONArr.length; i++) {
+            let currDataItem = currDataJSONArr[i]
+            if (currDataItem.hasOwnProperty('description')) {
+                descriptionDataText = currDataItem.description
+                break
+            }
+        }
+        if (!descriptionDataText) {
+            this.addNewItemJSON({description: this._description})
+            descriptionDataText = this._description
+        }
+        return descriptionDataText
+
+        // let currDataJSONArr = JSON.parse(this._data)
+        // return currDataJSONArr['description'] || ''
+    }
+
+    setDescriptionData(newDescriptionDataText) {
+        let descriptionDataText = null
+        let currDataJSONArr = this.dataJSON
+        for (let i = 0; i < currDataJSONArr.length; i++) {
+            let currDataItem = currDataJSONArr[i]
+            if (currDataItem.hasOwnProperty('description')) {
+                currDataItem.description = newDescriptionDataText
+                descriptionDataText = currDataItem.description
+                break
+            }
+        }
+
+        if (!descriptionDataText) {
+            this.addNewItemJSON({description: newDescriptionDataText})
+        }else{
+            this._data = JSON.stringify(currDataJSONArr)
+        }
+
+        // let currDataJSONArr = JSON.parse(this._data)
+        // currDataJSONArr['description'] = newDescriptionDataText
+        // this._data = JSON.stringify(currDataJSONArr)
+    }
+
+
     setFromJson(itemObj) {
 
         if (itemObj.hasOwnProperty('id')) {

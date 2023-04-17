@@ -25,7 +25,6 @@ export default class TourCL {
         this._price_usd = 0
     }
 
-
     get price_usd() {
         return this._price_usd;
     }
@@ -109,6 +108,17 @@ export default class TourCL {
 
     set isSaved(value) {
         this._isSaved = value
+    }
+
+    getDescriptionData() {
+        let currDataJSONArr = JSON.parse(this._data)
+        return currDataJSONArr['description'] || ''
+    }
+
+    setDescriptionData(newDescriptionDataText) {
+        let currDataJSONArr = JSON.parse(this._data)
+        currDataJSONArr['description'] = newDescriptionDataText
+        this._data = JSON.stringify(currDataJSONArr)
     }
 
     setFromJson(itemObj) {

@@ -134,7 +134,9 @@ const TourDetailsPage = observer((props) => {
                 setTourLanguage(currTour.languages)
 
                 setCurrName(currTour.name)
-                setCurrDescription(currTour.description)
+                // setCurrDescription(currTour.description)
+                setCurrDescription(currTour.getDescriptionData())
+
                 setIsActive(currTour.active)
                 setTourCategoriesItems(toursCategoryStore.getSavedCategoriesList())
                 setTourTypesItems(toursTypeStore.getSavedCategoriesList())
@@ -249,7 +251,13 @@ const TourDetailsPage = observer((props) => {
 
     const onDescriptionHandler = (value) => {
         setCurrDescription(value)
-        currTour.description = currDescription
+
+        currTour.description = value.substring(0, 120)
+        currTour.setDescriptionData(value)
+
+        console.log(currTour)
+
+        // currTour.description = currDescription
         currTour.isSaved = false
         onItemEditHandler(currTour.getAsJson())
     }
