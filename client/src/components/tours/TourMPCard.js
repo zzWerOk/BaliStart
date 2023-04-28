@@ -34,7 +34,9 @@ const TourMpCard = (props) => {
 
                 if (dataItem.hasOwnProperty('type')) {
                     if (dataItem.type === 'googleMapUrl') {
-                        itemMapUrlsDataArr.push(dataItem)
+                        if(dataItem?.url !== '') {
+                            itemMapUrlsDataArr.push(dataItem)
+                        }
                     }
                 }
                 setMapUrlsMP(itemMapUrlsDataArr)

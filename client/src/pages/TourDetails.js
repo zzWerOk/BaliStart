@@ -29,7 +29,7 @@ const TourDetails = () => {
     const [loadingMP, setLoadingMP] = useState(true)
 
     const [currTour, setCurrTour] = useState({})
-    const [tourData, setTourData] = useState([])
+    const [tourData, setTourData] = useState('')
     const [tourCategories, setTourCategories] = useState([])
     const [itemImage, setItemImage] = useState('')
     const [tourMP, setTourMP] = useState([])
@@ -167,6 +167,22 @@ const TourDetails = () => {
             return selectedCat.description
         }
         return ""
+    }
+
+    const getTourDescriptionElement = (shortDescriptionText) => {
+        let descriptionText = shortDescriptionText
+
+        const tourDataJson = JSON.parse(tourData)
+
+        if (tourDataJson.hasOwnProperty('description')) {
+            descriptionText = tourDataJson.description
+        }
+
+        return (
+            <p className={'lead my-0'}>
+                {descriptionText}
+            </p>
+        )
     }
 
     const getTourDataElements = (tourData) => {
@@ -404,6 +420,8 @@ const TourDetails = () => {
                                 style={{
                                     background: `linear-gradient(rgba(0, 0, 0, 0.5),rgba(0, 0, 0, 0.5)), url(${itemImage})`,
                                     backgroundSize: 'cover',
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'center',
                                     minHeight: '250px',
                                 }}
                             >
@@ -412,12 +430,18 @@ const TourDetails = () => {
                                         {currTour.name}
                                     </h1>
                                 </Row>
-                                <Row className={`${classes.topic_row} text-muted mx-3`} style={{paddingBottom: '20px'}}>
-                                    <p className={'lead my-3'} style={{color: `white`,}}>
-                                        {currTour.description}
-                                    </p>
-                                </Row>
+                                {/*<Row className={`${classes.topic_row} text-muted mx-3`} style={{paddingBottom: '20px'}}>*/}
+                                {/*    <p className={'lead my-3'} style={{color: `white`,}}>*/}
+                                {/*        {currTour.description}*/}
+                                {/*    </p>*/}
+                                {/*</Row>*/}
                             </div>
+                            <Row className={`${classes.topic_row} text-muted mx-3`} style={{paddingBottom: '0px'}}>
+                                {getTourDescriptionElement(currTour.description)}
+                                {/*<p className={'lead my-0'}>*/}
+                                {/*    {topic.description}*/}
+                                {/*</p>*/}
+                            </Row>
                             <div className={`${classes.topic_row} mx-2 mx-md-4`}>
 
                                 {

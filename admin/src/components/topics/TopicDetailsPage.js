@@ -872,7 +872,6 @@ const TopicDetailsPage = observer((props) => {
                                 }
                             }
 
-
                             return <TopicItemCard
                                 key={itemKey + redraw}
                                 index={index}
@@ -881,7 +880,8 @@ const TopicDetailsPage = observer((props) => {
                                 changeItemType={changeItemType}
                                 deleteDataItemByIndex={deleteDataItemByIndex}
                                 title={getDropDownTitleByType(item.type)}
-                                moveItemUp={index === 0 ? null : moveItemUp}
+                                moveItemUp={index === 1 ? null : moveItemUp}
+                                // moveItemUp={itemData[0] === item ? null : moveItemUp}
                                 moveItemDown={itemData[itemData.length - 1] === item ? null : moveItemDown}
                                 isMovedDownItem={movedDownItemIndex === index}
                             >

@@ -59,6 +59,8 @@ const MapPointsDetailsPage = observer((props) => {
     const [newImageLogo, setNewImageLogo] = useState(false)
     const [mapPointsItems_load, setMapPointsItems_load] = useState(true)
 
+    const [movedDownItemIndex, setMovedDownItemIndex] = useState(-1)
+
     const [tourTypesItems, setTourTypesItems] = useState([])
     const [tourTypes, setTourTypes] = useState([])
 
@@ -203,6 +205,54 @@ const MapPointsDetailsPage = observer((props) => {
         onItemEditHandler(currMapPoint.getAsJson())
     }
 
+    const moveItemUp = (index) => {
+        if (index !== null) {
+            if (index !== undefined) {
+                if (index > 0) {
+
+                    let newItemsArr = currMapPoint.dataJSON
+
+                    newItemsArr.splice(index - 1, 0, newItemsArr.splice(index, 1)[0])
+
+                    currMapPoint.data = JSON.stringify(newItemsArr)
+                    setItemData(newItemsArr)
+                    currMapPoint.isSaved = false
+                    onItemEditHandler(currMapPoint.getAsJson())
+
+                    setMovedDownItemIndex(index - 1)
+                    setTimeout(() => {
+                        setMovedDownItemIndex(-1)
+                    }, 800)
+
+                }
+            }
+        }
+    }
+
+    const moveItemDown = (index) => {
+        if (index !== null) {
+            if (index !== undefined) {
+                if (index < itemData.length - 1) {
+
+                    let newItemsArr = currMapPoint.dataJSON
+
+                    newItemsArr.splice(index, 0, newItemsArr.splice(index + 1, 1)[0])
+
+                    currMapPoint.data = JSON.stringify(newItemsArr)
+                    setItemData(newItemsArr)
+                    currMapPoint.isSaved = false
+                    onItemEditHandler(currMapPoint.getAsJson())
+
+                    setMovedDownItemIndex(index + 1)
+                    setTimeout(() => {
+                        setMovedDownItemIndex(-1)
+                    }, 800)
+                }
+            }
+        }
+
+    }
+
     const getDropDownTitleByType = (type) => {
         for (let i = 0; i < dropDownItems.length; i++) {
             if (dropDownItems[i].type === type) {
@@ -230,8 +280,10 @@ const MapPointsDetailsPage = observer((props) => {
     }
 
     const onDeleteHandler = () => {
+        /** Show 'YES' btn before delete **/
         setIsDeleting(true)
         setTimeout(() => {
+            /** Hide 'YES' btn after timing**/
             setIsDeleting(false)
         }, 3000)
     }
@@ -473,7 +525,6 @@ const MapPointsDetailsPage = observer((props) => {
                         <ToggleButton
                             id="toggle-active"
                             type="checkbox"
-                            // variant={setActiveError ? "outline-danger" : "outline-primary"}
                             variant={"outline-primary"}
                             checked={isActive}
                             value={'1'}
@@ -669,6 +720,9 @@ const MapPointsDetailsPage = observer((props) => {
                                     changeItemType={changeItemType}
                                     deleteDataItemByIndex={deleteDataItemByIndex}
                                     title={getDropDownTitleByType(item.type)}
+                                    moveItemUp={index === 1 ? null : moveItemUp}
+                                    moveItemDown={itemData[itemData.length - 1] === item ? null : moveItemDown}
+                                    isMovedDownItem={movedDownItemIndex === index}
                                 >
                                 </TopicItemCard>
                             }

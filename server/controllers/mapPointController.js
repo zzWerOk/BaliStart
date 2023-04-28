@@ -2,7 +2,6 @@ const {TableUpdates, MapPoint, User, Files} = require("../models/models");
 const ApiError = require("../error/ApiError");
 const {createNewFile, readFile, reWrightFile, removeFile} = require("../utils/consts");
 const path = require("path");
-const fs = require("fs");
 const {Op} = require("sequelize");
 
 class MapPointController {
@@ -119,7 +118,7 @@ class MapPointController {
                                 if (img) {
                                     if (process.platform === 'win32') {
                                         imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("\\") + 1, candidate.file_name.length);
-                                    }else{
+                                    } else {
                                         imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                                     }
 
@@ -388,12 +387,12 @@ class MapPointController {
 
                         return res.json({status: 'ok', data: resultItem})
                     }
-                }else {
+                } else {
                     return res.json({status: 'error', message: 'Object not found'})
                 }
             }
             return next(ApiError.internal("Ошибка чтения данных файла"))
-        }catch (e) {
+        } catch (e) {
             return next(ApiError.internal(e.message))
         }
     }
@@ -415,11 +414,10 @@ class MapPointController {
                     await TableUpdates.upsert({table_name: 'MapPoint', date: Date.now()})
                 } catch (e) {
                 }
-                const candidate = await MapPoint.findOne({where: {id}})
+                try {
+                    const candidate = await MapPoint.findOne({where: {id}})
 
-                if (candidate) {
-
-                    try {
+                    if (candidate) {
 
                         let imgFileName = candidate.file_name.substring(candidate.file_name.lastIndexOf("/") + 1, candidate.file_name.length);
                         if (process.platform === 'win32') {
@@ -427,18 +425,36 @@ class MapPointController {
                         }
 
                         const imgFilePath = path.resolve(__dirname, '..', "static", imgFileName)
-                        fs.unlinkSync(imgFilePath)
-                    } catch (e) {
-                    }
 
-                    const result = removeFile("data/" + candidate.file_name)
-                    if (result.hasOwnProperty('status')) {
-                        if (result.status === 'ok') {
-                            await Files.destroy({where: {table_name: 'MapPoint', file_name: candidate.file_name}})
-                            const count = await MapPoint.destroy({where: {id: id}})
-                            return res.json({status: "ok", message: `Удалено записей: ${count}`})
+                        try {
+                            await removeFile("data/" + candidate.file_name).then(async function (result) {
+                                return new Promise(async function (resolve) {
+                                    if (result.hasOwnProperty('status')) {
+                                        if (result.status === 'ok') {
+
+                                            removeFile(imgFilePath).then(() => {
+                                            })
+
+                                            await Files.destroy({
+                                                where: {
+                                                    table_name: 'MapPoint',
+                                                    file_name: candidate.file_name
+                                                }
+                                            })
+                                            const count = await MapPoint.destroy({where: {id: id}})
+                                            resolve({status: "ok", message: `Удалено записей: ${count}`})
+                                        }
+                                    }
+                                })
+                            }).then(async function (ress) {
+                                res.json(ress)
+                            })
+                        } catch (e) {
                         }
+
+                        return res
                     }
+                } catch (e) {
                 }
             }
         } catch (e) {

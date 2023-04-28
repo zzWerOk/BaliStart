@@ -22,15 +22,13 @@ const App = observer(() => {
 
     useMemo(() => {
 
-        console.log('')
-        console.log('')
-        console.log('process.env.REACT_APP_WS_URL %s', process.env.REACT_APP_WS_URL)
-        console.log('process.env.REACT_APP_API_URL %s', process.env.REACT_APP_API_URL)
-        console.log('!!!!!!!!!!!!!')
-        console.log('')
-        console.log('')
-
-
+        // console.log('')
+        // console.log('')
+        // console.log('process.env.REACT_APP_WS_URL %s', process.env.REACT_APP_WS_URL)
+        // console.log('process.env.REACT_APP_API_URL %s', process.env.REACT_APP_API_URL)
+        // console.log('!!!!!!!!!!!!!')
+        // console.log('')
+        // console.log('')
 
         if (ws === null) {
             // ws = new WebSocket('ws://localhost:3050?token=' + localStorage.getItem('token'))

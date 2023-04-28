@@ -189,6 +189,23 @@ const TopicDetails = (props) => {
         }
     }
 
+    const getTopicDescriptionElement = (shortDescriptionText) => {
+        let descriptionText = shortDescriptionText
+        topicData.map(function (item) {
+            {
+                if (item.hasOwnProperty('description')) {
+                    descriptionText = item.description
+                }
+            }
+        })
+
+        return (
+            <p className={'lead my-0'}>
+                {descriptionText}
+            </p>
+        )
+    }
+
     const getTopicDetailsElement = (element, index) => {
         try {
             if (element.hasOwnProperty('type')) {
@@ -213,7 +230,7 @@ const TopicDetails = (props) => {
                         return <TopicDetailLineComponent key={index} element={element}/>
                 }
             }
-        }catch (e) {
+        } catch (e) {
 
         }
     }
@@ -324,7 +341,7 @@ const TopicDetails = (props) => {
                                 <div className={'d-flex justify-content-between'}>
                                     <small>
                                         {/*{topic.userName}*/}
-                                        {<BaliUserNameBtn userName={topic.userName} userId={topic.userId} />}
+                                        {<BaliUserNameBtn userName={topic.userName} userId={topic.userId}/>}
                                     </small>
                                     <small>
                                         {epochToDateWithTime(topic.created_date)}
@@ -352,25 +369,40 @@ const TopicDetails = (props) => {
                                 </div>
                             </Row>
                             <div
+
+                                // style={{
+                                //     backgroundSize: 'cover',
+                                //     backgroundRepeat: 'no-repeat',
+                                //     backgroundPosition: 'center',
+                                //     backgroundImage: `url(${topicImage})`,
+                                //     minHeight: '250px'
+                                // }}
                                 style={{
+                                    background: `linear-gradient(rgba(0, 0, 0, 0.5),rgba(0, 0, 0, 0.5)), url(${topicImage})`,
                                     backgroundSize: 'cover',
                                     backgroundRepeat: 'no-repeat',
                                     backgroundPosition: 'center',
-                                    backgroundImage: `url(${topicImage})`,
-                                    height: '250px'
-                                }}>
+                                    minHeight: '250px',
+                                }}
+                            >
 
                                 <Row className={`${classes.topic_row} text-muted mx-3`} style={{paddingTop: '20px'}}>
                                     <h1 className={'display-4 font-italic'} style={{color: `white`,}}>
                                         {topic.name}
                                     </h1>
                                 </Row>
-                                <Row className={`${classes.topic_row} text-muted mx-3`} style={{paddingBottom: '20px'}}>
-                                    <p className={'lead my-3'} style={{color: `white`,}}>
-                                        {topic.description}
-                                    </p>
-                                </Row>
+                                {/*<Row className={`${classes.topic_row} text-muted mx-3`} style={{paddingBottom: '20px'}}>*/}
+                                {/*    <p className={'lead my-3'} style={{color: `white`,}}>*/}
+                                {/*        {topic.description}*/}
+                                {/*    </p>*/}
+                                {/*</Row>*/}
                             </div>
+                            <Row className={`${classes.topic_row} text-muted mx-3`} style={{paddingBottom: '0px'}}>
+                                {getTopicDescriptionElement(topic.description)}
+                                {/*<p className={'lead my-0'}>*/}
+                                {/*    {topic.description}*/}
+                                {/*</p>*/}
+                            </Row>
                             <div className={`${classes.topic_row} mx-2 mx-md-4`}>
                                 {
                                     topicData.map(function (item, index) {

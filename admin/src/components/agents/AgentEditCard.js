@@ -63,9 +63,6 @@ const AgentEditCard = (props) => {
         getById(tourGuideClicked).then((data) => {
             if (data.hasOwnProperty('status')) {
                 if (data.status === 'ok') {
-
-                    console.log(data)
-
                     setAgentData(data.data)
                 }
             }

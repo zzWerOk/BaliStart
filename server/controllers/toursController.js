@@ -2,7 +2,6 @@ const {TableUpdates, User, Tours, Files, Guide} = require("../models/models");
 const {Op} = require("sequelize");
 const ApiError = require("../error/ApiError");
 const path = require("path");
-const fs = require("fs");
 const {
     removeFile,
     createNewFile,
@@ -723,13 +722,8 @@ class ToursController {
                                     removeFile('static/' + imgFileName + '_orig').then(() => {
                                     })
 
-                                    // fs.unlinkSync(imgFilePath)
-                                    // fs.unlinkSync(imgFilePath + '_s')
-                                    // fs.unlinkSync(imgFilePath + '_th')
-                                    // fs.unlinkSync(imgFilePath + '_orig')
                                 } catch (e) {
                                 }
-
 
                                 if (result.status === 'ok') {
                                     await Files.destroy({where: {table_name: 'Tours', file_name: candidate.file_name}})
