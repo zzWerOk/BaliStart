@@ -98,23 +98,25 @@ const NavBar = observer(() => {
 
     const getNewChatUsers = () => {
 
-        getChatUsers().then(async data => {
-            if (data?.status === 'ok' && data?.data) {
-                let isHasUnseen = false
-                for (let i = 0; i < data.data.length; i++) {
-                    const currChatUser = data.data[i]
-                    if (!currChatUser.read) {
-                        isHasUnseen = true
-                        break
+        if(user?.isAuth) {
+            getChatUsers().then(async data => {
+                if (data?.status === 'ok' && data?.data) {
+                    let isHasUnseen = false
+                    for (let i = 0; i < data.data.length; i++) {
+                        const currChatUser = data.data[i]
+                        if (!currChatUser.read) {
+                            isHasUnseen = true
+                            break
+                        }
                     }
+                    setHasUnseen(isHasUnseen)
                 }
-                setHasUnseen(isHasUnseen)
-            }
-        }).catch((e) => {
-            console.log(e)
-        }).finally(() => {
-        })
-
+            }).catch((e) => {
+                console.log(e)
+            }).finally(() => {
+            })
+        }
+        
     }
 
     return (

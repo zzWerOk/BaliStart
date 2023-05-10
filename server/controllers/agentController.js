@@ -1,7 +1,7 @@
 const {TableUpdates, User, Agent} = require("../models/models");
 const ApiError = require("../error/ApiError");
-const {readFile, createNewFile} = require("../utils/consts");
-const path = require("path");
+const {readFile, createNewFile, saveUserAvatarWithThumb} = require("../utils/consts");
+// const path = require("path");
 
 class AgentController {
 
@@ -156,13 +156,16 @@ class AgentController {
 
                         } else {
                             if (img) {
-                                if (process.platform === 'win32') {
-                                    imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
-                                }else{
-                                    imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
-                                }
+                                // if (process.platform === 'win32') {
+                                //     imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
+                                // }else{
+                                //     imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
+                                // }
+                                //
+                                // await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
 
-                                await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                                await saveUserAvatarWithThumb(img, imgFileName, candidate)
+
                             }
 
                         }
@@ -268,21 +271,6 @@ class AgentController {
                         email: userEmail,
                     })
 
-                    // user_id: {type: DataTypes.INTEGER, allowNull: false},
-                    // avatar_img: {type: DataTypes.STRING},
-                    // name: {type: DataTypes.STRING},
-                    // about: {type: DataTypes.STRING},
-                    // active_till: {type: DataTypes.BIGINT, defaultValue:0 ,allowNull: false},
-                    // visible_till: {type: DataTypes.BIGINT, defaultValue:0 ,allowNull: false},
-                    // phones: {type: DataTypes.STRING},
-                    // links: {type: DataTypes.STRING},
-                    // email: {type: DataTypes.STRING},
-                    // languages: {type: DataTypes.STRING, allowNull: false},
-
-
-                    // } catch (e) {
-                    //     return res.json({status: 'error1', message: e.message})
-                    // }
                 }
 
                 if (candidate) {
@@ -311,13 +299,16 @@ class AgentController {
 
                         } else {
                             if (img) {
-                                if (process.platform === 'win32') {
-                                    imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
-                                }else{
-                                    imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
-                                }
+                                // if (process.platform === 'win32') {
+                                //     imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
+                                // }else{
+                                //     imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
+                                // }
+                                //
+                                // await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
 
-                                await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                                await saveUserAvatarWithThumb(img, imgFileName, candidate)
+
                             }
 
                         }
@@ -481,7 +472,7 @@ class AgentController {
         // return res.json({status: 'error'})
     }
 
-    async deleteAgent(req, res) {
+    async deleteAgent() {
         try {
             /**
              Обновление таблиц

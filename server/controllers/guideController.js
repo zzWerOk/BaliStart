@@ -1,7 +1,7 @@
 const {TableUpdates, Guide, User} = require("../models/models");
 const ApiError = require("../error/ApiError");
-const {readFile, createNewFile} = require("../utils/consts");
-const path = require("path");
+const {readFile, createNewFile, saveUserAvatarWithThumb} = require("../utils/consts");
+// const path = require("path");
 
 class GuideController {
 
@@ -74,7 +74,7 @@ class GuideController {
             return res.json({status: 'error', message: e.message})
         }
 
-    }
+    }//create
 
     async change(req, res) {
         try {
@@ -183,13 +183,16 @@ class GuideController {
 
                             } else {
                                 if (img) {
-                                    if (process.platform === 'win32') {
-                                        imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
-                                    }else{
-                                        imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
-                                    }
+                                    // if (process.platform === 'win32') {
+                                    //     imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
+                                    // }else{
+                                    //     imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
+                                    // }
+                                    //
+                                    // await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
 
-                                    await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                                    await saveUserAvatarWithThumb(img, imgFileName, candidate)
+
                                 }
 
                             }
@@ -232,7 +235,7 @@ class GuideController {
         } catch (e) {
         }
 
-    }
+    }//change
 
     async changeAdmin(req, res) {
         try {
@@ -336,13 +339,26 @@ class GuideController {
 
                         } else {
                             if (img) {
-                                if (process.platform === 'win32') {
-                                    imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
-                                }else{
-                                    imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
-                                }
 
-                                await img.mv(path.resolve(__dirname, '..', "static", imgFileName))
+                                await saveUserAvatarWithThumb(img, imgFileName, candidate)
+
+                                // if (process.platform === 'win32') {
+                                //     imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
+                                // } else {
+                                //     imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
+                                // }
+                                //
+                                // await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
+                                //
+                                //     removeFile('static/' + imgFileName)
+                                //     removeFile('static/' + imgFileName + '_s')
+                                //     removeFile('static/' + imgFileName + '_th')
+                                //
+                                //     resizeUserAvatarWithThumb('static/' + imgFileName)
+                                // })
+                                //
+                                // await sleep(200)
+
                             }
 
                         }
@@ -376,20 +392,6 @@ class GuideController {
                         guideDataJson.editable = true
                     }
 
-                    // about
-                    // active_till
-                    // avatar_img
-                    // createdAt
-                    // experience
-                    // id
-                    // languages
-                    // name
-                    // phones
-                    // religion
-                    // updatedAt
-                    // user_id
-                    // visible_till
-
                     if (guideDataJson.links === null || guideDataJson.links === undefined || guideDataJson.links === '') {
                         guideDataJson.links = '[]'
                     }
@@ -416,7 +418,7 @@ class GuideController {
         } catch (e) {
             return res.json({status: 'error', message: e.message})
         }
-    }
+    }//changeAdmin
 
     async getAll(req, res) {
 
@@ -579,7 +581,7 @@ class GuideController {
         // return res.json({status: 'error'})
     }
 
-    async deleteGuide(req, res) {
+    async deleteGuide() {
         try {
             /**
              Обновление таблиц

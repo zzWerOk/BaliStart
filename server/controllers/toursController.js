@@ -12,6 +12,7 @@ const {
     resizeImageWithThumb,
     sleep
 } = require("../utils/consts");
+const fs = require("fs");
 
 const saveTourImageFile = (dataText, newImagesArr, tourId) => {
     let dataText_json = JSON.parse(dataText)
@@ -614,7 +615,6 @@ class ToursController {
                                 guideDataJson.religion = currGuide.religion
                                 guideDataJson.avatar_img = currGuide.avatar_img
                                 guideDataJson.email = currGuide.email
-                                // guideDataJson.user_id = currGuide.user_id
 
                                 if (!guideDataJson.email || guideDataJson.email === '') {
                                     guideDataJson.email = currUser.email
@@ -624,25 +624,13 @@ class ToursController {
                                     guideDataJson.name = currUser.name
                                 }
 
-                                if (!guideDataJson.avatar_img || guideDataJson.avatar_img === '') {
+                                if (!fs.existsSync('static/' + guideDataJson.avatar_img + '_s')) {
                                     guideDataJson.avatar_img = currUser.avatar_img
                                 }
 
-                                // delete guideDataJson.createdAt
-                                // delete guideDataJson.updatedAt
-                                // delete guideDataJson.visible_till
-                                // delete guideDataJson.active_till
-                                // delete guideDataJson.editable
-                                // delete guideDataJson.user_id
-                                // // delete guideDataJson.email
-                                // delete guideDataJson.emergency_help_price
-                                // delete guideDataJson.holidays
-                                // delete guideDataJson.is_can_discount
-                                // delete guideDataJson.is_emergency_help
-                                // delete guideDataJson.is_has_car
-                                // delete guideDataJson.tours_ids
-                                // delete guideDataJson.userId
-
+                                // if (!guideDataJson.avatar_img || guideDataJson.avatar_img === '') {
+                                //     guideDataJson.avatar_img = currUser.avatar_img
+                                // }
 
                                 selectedGuides.push(guideDataJson)
                             }

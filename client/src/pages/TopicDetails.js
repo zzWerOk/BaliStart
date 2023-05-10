@@ -104,11 +104,13 @@ const TopicDetails = (props) => {
                         } catch (e) {
                         }
 
-                        setTopicSeen(topicIDUrl).then(
-                        ).catch((e) => {
-                            console.log(e)
-                        }).finally(() => {
-                        })
+                        if(user?.isAuth) {
+                            setTopicSeen(topicIDUrl).then(
+                            ).catch((e) => {
+                                console.log(e)
+                            }).finally(() => {
+                            })
+                        }
 
                     } else if (dataJson.hasOwnProperty('message')) {
                         if (dataJson.message === 'topic not found') {

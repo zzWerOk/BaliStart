@@ -24,7 +24,7 @@ const MapPointAgentComponent = (props) => {
     }
 
     const handleAgentId = (value) => {
-        item.topicId = value
+        item.userId = value
         dataItemEditHandler(item)
     }
 

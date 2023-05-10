@@ -202,7 +202,7 @@ addNewFileNameToTable = async function (tableName, fileName, next, md5 = '') {
 async function resizeImageWithThumb(filePath) {
     try {
         sharp.cache(false);
-        return new Promise(async r => {
+        return new Promise(async () => {
 
             return resizeImage(500, filePath + '_orig', filePath, () => {
                     resizeImage(250, filePath + '_orig', filePath + '_s', () => {
@@ -216,30 +216,6 @@ async function resizeImageWithThumb(filePath) {
             )
         })
 
-        // let isOk = sharp(filePath + '_orig')
-        //     .resize({height: 500})
-        //     .toFile(filePath, (err) => {
-        //         if (err) throw err;
-        //         // console.log(info);
-        //
-        //         isOk = sharp(filePath + '_orig')
-        //             .resize({height: 250})
-        //             .toFile(filePath + '_s', (err) => {
-        //                 if (err) throw err;
-        //                 // console.log(info);
-        //
-        //                 isOk = sharp(filePath + '_orig')
-        //                     .resize({height: 100})
-        //                     .toFile(filePath + '_th', (err) => {
-        //                         if (err) throw err;
-        //
-        //                         removeFile(filePath + '_orig')
-        //
-        //                     });
-        //             });
-        //     });
-        //
-        // return isOk
     } catch (e) {
 
     }
@@ -247,7 +223,7 @@ async function resizeImageWithThumb(filePath) {
 }
 
 async function resizeImage(height, filePath_read, filePath_save, onFinishFunc) {
-    return new Promise(async r => {
+    return new Promise(async () => {
 
         return await sharp(filePath_read)
             .resize({height: height})
@@ -265,11 +241,10 @@ async function resizeImage(height, filePath_read, filePath_save, onFinishFunc) {
 }
 
 async function resizeUserAvatarWithThumb(filePath) {
-// resizeUserAvatarWithThumb = async function (filePath) {
     sharp.cache(false);
 
     try {
-        return new Promise(async r => {
+        return new Promise(async () => {
 
             return await resizeImage(250, filePath + '_orig', filePath, async () => {
                 await resizeImage(150, filePath + '_orig', filePath + '_s', async () => {
@@ -284,6 +259,28 @@ async function resizeUserAvatarWithThumb(filePath) {
 
     }
     return null
+}
+
+async function saveUserAvatarWithThumb(img, imgFileName, candidate) {
+
+    if (process.platform === 'win32') {
+        imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("\\") + 1, candidate.avatar_img.length);
+    } else {
+        imgFileName = candidate.avatar_img.substring(candidate.avatar_img.lastIndexOf("/") + 1, candidate.avatar_img.length);
+    }
+
+    await img.mv(path.resolve(__dirname, '..', "static", imgFileName + '_orig')).then(() => {
+
+        removeFile('static/' + imgFileName)
+        removeFile('static/' + imgFileName + '_s')
+        removeFile('static/' + imgFileName + '_th')
+
+        resizeUserAvatarWithThumb('static/' + imgFileName)
+    })
+
+    await sleep(200)
+
+
 }
 
 function sleep(ms) {
@@ -301,5 +298,6 @@ module.exports = {
     resizeImageWithThumb,
     resizeUserAvatarWithThumb,
     sleep,
+    saveUserAvatarWithThumb,
 }
 
